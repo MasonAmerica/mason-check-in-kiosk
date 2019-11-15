@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "153912363552",
+    "firebase_url": "https://mason-check-in-kiosk.firebaseio.com",
+    "project_id": "mason-check-in-kiosk",
+    "storage_bucket": "mason-check-in-kiosk.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153912363552:android:523eb2602c7b62d6120a45",
+        "android_client_info": {
+          "package_name": "com.bymason.kiosk.checkin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153912363552-4u3ulvjqjt9fbie45gm13dv5s4knfusu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKvUvTdh3qq4NgyShRl_tj10gut7UOJDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153912363552-4u3ulvjqjt9fbie45gm13dv5s4knfusu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153912363552:android:908a8d43613b6816120a45",
+        "android_client_info": {
+          "package_name": "com.bymason.kiosk.checkin.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153912363552-4u3ulvjqjt9fbie45gm13dv5s4knfusu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKvUvTdh3qq4NgyShRl_tj10gut7UOJDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153912363552-4u3ulvjqjt9fbie45gm13dv5s4knfusu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
