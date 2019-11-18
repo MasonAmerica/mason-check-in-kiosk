@@ -108,9 +108,9 @@ dependencies {
     implementation(Config.Libs.Misc.retrofit)
     implementation(Config.Libs.Misc.retrofitGson)
     implementation(Config.Libs.Misc.gson)
+    implementation(Config.Libs.Misc.glide)
 
     implementation(Config.Libs.Misc.permissions)
-    implementation(Config.Libs.Misc.gandroid)
     implementation(Config.Libs.Misc.gauth)
     implementation(Config.Libs.Misc.gsuiteSdk)
 }

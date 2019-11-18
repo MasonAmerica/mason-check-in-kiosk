@@ -36,7 +36,7 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-alpha02"
+        const val android = "com.android.tools.build:gradle:4.0.0-alpha03"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val mason = "com.bymason.build:mason-apps:1.0.2"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
@@ -95,9 +95,9 @@ object Config {
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
             const val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
             const val gson = "com.google.code.gson:gson:2.8.6"
+            const val glide = "com.github.bumptech.glide:glide:4.10.0"
 
             const val permissions = "pub.devrel:easypermissions:3.0.0"
-            const val gandroid = "com.google.http-client:google-http-client-android:1.33.0"
             const val gauth = "com.google.auth:google-auth-library-oauth2-http:0.18.0"
             const val gsuiteSdk =
                     "com.google.apis:google-api-services-admin-directory:directory_v1-rev20190806-1.30.3"
