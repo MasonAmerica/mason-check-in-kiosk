@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -57,6 +58,10 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
     }
@@ -113,6 +118,30 @@ dependencies {
     implementation(Config.Libs.Misc.permissions)
     implementation(Config.Libs.Misc.gauth)
     implementation(Config.Libs.Misc.gsuiteSdk)
+
+    testImplementation(Config.Libs.Testing.junit)
+    testImplementation(Config.Libs.Testing.truth)
+    testImplementation(Config.Libs.Testing.espresso)
+    testImplementation(Config.Libs.Testing.core)
+    testImplementation(Config.Libs.Testing.arch)
+    debugImplementation(Config.Libs.Testing.fragment)
+    testImplementation(Config.Libs.Testing.robolectric)
+    testImplementation(Config.Libs.Testing.mockito)
+    testImplementation(Config.Libs.Testing.coroutines)
+}
+
+tasks.matching {
+    it.name.contains("ReleaseUnitTest")
+}.configureEach {
+    enabled = false
+}
+
+tasks.withType<KotlinCompile>().matching {
+    it.name.contains("UnitTest")
+}.configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xno-call-assertions"
+    }
 }
 
 apply(plugin = "com.google.gms.google-services")

@@ -4,7 +4,7 @@ import org.gradle.kotlin.dsl.version
 import org.gradle.plugin.use.PluginDependenciesSpec
 
 object Config {
-    private const val kotlinVersion = "1.3.50"
+    private const val kotlinVersion = "1.3.60"
     private const val navVersion = "2.2.0-rc02"
 
     fun RepositoryHandler.deps() {
@@ -50,12 +50,10 @@ object Config {
 
     object Libs {
         object Kotlin {
-            private const val coroutinesVersion = "1.3.2"
             private const val ankoVersion = "0.10.8"
 
             const val jvm = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-            const val coroutinesAndroid =
-                    "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+            const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
 
             const val common = "org.jetbrains.anko:anko-common:$ankoVersion"
             const val appCompat = "org.jetbrains.anko:anko-appcompat-v7-commons:$ankoVersion"
@@ -91,7 +89,7 @@ object Config {
         object Misc {
             private const val retrofitVersion = "2.6.2"
 
-            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.0-beta-3"
+            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.0-beta-4"
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
             const val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
             const val gson = "com.google.code.gson:gson:2.8.6"
@@ -101,6 +99,18 @@ object Config {
             const val gauth = "com.google.auth:google-auth-library-oauth2-http:0.18.0"
             const val gsuiteSdk =
                     "com.google.apis:google-api-services-admin-directory:directory_v1-rev20190806-1.30.3"
+        }
+
+        object Testing {
+            const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha02"
+            const val truth = "androidx.test.ext:truth:1.3.0-alpha02"
+            const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha02"
+            const val core = "androidx.test:core-ktx:1.2.1-alpha02"
+            const val arch = "androidx.arch.core:core-testing:2.1.0"
+            const val fragment = "androidx.fragment:fragment-testing:1.2.0-rc02"
+            const val robolectric = "org.robolectric:robolectric:4.3.1"
+            const val mockito = "org.mockito:mockito-core:3.1.0"
+            const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2"
         }
     }
 }

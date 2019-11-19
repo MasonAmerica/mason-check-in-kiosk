@@ -21,11 +21,6 @@ class HomeActivity : ActivityBase() {
         setupActionBarWithNavController(controller, configuration)
     }
 
-    override fun onSupportNavigateUp() = if (controller.currentDestination?.id == R.id.nda) {
-        // popUpTo doesn't seem to work so manually force us back to the start.
-        controller.navigate(NavGraphDirections.reset())
-        true
-    } else {
-        controller.navigateUp(configuration) || super.onSupportNavigateUp()
-    }
+    override fun onSupportNavigateUp() =
+            controller.navigateUp(configuration) || super.onSupportNavigateUp()
 }

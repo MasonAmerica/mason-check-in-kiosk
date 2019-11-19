@@ -1,11 +1,12 @@
 package com.bymason.kiosk.checkin.feature.identity
 
 import android.os.Bundle
-import android.util.Patterns
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.doOnImeDone
@@ -13,6 +14,7 @@ import com.bymason.kiosk.checkin.core.ui.showKeyboard
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
 
 class IdentityFragment : FragmentBase(R.layout.identity_fragment), View.OnFocusChangeListener {
+    private val vm by viewModels<IdentityViewModel>()
     private val binding by LifecycleAwareLazy { IdentityFragmentBinding.bind(requireView()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,21 +48,17 @@ class IdentityFragment : FragmentBase(R.layout.identity_fragment), View.OnFocusC
     }
 
     private fun updateFormValidityStatus() {
-        binding.next.isEnabled = isNameValid() && isEmailValid()
+        binding.next.isEnabled =
+                vm.isNameValid(extractName()) &&
+                        vm.isEmailValid(extractEmail())
     }
 
-    private fun isNameValid(): Boolean {
-        val name = binding.name.text?.toString()
-        return !name.isNullOrEmpty()
-    }
+    private fun extractName() = binding.name.text?.toString()
 
-    private fun isEmailValid(): Boolean {
-        val email = binding.email.text?.toString()
-        return Patterns.EMAIL_ADDRESS.matcher(email.orEmpty()).matches()
-    }
+    private fun extractEmail() = binding.email.text?.toString()
 
     private fun validateName() {
-        binding.nameLayout.error = if (isNameValid()) {
+        binding.nameLayout.error = if (vm.isNameValid(extractName())) {
             null
         } else {
             getString(R.string.kiosk_checkin_identity_name_invalid_error)
@@ -68,7 +66,7 @@ class IdentityFragment : FragmentBase(R.layout.identity_fragment), View.OnFocusC
     }
 
     private fun validateEmail() {
-        binding.emailLayout.error = if (isEmailValid()) {
+        binding.emailLayout.error = if (vm.isEmailValid(extractEmail())) {
             null
         } else {
             getString(R.string.kiosk_checkin_identity_email_invalid_error)
@@ -77,10 +75,8 @@ class IdentityFragment : FragmentBase(R.layout.identity_fragment), View.OnFocusC
 
     private fun next() {
         if (binding.next.isEnabled) {
-            findNavController().navigate(IdentityFragmentDirections.next(
-                    binding.name.text.toString(),
-                    binding.email.text.toString()
-            ))
+            findNavController().navigate(IdentityFragmentDirections.next(Guest(
+                    extractName()!!, extractEmail()!!)))
         }
     }
 }
