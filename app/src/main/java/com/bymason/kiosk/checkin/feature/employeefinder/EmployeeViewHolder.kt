@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -8,12 +8,12 @@ import com.bumptech.glide.Glide
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.model.Employee
 import com.bymason.kiosk.checkin.core.model.Guest
-import com.bymason.kiosk.checkin.databinding.MasoniteFinderFragmentItemBinding
+import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentItemBinding
 
 class EmployeeViewHolder(
         private val fragment: Fragment,
         private val guest: Guest,
-        private val binding: MasoniteFinderFragmentItemBinding
+        private val binding: EmployeeFinderFragmentItemBinding
 ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
     private lateinit var employee: Employee
 
@@ -33,6 +33,6 @@ class EmployeeViewHolder(
     }
 
     override fun onClick(v: View) {
-        v.findNavController().navigate(MasoniteFinderFragmentDirections.next(guest, employee))
+        v.findNavController().navigate(EmployeeFinderFragmentDirections.next(guest, employee))
     }
 }

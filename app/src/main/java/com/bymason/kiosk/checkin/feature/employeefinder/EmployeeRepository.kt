@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.MasonKiosk

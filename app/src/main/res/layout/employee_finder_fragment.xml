@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/spacing_large"
-        android:hint="@string/kiosk_checkin_masonite_finder_search_hint">
+        android:hint="@string/kiosk_checkin_employee_finder_search_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search"
@@ -27,7 +27,7 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/masonites"
+            android:id="@+id/employees"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/spacing_normal"
@@ -35,7 +35,7 @@
             android:paddingBottom="@dimen/spacing_large"
             android:scrollbarStyle="outsideOverlay"
             app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/masonite_finder_fragment_item" />
+            tools:listitem="@layout/employee_finder_fragment_item" />
 
         <TextView
             android:id="@+id/noEmployeesHint"
@@ -44,7 +44,7 @@
             android:layout_gravity="center"
             android:drawableTop="@drawable/ic_people_96dp"
             android:gravity="center"
-            android:text="@string/kiosk_checkin_masonite_finder_no_employees_message" />
+            android:text="@string/kiosk_checkin_employee_finder_no_employees_message" />
 
     </FrameLayout>
 

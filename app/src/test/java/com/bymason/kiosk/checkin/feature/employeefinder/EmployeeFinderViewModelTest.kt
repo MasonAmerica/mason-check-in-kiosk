@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.bymason.kiosk.checkin.core.model.Employee
@@ -13,21 +13,21 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
-class MasoniteFinderViewModelTest {
+class EmployeeFinderViewModelTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
     @get:Rule
     val dispatcherRule = TestCoroutineDispatcherRule()
 
     private val mockEmployeeRepository = mock(EmployeeRepository::class.java)
-    private val vm = MasoniteFinderViewModel(mockEmployeeRepository)
+    private val vm = EmployeeFinderViewModel(mockEmployeeRepository)
 
     @Test
     fun `Searching for null name noops with empty employees`() = dispatcherRule.runBlocking {
         vm.find(null)
 
         verify(mockEmployeeRepository, never()).find(any())
-        assertThat(vm.masonites.value).isEmpty()
+        assertThat(vm.employees.value).isEmpty()
     }
 
     @Test
@@ -35,7 +35,7 @@ class MasoniteFinderViewModelTest {
         vm.find(" ")
 
         verify(mockEmployeeRepository, never()).find(any())
-        assertThat(vm.masonites.value).isEmpty()
+        assertThat(vm.employees.value).isEmpty()
     }
 
     @Test
@@ -45,7 +45,7 @@ class MasoniteFinderViewModelTest {
 
         vm.find("Mr")
 
-        assertThat(vm.masonites.value).containsExactly(employee)
+        assertThat(vm.employees.value).containsExactly(employee)
     }
 
     @Test
@@ -54,7 +54,7 @@ class MasoniteFinderViewModelTest {
         val employee2 = Employee("id2", "Mr Robot", "email", null)
         val result1 = CompletableDeferred<List<Employee>>()
         val result2 = CompletableDeferred<List<Employee>>()
-        val vm = MasoniteFinderViewModel(object : EmployeeRepository {
+        val vm = EmployeeFinderViewModel(object : EmployeeRepository {
             override suspend fun find(name: String) = when (name) {
                 "1" -> result1
                 "2" -> result2
@@ -63,13 +63,13 @@ class MasoniteFinderViewModelTest {
         })
 
         vm.find("1")
-        assertThat(vm.masonites.value).isNull()
+        assertThat(vm.employees.value).isNull()
 
         vm.find("2")
         result2.complete(listOf(employee2))
-        assertThat(vm.masonites.value).containsExactly(employee2)
+        assertThat(vm.employees.value).containsExactly(employee2)
 
         result1.complete(listOf(employee1))
-        assertThat(vm.masonites.value).containsExactly(employee2)
+        assertThat(vm.employees.value).containsExactly(employee2)
     }
 }

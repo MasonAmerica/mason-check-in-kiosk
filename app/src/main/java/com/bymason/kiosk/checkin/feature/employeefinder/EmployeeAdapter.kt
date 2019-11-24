@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.bymason.kiosk.checkin.core.model.Employee
 import com.bymason.kiosk.checkin.core.model.Guest
-import com.bymason.kiosk.checkin.databinding.MasoniteFinderFragmentItemBinding
+import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentItemBinding
 
 class EmployeeAdapter(
         private val fragment: Fragment,
@@ -17,7 +17,7 @@ class EmployeeAdapter(
         return EmployeeViewHolder(
                 fragment,
                 guest,
-                MasoniteFinderFragmentItemBinding.inflate(
+                EmployeeFinderFragmentItemBinding.inflate(
                         LayoutInflater.from(parent.context), parent, false)
         )
     }

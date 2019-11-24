@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,30 +11,30 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-class MasoniteFinderViewModel(
+class EmployeeFinderViewModel(
         private val repository: EmployeeRepository
 ) : ViewModel() {
-    private val _masonites = MutableLiveData<List<Employee>>()
-    val masonites: LiveData<List<Employee>> get() = _masonites
+    private val _employees = MutableLiveData<List<Employee>>()
+    val employees: LiveData<List<Employee>> get() = _employees
 
     private var previousSearch: Job? = null
 
-    fun find(masonite: String?) {
+    fun find(employee: String?) {
         previousSearch?.cancel("New search came in")
-        if (masonite.isNullOrBlank()) {
-            _masonites.postValue(emptyList())
+        if (employee.isNullOrBlank()) {
+            _employees.postValue(emptyList())
             return
         }
 
         previousSearch = viewModelScope.launch {
             val employees = try {
-                repository.find(masonite)
+                repository.find(employee)
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to fetch list of employees", t)
                 return@launch
             }
 
-            _masonites.postValue(employees)
+            _employees.postValue(employees)
         }
     }
 
@@ -42,10 +42,10 @@ class MasoniteFinderViewModel(
             private val repository: EmployeeRepository
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            check(modelClass === MasoniteFinderViewModel::class.java)
+            check(modelClass === EmployeeFinderViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return MasoniteFinderViewModel(repository) as T
+            return EmployeeFinderViewModel(repository) as T
         }
     }
 }

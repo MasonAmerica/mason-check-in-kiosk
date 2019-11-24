@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import androidx.core.view.isVisible
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -14,7 +14,7 @@ import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.model.Employee
 import com.bymason.kiosk.checkin.core.model.Guest
-import com.bymason.kiosk.checkin.databinding.MasoniteFinderFragmentBinding
+import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentBinding
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -25,18 +25,18 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
-class MasoniteFinderFragmentTest {
+class EmployeeFinderFragmentTest {
     private val mockEmployeeRepository = mock(EmployeeRepository::class.java)
 
     @Test
     fun `No employees found hint is visible on launch`() {
-        val scenario = launchFragmentInContainer<MasoniteFinderFragment>(
-                MasoniteFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
+        val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
+                EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
-            val binding = MasoniteFinderFragmentBinding.bind(fragment.requireView())
+            val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
 
             assertThat(binding.noEmployeesHint.isVisible).isTrue()
         }
@@ -44,13 +44,13 @@ class MasoniteFinderFragmentTest {
 
     @Test
     fun `Searching for employee displays results`() {
-        val scenario = launchFragmentInContainer<MasoniteFinderFragment>(
-                MasoniteFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
+        val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
+                EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
-            val binding = MasoniteFinderFragmentBinding.bind(fragment.requireView())
+            val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(
                         Employee("id", "Mr Robot", "email", null)))
@@ -58,20 +58,20 @@ class MasoniteFinderFragmentTest {
 
             binding.search.setText("Person")
 
-            assertThat(binding.masonites.adapter!!.itemCount).isEqualTo(1)
+            assertThat(binding.employees.adapter!!.itemCount).isEqualTo(1)
             onView(withId(R.id.name)).check(matches(withText("Mr Robot")))
         }
     }
 
     @Test
     fun `No employees found hint is hidden with employee results`() {
-        val scenario = launchFragmentInContainer<MasoniteFinderFragment>(
-                MasoniteFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
+        val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
+                EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
-            val binding = MasoniteFinderFragmentBinding.bind(fragment.requireView())
+            val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(
                         Employee("id", "name", "email", null)))
@@ -85,13 +85,13 @@ class MasoniteFinderFragmentTest {
 
     @Test
     fun `No employees found hint is visible with empty employee results`() {
-        val scenario = launchFragmentInContainer<MasoniteFinderFragment>(
-                MasoniteFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
+        val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
+                EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
-            val binding = MasoniteFinderFragmentBinding.bind(fragment.requireView())
+            val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(emptyList())
             }
@@ -107,15 +107,15 @@ class MasoniteFinderFragmentTest {
         val guest = Guest("Name", "foobar@example.com")
         val employee = Employee("id", "name", "email", null)
         val mockNavController = mock(NavController::class.java)
-        val scenario = launchFragmentInContainer<MasoniteFinderFragment>(
-                MasoniteFinderFragmentArgs(guest).toBundle(),
+        val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
+                EmployeeFinderFragmentArgs(guest).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
 
-            val binding = MasoniteFinderFragmentBinding.bind(fragment.requireView())
+            val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(employee))
             }
@@ -124,6 +124,6 @@ class MasoniteFinderFragmentTest {
 
         onView(withId(R.id.name)).perform(click())
 
-        verify(mockNavController).navigate(MasoniteFinderFragmentDirections.next(guest, employee))
+        verify(mockNavController).navigate(EmployeeFinderFragmentDirections.next(guest, employee))
     }
 }

@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.masonitefinder
+package com.bymason.kiosk.checkin.feature.employeefinder
 
 import android.os.Bundle
 import android.view.View
@@ -10,17 +10,17 @@ import androidx.navigation.fragment.navArgs
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
-import com.bymason.kiosk.checkin.databinding.MasoniteFinderFragmentBinding
+import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentBinding
 
-class MasoniteFinderFragment(
+class EmployeeFinderFragment(
         repository: EmployeeRepository
-) : FragmentBase(R.layout.masonite_finder_fragment) {
-    private val args by navArgs<MasoniteFinderFragmentArgs>()
+) : FragmentBase(R.layout.employee_finder_fragment) {
+    private val args by navArgs<EmployeeFinderFragmentArgs>()
 
-    private val vm by viewModels<MasoniteFinderViewModel> {
-        MasoniteFinderViewModel.Factory(repository)
+    private val vm by viewModels<EmployeeFinderViewModel> {
+        EmployeeFinderViewModel.Factory(repository)
     }
-    private val binding by LifecycleAwareLazy { MasoniteFinderFragmentBinding.bind(requireView()) }
+    private val binding by LifecycleAwareLazy { EmployeeFinderFragmentBinding.bind(requireView()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.search.doAfterTextChanged {
@@ -28,8 +28,8 @@ class MasoniteFinderFragment(
         }
 
         val adapter = EmployeeAdapter(this, args.guest)
-        binding.masonites.adapter = adapter
-        vm.masonites.observe(viewLifecycleOwner) {
+        binding.employees.adapter = adapter
+        vm.employees.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             binding.noEmployeesHint.isVisible = it.isEmpty()
         }
