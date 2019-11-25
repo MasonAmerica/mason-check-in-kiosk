@@ -36,7 +36,7 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-alpha03"
+        const val android = "com.android.tools.build:gradle:4.0.0-alpha04"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val mason = "com.bymason.build:mason-apps:1.0.2"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
@@ -53,7 +53,9 @@ object Config {
             private const val ankoVersion = "0.10.8"
 
             const val jvm = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+            const val js = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
             const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
+            const val coroutinesJs = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.2"
 
             const val common = "org.jetbrains.anko:anko-common:$ankoVersion"
             const val appCompat = "org.jetbrains.anko:anko-appcompat-v7-commons:$ankoVersion"

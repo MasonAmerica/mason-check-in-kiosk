@@ -4,6 +4,9 @@
 /.idea
 .DS_Store
 build
+!buildSrc/src/main/kotlin/com/bymason/build
 /captures
 .externalNativeBuild
 *creds.json
+.firebase
+node_modules

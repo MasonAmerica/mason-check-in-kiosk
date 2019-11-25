@@ -7,8 +7,8 @@ plugins {
     id("mason-apps")
     id("io.fabric")
 
-    id("kotlin-android")
-    id("kotlin-android-extensions")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.android.extensions")
 
     id("androidx.navigation.safeargs.kotlin")
 }

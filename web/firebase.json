@@ -1,0 +1,17 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "site/build/distributions",
+    "rewrites": [
+      {
+        "source": "/auth/slack/redirect",
+        "function": "slackAuthHandler"
+      }
+    ]
+  },
+  "functions": {
+    "source": "server/functions"
+  }
+}

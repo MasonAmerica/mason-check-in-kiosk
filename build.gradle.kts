@@ -15,6 +15,8 @@ buildscript {
 
 plugins {
     Config.Plugins.run { versionChecker }
+    `lifecycle-base`
+    id("com.bymason.build.kiosk")
 }
 
 buildScan {
@@ -30,10 +32,6 @@ allprojects {
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
-}
-
-tasks.register<Delete>("clean") {
-    delete("build")
 }
 
 fun Project.configureKtlint() {

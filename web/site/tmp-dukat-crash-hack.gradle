@@ -1,0 +1,2 @@
+// TODO remove after https://github.com/JetBrains/kotlin/pull/2822
+rootProject.kotlinNodeJs.versions.dukat.version = "0.0.23"
