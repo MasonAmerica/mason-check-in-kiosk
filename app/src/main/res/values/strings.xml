@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Mason Check-in Kiosk</string>
+
+    <!-- Welcome -->
+    <string name="kiosk_welcome_checkin_info_title">Welcome to Mason!</string>
+    <string name="kiosk_welcome_checkin_info_body">Tap anywhere to get started.</string>
+
+    <!-- Identity -->
+    <string name="kiosk_checkin_identity_title">Tell us a little bit about yourself</string>
+
+    <string name="kiosk_checkin_identity_name_hint">Full Name</string>
+    <string name="kiosk_checkin_identity_name_invalid_error">Name must be specified</string>
+    <string name="kiosk_checkin_identity_email_hint">Email</string>
+    <string name="kiosk_checkin_identity_email_invalid_error">Invalid email address</string>
+
+    <string name="kiosk_checkin_identity_continue_button_title">Continue</string>
+
+    <!-- Employee Finder -->
+    <string name="kiosk_checkin_employee_finder_title">Who are you here to see?</string>
+    <string name="kiosk_checkin_employee_finder_search_hint">Employee name</string>
+    <string name="kiosk_checkin_employee_finder_no_employees_message">
+        Try searching for a current employee.
+    </string>
+
+    <!-- NDA -->
+    <string name="kiosk_checkin_nda_title">Sign Mason\'s NDA</string>
+    <string name="kiosk_checkin_nda_finish_button_title">Finish check-in</string>
+</resources>
