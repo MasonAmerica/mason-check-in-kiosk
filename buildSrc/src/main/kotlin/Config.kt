@@ -43,7 +43,6 @@ object Config {
         const val google = "com.google.gms:google-services:4.3.3"
         const val fabric = "io.fabric.tools:gradle:1.31.2"
 
-        const val ktlint = "com.pinterest:ktlint:0.33.0"
         val PluginDependenciesSpec.versionChecker
             get() = id("com.github.ben-manes.versions") version "0.27.0"
     }

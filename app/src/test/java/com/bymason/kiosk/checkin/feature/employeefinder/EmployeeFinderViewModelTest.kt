@@ -49,7 +49,8 @@ class EmployeeFinderViewModelTest {
     }
 
     @Test
-    fun `Searching for two employees in a row cancels previous search`() = dispatcherRule.runBlocking {
+    fun `Searching for two employees in a row cancels previous search`(
+    ) = dispatcherRule.runBlocking {
         val employee1 = Employee("id1", "Mr Robot", null)
         val employee2 = Employee("id2", "Mr Robot", null)
         val result1 = CompletableDeferred<List<Employee>>()

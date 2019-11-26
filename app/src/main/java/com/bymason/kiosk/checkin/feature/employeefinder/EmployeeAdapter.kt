@@ -33,7 +33,10 @@ class EmployeeAdapter(
                     newItem: Employee
             ) = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Employee, newItem: Employee) = oldItem == newItem
+            override fun areContentsTheSame(
+                    oldItem: Employee,
+                    newItem: Employee
+            ) = oldItem == newItem
         }
     }
 }

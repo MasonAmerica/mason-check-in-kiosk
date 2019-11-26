@@ -15,25 +15,23 @@ import kotlin.js.Promise
 import kotlin.js.json
 
 fun handleGSuiteAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
-    val error = req.query["error"]
-    if (error != null) {
-        console.log(error)
-        res.status(400).send(error)
-        return null
-    }
-
+    if (!checkForError(req, res)) return null
     return GlobalScope.async { fetchGSuiteAccessToken(req, res) }.asPromise()
 }
 
 fun handleSlackAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
+    if (!checkForError(req, res)) return null
+    return GlobalScope.async { fetchSlackAccessToken(req, res) }.asPromise()
+}
+
+private fun checkForError(req: Request<Any?>, res: Response<Any?>): Boolean {
     val error = req.query["error"]
     if (error != null) {
         console.log(error)
         res.status(400).send(error)
-        return null
+        return false
     }
-
-    return GlobalScope.async { fetchSlackAccessToken(req, res) }.asPromise()
+    return true
 }
 
 private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any?>) {
