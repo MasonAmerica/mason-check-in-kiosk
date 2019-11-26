@@ -1358,7 +1358,7 @@ external interface `Schema$TrustedApps` {
         set(value) = definedExternally
 }
 
-external interface `Schema$User` {
+external interface `Schema$User` : `Schema$Base`<`Schema$User`> {
     var addresses: Any?
         get() = definedExternally
         set(value) = definedExternally
@@ -3699,7 +3699,7 @@ open external class `Resource$Users`(context: APIRequestContext) {
     open fun delete(params: `Params$Resource$Users$Delete`, options: BodyResponseCallback<Unit>, callback: BodyResponseCallback<Unit>)
     open fun delete(params: `Params$Resource$Users$Delete`, callback: BodyResponseCallback<Unit>)
     open fun delete(callback: BodyResponseCallback<Unit>)
-    open fun get(params: `Params$Resource$Users$Get`? = definedExternally, options: MethodOptions? = definedExternally): Promise<`Schema$User`>
+    open fun get(params: Any? = definedExternally, options: MethodOptions? = definedExternally): Promise<`Schema$User`>
     open fun get(params: `Params$Resource$Users$Get`, options: MethodOptions, callback: BodyResponseCallback<`Schema$User`>)
     open fun get(params: `Params$Resource$Users$Get`, options: BodyResponseCallback<`Schema$User`>, callback: BodyResponseCallback<`Schema$User`>)
     open fun get(params: `Params$Resource$Users$Get`, callback: BodyResponseCallback<`Schema$User`>)

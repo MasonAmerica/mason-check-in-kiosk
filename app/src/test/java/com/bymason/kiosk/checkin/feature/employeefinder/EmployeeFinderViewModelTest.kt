@@ -40,7 +40,7 @@ class EmployeeFinderViewModelTest {
 
     @Test
     fun `Searching for valid name lists employees`() = dispatcherRule.runBlocking {
-        val employee = Employee("id", "Mr Robot", "email", null)
+        val employee = Employee("id", "Mr Robot", null)
         `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(employee))
 
         vm.find("Mr")
@@ -50,8 +50,8 @@ class EmployeeFinderViewModelTest {
 
     @Test
     fun `Searching for two employees in a row cancels previous search`() = dispatcherRule.runBlocking {
-        val employee1 = Employee("id1", "Mr Robot", "email", null)
-        val employee2 = Employee("id2", "Mr Robot", "email", null)
+        val employee1 = Employee("id1", "Mr Robot", null)
+        val employee2 = Employee("id2", "Mr Robot", null)
         val result1 = CompletableDeferred<List<Employee>>()
         val result2 = CompletableDeferred<List<Employee>>()
         val vm = EmployeeFinderViewModel(object : EmployeeRepository {

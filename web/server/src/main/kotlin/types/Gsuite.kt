@@ -13,7 +13,7 @@ open external class GoogleApis(options: GlobalOptions? = definedExternally) {
     open var _discovery: Any
     open var auth: AuthPlus
     open var _options: GlobalOptions
-    open fun options(options: GlobalOptions? = definedExternally)
+    open fun options(options: Json? = definedExternally)
     open var addAPIs: Any
     open fun discover(url: String): Promise<Unit>
     open fun discover(url: String, callback: (err: Error? /* = null */) -> Unit)
@@ -111,9 +111,7 @@ external interface CredentialBody {
         set(value) = definedExternally
 }
 
-external interface Certificates {
-
-}
+external interface Certificates
 
 @Suppress("NOTHING_TO_INLINE")
 inline operator fun Certificates.get(index: String): dynamic /* String | JwkCertificate */ = asDynamic()[index]
@@ -123,9 +121,7 @@ inline operator fun Certificates.set(index: String, value: String) {
     asDynamic()[index] = value
 }
 
-external interface Headers {
-
-}
+external interface Headers
 
 @Suppress("NOTHING_TO_INLINE")
 inline operator fun Headers.get(index: String): String? = asDynamic()[index]

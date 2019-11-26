@@ -1,12 +1,11 @@
 package com.bymason.kiosk.checkin.functions
 
+import com.bymason.kiosk.checkin.utils.buildGoogleAuthClient
 import express.Request
 import express.Response
 import firebase.firestore.SetOptions
 import firebase.functions.admin
 import firebase.functions.functions
-import google.OAuth2Client
-import google.google
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asPromise
 import kotlinx.coroutines.async
@@ -14,17 +13,6 @@ import kotlinx.coroutines.await
 import superagent.superagent
 import kotlin.js.Promise
 import kotlin.js.json
-
-fun buildGoogleAuthClient(): OAuth2Client {
-    @Suppress("UNUSED_VARIABLE") val clientId = functions.config().gsuite.client_id
-    @Suppress("UNUSED_VARIABLE") val clientSecret = functions.config().gsuite.client_secret
-    @Suppress("UNUSED_VARIABLE") val google = google
-    return js("new google.auth.OAuth2(" +
-                      "clientId, " +
-                      "clientSecret, " +
-                      "'https://mason-check-in-kiosk.firebaseapp.com/auth/gsuite/redirect'" +
-                      ")").unsafeCast<OAuth2Client>()
-}
 
 fun handleGSuiteAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
     val error = req.query["error"]

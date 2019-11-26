@@ -1,7 +1,7 @@
 package com.bymason.kiosk.checkin.functions
 
+import com.bymason.kiosk.checkin.utils.getAndInitCreds
 import firebase.functions.AuthContext
-import firebase.functions.admin
 import firebase.https.CallableContext
 import firebase.https.HttpsError
 import google.google
@@ -21,16 +21,14 @@ fun findEmployees(employee: String, context: CallableContext): Promise<Array<Jso
 }
 
 private suspend fun findEmployees(auth: AuthContext, employee: String): Array<Json> {
-    val credsDoc = admin.firestore().collection("credentials").doc(auth.uid).get().await()
-    val client = buildGoogleAuthClient()
-    client.credentials = credsDoc.data()["gsuite"].asDynamic()
-
-    val directory = google.admin(json("version" to "directory_v1", "auth" to client))
+    getAndInitCreds(auth.uid)
+    val directory = google.admin(json("version" to "directory_v1"))
     val employees = directory.users.list(json(
             "customer" to "my_customer",
             "viewType" to "domain_public",
             "query" to employee
     )).await().data
+
     return employees.users.orEmpty().map {
         json(
                 "id" to it.id,

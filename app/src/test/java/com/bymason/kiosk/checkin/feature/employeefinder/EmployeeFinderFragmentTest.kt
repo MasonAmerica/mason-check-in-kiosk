@@ -33,7 +33,7 @@ class EmployeeFinderFragmentTest {
         val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
                 EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
+                CheckInNavHostFragment.Factory(employeeRepository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
@@ -47,13 +47,13 @@ class EmployeeFinderFragmentTest {
         val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
                 EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
+                CheckInNavHostFragment.Factory(employeeRepository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(
-                        Employee("id", "Mr Robot", "email", null)))
+                        Employee("id", "Mr Robot", null)))
             }
 
             binding.search.setText("Person")
@@ -68,13 +68,13 @@ class EmployeeFinderFragmentTest {
         val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
                 EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
+                CheckInNavHostFragment.Factory(employeeRepository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(
-                        Employee("id", "name", "email", null)))
+                        Employee("id", "name", null)))
             }
 
             binding.search.setText("Person")
@@ -88,7 +88,7 @@ class EmployeeFinderFragmentTest {
         val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
                 EmployeeFinderFragmentArgs(Guest("Name", "foobar@example.com")).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
+                CheckInNavHostFragment.Factory(employeeRepository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
@@ -105,12 +105,12 @@ class EmployeeFinderFragmentTest {
     @Test
     fun `Selecting employee result navigates to next destination`() {
         val guest = Guest("Name", "foobar@example.com")
-        val employee = Employee("id", "name", "email", null)
+        val employee = Employee("id", "name", null)
         val mockNavController = mock(NavController::class.java)
         val scenario = launchFragmentInContainer<EmployeeFinderFragment>(
                 EmployeeFinderFragmentArgs(guest).toBundle(),
                 R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                CheckInNavHostFragment.Factory(repository = mockEmployeeRepository)
+                CheckInNavHostFragment.Factory(employeeRepository = mockEmployeeRepository)
         )
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)

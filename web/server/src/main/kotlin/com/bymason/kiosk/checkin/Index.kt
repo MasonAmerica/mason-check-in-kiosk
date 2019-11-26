@@ -1,10 +1,12 @@
 package com.bymason.kiosk.checkin
 
 import com.bymason.kiosk.checkin.functions.findEmployees
+import com.bymason.kiosk.checkin.functions.finishCheckIn
 import com.bymason.kiosk.checkin.functions.handleGSuiteAuth
 import com.bymason.kiosk.checkin.functions.handleSlackAuth
 import firebase.functions.admin
 import firebase.functions.functions
+import kotlin.js.Json
 
 external val exports: dynamic
 
@@ -18,4 +20,6 @@ fun main() {
 
     exports.findEmployees = functions.https
             .onCall<String> { data, context -> findEmployees(data, context) }
+    exports.finishCheckIn = functions.https
+            .onCall<Json> { data, context -> finishCheckIn(data, context) }
 }
