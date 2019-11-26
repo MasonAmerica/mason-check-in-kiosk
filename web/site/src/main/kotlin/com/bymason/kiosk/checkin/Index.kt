@@ -34,8 +34,7 @@ fun main() {
             firebaseUi.start("#signed-out-container", json(
                     "signInOptions" to arrayOf(json(
                             "provider" to EmailAuthProvider.PROVIDER_ID,
-                            "signInMethod" to EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
-                            "forceSameDevice" to false
+                            "requireDisplayName" to false
                     ))
             ))
         } else {
