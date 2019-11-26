@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/welcome">
+
+    <action
+        android:id="@+id/reset"
+        app:destination="@id/welcome"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/slide_out_right"
+        app:popUpTo="@id/welcome"
+        app:popUpToInclusive="true" />
+
+    <fragment
+        android:id="@+id/welcome"
+        android:name="com.bymason.kiosk.checkin.WelcomeFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/welcome_fragment">
+
+        <action
+            android:id="@+id/next"
+            app:destination="@id/identity"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/identity"
+        android:name="com.bymason.kiosk.checkin.feature.identity.IdentityFragment"
+        android:label="@string/kiosk_checkin_identity_title"
+        tools:layout="@layout/identity_fragment">
+
+        <action
+            android:id="@+id/next"
+            app:destination="@id/employeeFinder"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/employeeFinder"
+        android:name="com.bymason.kiosk.checkin.feature.employeefinder.EmployeeFinderFragment"
+        android:label="@string/kiosk_checkin_employee_finder_title"
+        tools:layout="@layout/employee_finder_fragment">
+
+        <argument
+            android:name="guest"
+            app:argType="com.bymason.kiosk.checkin.core.model.Guest" />
+
+        <action
+            android:id="@+id/next"
+            app:destination="@id/nda"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nda"
+        android:name="com.bymason.kiosk.checkin.feature.nda.NdaFragment"
+        android:label="@string/kiosk_checkin_nda_title"
+        tools:layout="@layout/nda_fragment">
+
+        <argument
+            android:name="guest"
+            app:argType="com.bymason.kiosk.checkin.core.model.Guest" />
+
+        <argument
+            android:name="employee"
+            app:argType="com.bymason.kiosk.checkin.core.model.Employee" />
+
+        <action
+            android:id="@+id/next"
+            app:destination="@id/nda"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+</navigation>
