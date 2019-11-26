@@ -45,6 +45,14 @@ fun main() {
 }
 
 fun onSignedIn(user: User) {
+    document.getElementById("add-to-google")?.setAttribute(
+            "href", "https://accounts.google.com/o/oauth2/v2/auth?" +
+            "client_id=153912363552-dla8r4rf4uekcs094i0up3kp0p5vqcp7.apps.googleusercontent.com&" +
+            "scope=https://www.googleapis.com/auth/admin.directory.user.readonly&" +
+            "access_type=offline&" +
+            "response_type=code&" +
+            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/auth/gsuite/redirect&" +
+            "state=${user.uid}")
     document.getElementById("add-to-slack")?.setAttribute(
             "href", "https://slack.com/oauth/v2/authorize?" +
             "client_id=2392918492.847431680672&" +

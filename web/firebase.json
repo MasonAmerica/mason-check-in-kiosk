@@ -6,6 +6,10 @@
     "public": "site/build/distributions",
     "rewrites": [
       {
+        "source": "/auth/gsuite/redirect",
+        "function": "gsuiteAuthHandler"
+      },
+      {
         "source": "/auth/slack/redirect",
         "function": "slackAuthHandler"
       }

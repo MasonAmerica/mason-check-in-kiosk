@@ -55,6 +55,7 @@ object Config {
             const val jvm = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
             const val js = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
             const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
+            const val coroutinesTasks = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.2"
             const val coroutinesJs = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.2"
 
             const val common = "org.jetbrains.anko:anko-common:$ankoVersion"
@@ -85,6 +86,9 @@ object Config {
 
         object Firebase {
             const val analytics = "com.google.firebase:firebase-analytics:17.2.1"
+            const val auth = "com.google.firebase:firebase-auth:19.2.0"
+            const val fuiAuth = "com.firebaseui:firebase-ui-auth:6.1.0"
+            const val functions = "com.google.firebase:firebase-functions-ktx:19.0.1"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
         }
 

@@ -87,6 +87,7 @@ masonApps {
 dependencies {
     implementation(Config.Libs.Kotlin.jvm)
     implementation(Config.Libs.Kotlin.coroutinesAndroid)
+    implementation(Config.Libs.Kotlin.coroutinesTasks)
 
     implementation(Config.Libs.Kotlin.common)
     implementation(Config.Libs.Kotlin.appCompat)
@@ -107,6 +108,9 @@ dependencies {
     implementation(Config.Libs.Jetpack.navUi)
 
     implementation(Config.Libs.Firebase.analytics)
+    implementation(Config.Libs.Firebase.auth)
+    implementation(Config.Libs.Firebase.fuiAuth)
+    implementation(Config.Libs.Firebase.functions)
     implementation(Config.Libs.Firebase.crashlytics)
     debugImplementation(Config.Libs.Misc.leakCanary)
 

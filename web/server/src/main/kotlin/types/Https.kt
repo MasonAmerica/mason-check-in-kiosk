@@ -23,7 +23,7 @@ fun HttpsError(code: String, message: String? = null, details: Any? = null): Not
 
 external class Https {
     fun <T> onCall(handler: (data: T, context: CallableContext) -> Promise<*>?): dynamic = definedExternally
-    fun <T> onRequest(handler: (Request<Any?>, Response<Any?>) -> Unit): dynamic = definedExternally
+    fun <T> onRequest(handler: (Request<Any?>, Response<Any?>) -> Promise<*>?): dynamic = definedExternally
 }
 
 external interface CallableContext {
