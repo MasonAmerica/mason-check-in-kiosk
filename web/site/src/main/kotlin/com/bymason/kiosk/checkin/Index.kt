@@ -52,6 +52,13 @@ fun onSignedIn(user: User) {
             "response_type=code&" +
             "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/auth/gsuite/redirect&" +
             "state=${user.uid}")
+    document.getElementById("add-to-docusign")?.setAttribute(
+            "href", "https://account-d.docusign.com/oauth/auth?" +
+            "client_id=b9bf0128-0695-4ad2-8ec8-ec9d1ba3bf76&" +
+            "scope=signature&" +
+            "response_type=code&" +
+            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/auth/docusign/redirect&" +
+            "state=${user.uid}")
     document.getElementById("add-to-slack")?.setAttribute(
             "href", "https://slack.com/oauth/v2/authorize?" +
             "client_id=2392918492.847431680672&" +

@@ -2,6 +2,7 @@ package com.bymason.kiosk.checkin
 
 import com.bymason.kiosk.checkin.functions.findEmployees
 import com.bymason.kiosk.checkin.functions.finishCheckIn
+import com.bymason.kiosk.checkin.functions.handleDocusignAuth
 import com.bymason.kiosk.checkin.functions.handleGSuiteAuth
 import com.bymason.kiosk.checkin.functions.handleSlackAuth
 import firebase.functions.admin
@@ -15,6 +16,8 @@ fun main() {
 
     exports.gsuiteAuthHandler = functions.https
             .onRequest<Any?> { req, res -> handleGSuiteAuth(req, res) }
+    exports.docusignAuthHandler = functions.https
+            .onRequest<Any?> { req, res -> handleDocusignAuth(req, res) }
     exports.slackAuthHandler = functions.https
             .onRequest<Any?> { req, res -> handleSlackAuth(req, res) }
 

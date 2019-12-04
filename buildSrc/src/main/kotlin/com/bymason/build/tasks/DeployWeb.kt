@@ -17,6 +17,9 @@ import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
 internal abstract class DeployWeb : DefaultTask() {
+    @set:Option(option = "dev", description = "Skip sanity checks.")
+    @get:Input
+    var dev: Boolean = false
     @set:Option(option = "only", description = "See firebase help documentation")
     @get:Optional
     @get:Input
@@ -25,6 +28,7 @@ internal abstract class DeployWeb : DefaultTask() {
     @TaskAction
     fun deploy() {
         project.serviceOf<WorkerExecutor>().noIsolation().submit(Deployer::class) {
+            devArg.set(dev)
             onlyArgs.set(only)
         }
     }
@@ -46,12 +50,14 @@ internal abstract class DeployWeb : DefaultTask() {
                 into(layout.projectDirectory.dir("web/site/build/distributions"))
             }
 
-            execOps.exec {
-                commandLine("npm", "i", "-g", "firebase-tools")
-            }
-            execOps.exec {
-                commandLine("npm", "ci")
-                workingDir = layout.projectDirectory.dir("web/server/functions").asFile
+            if (!parameters.devArg.get()) {
+                execOps.exec {
+                    commandLine("npm", "i", "-g", "firebase-tools")
+                }
+                execOps.exec {
+                    commandLine("npm", "ci")
+                    workingDir = layout.projectDirectory.dir("web/server/functions").asFile
+                }
             }
             execOps.exec {
                 var command = "firebase deploy --non-interactive"
@@ -65,6 +71,7 @@ internal abstract class DeployWeb : DefaultTask() {
         }
 
         interface Params : WorkParameters {
+            val devArg: Property<Boolean>
             val onlyArgs: Property<String>
         }
     }

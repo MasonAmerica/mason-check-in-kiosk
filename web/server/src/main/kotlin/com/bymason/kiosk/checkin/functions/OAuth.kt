@@ -19,6 +19,11 @@ fun handleGSuiteAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
     return GlobalScope.async { fetchGSuiteAccessToken(req, res) }.asPromise()
 }
 
+fun handleDocusignAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
+    if (!checkForError(req, res)) return null
+    return GlobalScope.async { fetchDocusignAccessToken(req, res) }.asPromise()
+}
+
 fun handleSlackAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
     if (!checkForError(req, res)) return null
     return GlobalScope.async { fetchSlackAccessToken(req, res) }.asPromise()
@@ -39,8 +44,9 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
     val creds = try {
         client.getToken(req.query["code"].unsafeCast<String>()).await().tokens
     } catch (e: Throwable) {
-        console.log(e)
-        res.status(401).send(e.asDynamic().response.data)
+        val error = e.asDynamic().response.data
+        console.log(error)
+        res.status(401).send(error)
         return
     }
 
@@ -49,6 +55,40 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
             .doc(req.query["state"].unsafeCast<String>())
             .set(json("gsuite" to creds), SetOptions.merge)
             .await()
+    res.redirect("/")
+}
+
+private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<Any?>) {
+    val credsResult = try {
+        superagent.post("https://account-d.docusign.com/oauth/token")
+                .set(json("Authorization" to "Basic ${functions.config().docusign.client_hash}"))
+                .query(json(
+                        "grant_type" to "authorization_code",
+                        "code" to req.query["code"]
+                )).await()
+    } catch (e: Throwable) {
+        val error = e.asDynamic().response.text
+        console.log(error)
+        res.status(401).send(error)
+        return
+    }
+
+    val accountResult = try {
+        superagent.get("https://account-d.docusign.com/oauth/userinfo")
+                .set(json("Authorization" to "Bearer ${credsResult.body["access_token"]}"))
+                .await()
+    } catch (e: Throwable) {
+        val error = e.asDynamic().response.text
+        console.log(error)
+        res.status(401).send(error)
+        return
+    }
+
+    val ref = admin.firestore()
+            .collection("credentials")
+            .doc(req.query["state"].unsafeCast<String>())
+    ref.set(json("docusign" to accountResult.body), SetOptions.merge).await()
+    ref.set(json("docusign" to credsResult.body), SetOptions.merge).await()
     res.redirect("/")
 }
 

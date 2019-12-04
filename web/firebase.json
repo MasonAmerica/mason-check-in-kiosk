@@ -10,6 +10,10 @@
         "function": "gsuiteAuthHandler"
       },
       {
+          "source": "/auth/docusign/redirect",
+          "function": "docusignAuthHandler"
+      },
+        {
         "source": "/auth/slack/redirect",
         "function": "slackAuthHandler"
       }
