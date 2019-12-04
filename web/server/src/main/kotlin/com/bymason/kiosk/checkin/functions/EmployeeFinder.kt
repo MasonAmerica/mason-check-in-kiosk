@@ -21,13 +21,14 @@ fun findEmployees(employee: String, context: CallableContext): Promise<Array<Jso
 }
 
 private suspend fun findEmployees(auth: AuthContext, employee: String): Array<Json> {
-    getAndInitCreds(auth.uid)
+    getAndInitCreds(auth.uid, "gsuite")
     val directory = google.admin(json("version" to "directory_v1"))
     val employees = directory.users.list(json(
             "customer" to "my_customer",
             "viewType" to "domain_public",
             "query" to employee
     )).await().data
+    console.log("Employees: ", employees)
 
     return employees.users.orEmpty().map {
         json(

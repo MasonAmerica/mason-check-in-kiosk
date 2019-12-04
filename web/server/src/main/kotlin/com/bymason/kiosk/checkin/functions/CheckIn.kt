@@ -30,17 +30,20 @@ fun finishCheckIn(data: Json, context: CallableContext): Promise<*>? {
 }
 
 private suspend fun finishCheckIn(auth: AuthContext, employeeId: String, guestName: String?) {
-    val creds = getAndInitCreds(auth.uid)
+    val creds = getAndInitCreds(auth.uid, "gsuite", "slack")
     val directory = google.admin(json("version" to "directory_v1"))
     val employee = directory.users.get(json(
             "viewType" to "domain_public",
             "userKey" to employeeId
     )).await().data
+    console.log("Employee: ", employee)
 
     val employeeEmail = employee.primaryEmail
     val slackUser = superagent.get("https://slack.com/api/users.lookupByEmail")
-            .query(json("token" to creds.slackToken, "email" to employeeEmail))
+            .query(json("token" to creds["slack"], "email" to employeeEmail))
             .await().body
+    console.log("Slack user: ", slackUser)
+
     if (!slackUser["ok"].unsafeCast<Boolean>()) {
         throw HttpsError("not-found", slackUser["error"].unsafeCast<String>())
     }
@@ -48,11 +51,12 @@ private suspend fun finishCheckIn(auth: AuthContext, employeeId: String, guestNa
     val slackUserId = slackUser.asDynamic().user.id
     val slackMessage = superagent.post("https://slack.com/api/chat.postMessage")
             .query(json(
-                    "token" to creds.slackToken,
+                    "token" to creds["slack"],
                     "channel" to slackUserId,
                     "text" to "Your guest ($guestName) just arrived! \uD83D\uDC4B"
             ))
             .await().body
+    console.log("Slack message: ", slackUser)
 
     if (!slackMessage["ok"].unsafeCast<Boolean>()) {
         throw HttpsError("unknown", slackUser["error"].unsafeCast<String>())

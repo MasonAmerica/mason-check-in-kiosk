@@ -11,6 +11,7 @@ import kotlinx.coroutines.asPromise
 import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import superagent.superagent
+import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
 
@@ -51,9 +52,11 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
     }
 
     admin.firestore()
-            .collection("credentials")
+            .collection("config")
             .doc(req.query["state"].unsafeCast<String>())
-            .set(json("gsuite" to creds), SetOptions.merge)
+            .collection("credentials")
+            .doc("gsuite")
+            .set(creds.unsafeCast<Json>(), SetOptions.merge)
             .await()
     res.redirect("/")
 }
@@ -85,10 +88,12 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
     }
 
     val ref = admin.firestore()
-            .collection("credentials")
+            .collection("config")
             .doc(req.query["state"].unsafeCast<String>())
-    ref.set(json("docusign" to accountResult.body), SetOptions.merge).await()
-    ref.set(json("docusign" to credsResult.body), SetOptions.merge).await()
+            .collection("credentials")
+            .doc("docusign")
+    ref.set(accountResult.body, SetOptions.merge).await()
+    ref.set(credsResult.body, SetOptions.merge).await()
     res.redirect("/")
 }
 
@@ -102,9 +107,11 @@ private suspend fun fetchSlackAccessToken(req: Request<Any?>, res: Response<Any?
 
     if (result.body["ok"].unsafeCast<Boolean>()) {
         admin.firestore()
-                .collection("credentials")
+                .collection("config")
                 .doc(req.query["state"].unsafeCast<String>())
-                .set(json("slack" to result.body), SetOptions.merge)
+                .collection("credentials")
+                .doc("slack")
+                .set(result.body, SetOptions.merge)
                 .await()
         res.redirect("/")
     } else {
