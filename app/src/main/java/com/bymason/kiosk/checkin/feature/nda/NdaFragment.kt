@@ -17,6 +17,11 @@ class NdaFragment(
     private val vm by viewModels<NdaViewModel> { NdaViewModel.Factory(repository) }
     private val binding by LifecycleAwareLazy { NdaFragmentBinding.bind(requireView()) }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        vm.signNda(args.guest)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.finish.setOnClickListener { vm.finish(args.employee, args.guest) }
     }

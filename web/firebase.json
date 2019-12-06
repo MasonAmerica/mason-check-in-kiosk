@@ -2,19 +2,22 @@
   "firestore": {
     "rules": "firestore.rules"
   },
+  "storage": {
+    "rules": "storage.rules"
+  },
   "hosting": {
     "public": "site/build/distributions",
     "rewrites": [
       {
-        "source": "/auth/gsuite/redirect",
+        "source": "/redirect/gsuite/auth",
         "function": "gsuiteAuthHandler"
       },
       {
-          "source": "/auth/docusign/redirect",
-          "function": "docusignAuthHandler"
+        "source": "/redirect/docusign/auth",
+        "function": "docusignAuthHandler"
       },
-        {
-        "source": "/auth/slack/redirect",
+      {
+        "source": "/redirect/slack/auth",
         "function": "slackAuthHandler"
       }
     ]

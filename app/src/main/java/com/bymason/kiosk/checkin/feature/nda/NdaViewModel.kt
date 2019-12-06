@@ -11,6 +11,17 @@ import kotlinx.coroutines.launch
 class NdaViewModel(
         private val repository: NdaRepository
 ) : ViewModel() {
+    fun signNda(guest: Guest) {
+        viewModelScope.launch {
+            try {
+                println(repository.sign(guest.name, guest.email))
+            } catch (t: Throwable) {
+                logBreadcrumb("Failed to get link to sign NDA", t)
+                return@launch
+            }
+        }
+    }
+
     fun finish(employee: Employee, guest: Guest) {
         viewModelScope.launch {
             try {

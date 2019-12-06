@@ -51,7 +51,7 @@ private suspend fun finishCheckIn(auth: AuthContext, employeeId: String, guestNa
     val slackUserId = slackUser.asDynamic().user.id
     val slackMessage = superagent.post("https://slack.com/api/chat.postMessage")
             .query(json(
-                    "token" to creds["slack"],
+                    "token" to creds.getValue("slack")["access_token"],
                     "channel" to slackUserId,
                     "text" to "Your guest ($guestName) just arrived! \uD83D\uDC4B"
             ))

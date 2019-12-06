@@ -2,6 +2,7 @@ package com.bymason.kiosk.checkin
 
 import com.bymason.kiosk.checkin.functions.findEmployees
 import com.bymason.kiosk.checkin.functions.finishCheckIn
+import com.bymason.kiosk.checkin.functions.generateNdaLink
 import com.bymason.kiosk.checkin.functions.handleDocusignAuth
 import com.bymason.kiosk.checkin.functions.handleGSuiteAuth
 import com.bymason.kiosk.checkin.functions.handleSlackAuth
@@ -23,6 +24,8 @@ fun main() {
 
     exports.findEmployees = functions.https
             .onCall<String> { data, context -> findEmployees(data, context) }
+    exports.generateNdaLink = functions.https
+            .onCall<Json> { data, context -> generateNdaLink(data, context) }
     exports.finishCheckIn = functions.https
             .onCall<Json> { data, context -> finishCheckIn(data, context) }
 }

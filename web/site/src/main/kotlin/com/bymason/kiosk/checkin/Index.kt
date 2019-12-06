@@ -50,18 +50,19 @@ fun onSignedIn(user: User) {
             "scope=https://www.googleapis.com/auth/admin.directory.user.readonly&" +
             "access_type=offline&" +
             "response_type=code&" +
-            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/auth/gsuite/redirect&" +
+            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/redirect/gsuite/auth&" +
             "state=${user.uid}")
     document.getElementById("add-to-docusign")?.setAttribute(
             "href", "https://account-d.docusign.com/oauth/auth?" +
             "client_id=b9bf0128-0695-4ad2-8ec8-ec9d1ba3bf76&" +
             "scope=signature&" +
             "response_type=code&" +
-            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/auth/docusign/redirect&" +
+            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/redirect/docusign/auth&" +
             "state=${user.uid}")
     document.getElementById("add-to-slack")?.setAttribute(
             "href", "https://slack.com/oauth/v2/authorize?" +
             "client_id=2392918492.847431680672&" +
             "scope=users:read,users:read.email,chat:write&" +
+            "redirect_uri=https://mason-check-in-kiosk.firebaseapp.com/redirect/slack/auth&" +
             "state=${user.uid}")
 }

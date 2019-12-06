@@ -17,6 +17,7 @@ kotlin {
         implementation(npm("@google-cloud/firestore", "2.6.0"))
         implementation(npm("googleapis", "45.0.0"))
         implementation(npm("superagent", "5.1.1"))
+        implementation(npm("docusign-esign", "5.1.0"))
     }
 }
 
