@@ -2,6 +2,7 @@ package com.bymason.kiosk.checkin.functions
 
 import com.bymason.kiosk.checkin.utils.createInstance
 import com.bymason.kiosk.checkin.utils.getAndInitCreds
+import com.bymason.kiosk.checkin.utils.refreshDocusignCreds
 import firebase.firestore.DocumentSnapshot
 import firebase.functions.AuthContext
 import firebase.functions.admin

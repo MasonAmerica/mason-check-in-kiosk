@@ -30,24 +30,6 @@ fun handleSlackAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
     return GlobalScope.async { fetchSlackAccessToken(req, res) }.asPromise()
 }
 
-suspend fun refreshDocusignCreds(uid: String, creds: Json): Json {
-    val credsResult = superagent.post("https://account-d.docusign.com/oauth/token")
-            .set(json("Authorization" to "Basic ${functions.config().docusign.client_hash}"))
-            .query(json(
-                    "grant_type" to "refresh_token",
-                    "refresh_token" to creds["refresh_token"]
-            )).await()
-
-    admin.firestore()
-            .collection("config")
-            .doc(uid)
-            .collection("credentials")
-            .doc("docusign")
-            .set(credsResult.body, SetOptions.merge)
-
-    return credsResult.body
-}
-
 private fun checkForError(req: Request<Any?>, res: Response<Any?>): Boolean {
     val error = req.query["error"]
     if (error != null) {

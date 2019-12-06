@@ -1,6 +1,8 @@
 package com.bymason.kiosk.checkin.functions
 
 import com.bymason.kiosk.checkin.utils.getAndInitCreds
+import com.bymason.kiosk.checkin.utils.installGoogleAuth
+import com.bymason.kiosk.checkin.utils.maybeRefreshGsuiteCreds
 import firebase.functions.AuthContext
 import firebase.https.CallableContext
 import firebase.https.HttpsError
@@ -31,11 +33,13 @@ fun finishCheckIn(data: Json, context: CallableContext): Promise<*>? {
 
 private suspend fun finishCheckIn(auth: AuthContext, employeeId: String, guestName: String?) {
     val creds = getAndInitCreds(auth.uid, "gsuite", "slack")
+    val state = installGoogleAuth(creds.getValue("gsuite"))
     val directory = google.admin(json("version" to "directory_v1"))
     val employee = directory.users.get(json(
             "viewType" to "domain_public",
             "userKey" to employeeId
     )).await().data
+    maybeRefreshGsuiteCreds(auth.uid, state)
     console.log("Employee: ", employee)
 
     val employeeEmail = employee.primaryEmail
