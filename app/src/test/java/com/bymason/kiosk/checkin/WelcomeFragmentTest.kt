@@ -7,20 +7,27 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.bymason.kiosk.checkin.core.data.Auth
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class WelcomeFragmentTest {
+    private val mockAuth = mock(Auth::class.java)
+
     @Test
     fun `Clicking anywhere moves to the next screen`() {
         val mockNavController = mock(NavController::class.java)
-        val scenario = launchFragmentInContainer<WelcomeFragment>()
+        val scenario = launchFragmentInContainer<WelcomeFragment>(
+                factory = CheckInNavHostFragment.Factory(auth = mockAuth)
+        )
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
         }
+        `when`(mockAuth.isSignedIn).thenReturn(true)
 
         onView(withId(R.id.root)).perform(click())
 

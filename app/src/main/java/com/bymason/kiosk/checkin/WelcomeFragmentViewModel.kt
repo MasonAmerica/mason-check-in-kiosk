@@ -1,26 +1,27 @@
 package com.bymason.kiosk.checkin
 
 import android.content.Intent
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
 import com.bymason.kiosk.checkin.core.data.Auth
-import com.bymason.kiosk.checkin.core.data.SingleLiveEvent
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class WelcomeFragmentViewModel(
         private val auth: Auth
 ) : ViewModel() {
-    private val _navEvents = SingleLiveEvent<NavDirections>()
-    val navEvents: LiveData<NavDirections> = _navEvents
-    private val _intentEvents = SingleLiveEvent<Pair<Int, Intent>>()
-    val intentEvents: LiveData<Pair<Int, Intent>> = _intentEvents
+    private val _navEvents = Channel<NavDirections>(Channel.CONFLATED)
+    val navEvents: Flow<NavDirections> = flow { for (e in _navEvents) emit(e) }
+    private val _intentEvents = Channel<Pair<Int, Intent>>(Channel.CONFLATED)
+    val intentEvents: Flow<Pair<Int, Intent>> = flow { for (e in _intentEvents) emit(e) }
 
     fun start() {
         if (auth.isSignedIn) {
-            _navEvents.postValue(WelcomeFragmentDirections.next())
+            _navEvents.offer(WelcomeFragmentDirections.next())
         } else {
-            _intentEvents.postValue(SIGN_IN_RC to auth.newSignInIntent())
+            _intentEvents.offer(SIGN_IN_RC to auth.newSignInIntent())
         }
     }
 
