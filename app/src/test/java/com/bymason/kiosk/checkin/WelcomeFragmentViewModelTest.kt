@@ -4,7 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
@@ -27,9 +28,9 @@ class WelcomeFragmentViewModelTest {
         vm.start()
 
         launch {
-            assertThat(vm.navEvents.toList()).containsExactly(WelcomeFragmentDirections.next())
-            assertThat(vm.intentEvents.toList()).isEmpty()
-        }.cancel()
+            assertThat(vm.navEvents.take(1).single())
+                    .isEqualTo(WelcomeFragmentDirections.next())
+        }
     }
 
     @Test
@@ -39,8 +40,7 @@ class WelcomeFragmentViewModelTest {
         vm.start()
 
         launch {
-            assertThat(vm.navEvents.toList()).isEmpty()
-            assertThat(vm.intentEvents.toList()).hasSize(1)
-        }.cancel()
+            assertThat(vm.intentEvents.take(1).single()).isNotNull()
+        }
     }
 }

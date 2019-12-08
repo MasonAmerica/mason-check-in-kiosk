@@ -89,10 +89,6 @@ dependencies {
     implementation(Config.Libs.Kotlin.coroutinesAndroid)
     implementation(Config.Libs.Kotlin.coroutinesTasks)
 
-    implementation(Config.Libs.Kotlin.common)
-    implementation(Config.Libs.Kotlin.appCompat)
-    implementation(Config.Libs.Kotlin.design)
-
     implementation(Config.Libs.Jetpack.core)
     implementation(Config.Libs.Jetpack.appCompat)
     implementation(Config.Libs.Jetpack.fragment)
@@ -106,6 +102,7 @@ dependencies {
     implementation(Config.Libs.Jetpack.viewModel)
     implementation(Config.Libs.Jetpack.navFragments)
     implementation(Config.Libs.Jetpack.navUi)
+    implementation(Config.Libs.Jetpack.webkit)
 
     implementation(Config.Libs.Firebase.analytics)
     implementation(Config.Libs.Firebase.auth)

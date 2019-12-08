@@ -49,17 +49,11 @@ object Config {
 
     object Libs {
         object Kotlin {
-            private const val ankoVersion = "0.10.8"
-
             const val jvm = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
             const val js = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
             const val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
             const val coroutinesTasks = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.2"
             const val coroutinesJs = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.2"
-
-            const val common = "org.jetbrains.anko:anko-common:$ankoVersion"
-            const val appCompat = "org.jetbrains.anko:anko-appcompat-v7-commons:$ankoVersion"
-            const val design = "org.jetbrains.anko:anko-design:$ankoVersion"
         }
 
         object Jetpack {
@@ -81,6 +75,8 @@ object Config {
 
             const val navFragments = "androidx.navigation:navigation-fragment-ktx:$navVersion"
             const val navUi = "androidx.navigation:navigation-ui-ktx:$navVersion"
+
+            const val webkit = "androidx.webkit:webkit:1.1.0"
         }
 
         object Firebase {

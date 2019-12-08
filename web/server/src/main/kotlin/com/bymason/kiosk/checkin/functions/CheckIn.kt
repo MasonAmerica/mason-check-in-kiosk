@@ -44,7 +44,10 @@ private suspend fun finishCheckIn(auth: AuthContext, employeeId: String, guestNa
 
     val employeeEmail = employee.primaryEmail
     val slackUser = superagent.get("https://slack.com/api/users.lookupByEmail")
-            .query(json("token" to creds["slack"], "email" to employeeEmail))
+            .query(json(
+                    "token" to creds.getValue("slack")["access_token"],
+                    "email" to employeeEmail
+            ))
             .await().body
     console.log("Slack user: ", slackUser)
 
