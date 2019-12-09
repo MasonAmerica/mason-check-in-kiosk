@@ -8,7 +8,7 @@
     tools:context=".HomeActivity">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/searchLayout"
+        android:id="@+id/search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/spacing_large"
@@ -38,7 +38,7 @@
             tools:listitem="@layout/employee_finder_fragment_item" />
 
         <TextView
-            android:id="@+id/noEmployeesHint"
+            android:id="@+id/no_employees_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

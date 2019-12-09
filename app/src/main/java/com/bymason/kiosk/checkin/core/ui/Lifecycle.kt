@@ -24,7 +24,7 @@ fun <T> Fragment.LifecycleAwareLazy(evaluator: () -> T): ReadOnlyLifecycleAwareL
 fun <T : Any> Fragment.LifecycleAwareLazy(): ReadWriteLifecycleAwareLazy<T> =
         ReadWriteFragmentLifecycleAwareLazy(this)
 
-infix fun <R : LifecycleAwareLazy<T>, T> R.onDestroy(cleanup: (T) -> Unit) = apply {
+infix fun <R : LifecycleAwareLazy<T>, T> R.onDestroy(cleanup: T.() -> Unit) = apply {
     this.cleanup = cleanup
 }
 

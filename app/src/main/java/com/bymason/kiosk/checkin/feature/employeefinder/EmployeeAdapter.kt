@@ -11,11 +11,13 @@ import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentItemBinding
 
 class EmployeeAdapter(
         private val fragment: Fragment,
+        private val vm: EmployeeFinderViewModel,
         private val guest: Guest
 ) : ListAdapter<Employee, EmployeeViewHolder>(differ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolder {
         return EmployeeViewHolder(
                 fragment,
+                vm,
                 guest,
                 EmployeeFinderFragmentItemBinding.inflate(
                         LayoutInflater.from(parent.context), parent, false)

@@ -1,9 +1,9 @@
 package com.bymason.kiosk.checkin.feature.nda
 
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,6 +12,7 @@ import androidx.webkit.WebViewClientCompat
 import com.bymason.kiosk.checkin.core.logBreadcrumb
 import com.bymason.kiosk.checkin.core.model.Employee
 import com.bymason.kiosk.checkin.core.model.Guest
+import com.bymason.kiosk.checkin.core.ui.StateHolder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,8 +21,8 @@ import kotlinx.coroutines.launch
 class NdaViewModel(
         private val repository: NdaRepository
 ) : ViewModel() {
-    private val _state = MutableLiveData<State>(State())
-    val state: LiveData<State> get() = _state
+    private val _state = StateHolder(State())
+    val state: LiveData<State> get() = _state.liveData
     private val _actions = Channel<Action>(Channel.CONFLATED)
     val actions: Flow<Action> = flow { for (e in _actions) emit(e) }
     private val _viewActions = Channel<ViewAction>(Channel.CONFLATED)
@@ -43,7 +44,14 @@ class NdaViewModel(
         }
     }
 
+    fun createWebChromeClient() = object : WebChromeClient() {
+        override fun onProgressChanged(view: WebView, newProgress: Int) {
+            _state.value = _state.value.copy(isLoading = newProgress != 100)
+        }
+    }
+
     fun signNda(guest: Guest) {
+        _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
                 _viewActions.offer(ViewAction.VisitPage(repository.sign(guest.name, guest.email)))
@@ -55,10 +63,12 @@ class NdaViewModel(
     }
 
     fun finish(employee: Employee, guest: Guest) {
+        _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
                 repository.finish(employee.id, guest.name, guest.email)
                 _actions.offer(Action.Navigate(NdaFragmentDirections.reset()))
+                _state.value = _state.value.copy(isLoading = false)
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to fetch list of employees", t)
                 return@launch
@@ -68,7 +78,10 @@ class NdaViewModel(
 
     private fun onNdaSigned(result: String) {
         if (result == "signing_complete") {
-            _state.postValue(_state.value!!.copy(isFinishButtonEnabled = true))
+            _state.value = _state.value.copy(
+                    isWebViewVisible = false,
+                    isFinishButtonVisible = true
+            )
         } else {
             _actions.offer(Action.SignNda)
         }
@@ -85,7 +98,9 @@ class NdaViewModel(
     }
 
     data class State(
-            val isFinishButtonEnabled: Boolean = false
+            val isLoading: Boolean = false,
+            val isWebViewVisible: Boolean = true,
+            val isFinishButtonVisible: Boolean = false
     )
 
     class Factory(

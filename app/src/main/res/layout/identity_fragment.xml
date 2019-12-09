@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/ic_logo" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/nameLayout"
+        android:id="@+id/name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_large"
@@ -35,12 +35,12 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName|textCapWords" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailLayout"
+        android:id="@+id/email_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_large"
@@ -49,7 +49,7 @@
         android:hint="@string/kiosk_checkin_identity_email_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nameLayout">
+        app:layout_constraintTop_toBottomOf="@id/name_layout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"

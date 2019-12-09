@@ -1,7 +1,9 @@
 package com.bymason.kiosk.checkin.feature.nda
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -20,6 +22,7 @@ class NdaFragment(
 
     private val vm by viewModels<NdaViewModel> { NdaViewModel.Factory(repository) }
     private val binding by LifecycleAwareLazy { NdaFragmentBinding.bind(requireView()) }
+    private val progress by lazy { requireActivity().findViewById<View>(R.id.progress) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,10 +33,16 @@ class NdaFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.web.webViewClient = vm.createWebViewClient()
+        binding.web.webChromeClient = vm.createWebChromeClient()
         binding.web.settings.javaScriptEnabled = true
         binding.web.restoreState(savedInstanceState)
 
-        binding.finish.setOnClickListener { vm.finish(args.employee, args.guest) }
+        binding.finishCheckInHint.setOnTouchListener { _, e ->
+            if (e.action == MotionEvent.ACTION_UP) {
+                vm.finish(args.employee, args.guest)
+            }
+            true
+        }
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             vm.viewActions.collect { onViewActionRequested(it) }
@@ -62,6 +71,8 @@ class NdaFragment(
     }
 
     private fun onViewStateChanged(state: NdaViewModel.State) {
-        binding.finish.isEnabled = state.isFinishButtonEnabled
+        progress.isVisible = state.isLoading
+        binding.web.isVisible = state.isWebViewVisible
+        binding.finishCheckInHint.isVisible = state.isFinishButtonVisible
     }
 }
