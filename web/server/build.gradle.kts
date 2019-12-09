@@ -18,6 +18,7 @@ kotlin {
         implementation(npm("googleapis", "45.0.0"))
         implementation(npm("superagent", "5.1.1"))
         implementation(npm("docusign-esign", "5.1.0"))
+        implementation(npm("md5", "2.2.1"))
     }
 }
 

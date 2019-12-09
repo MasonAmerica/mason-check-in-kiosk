@@ -35,10 +35,17 @@ private suspend fun findEmployees(auth: AuthContext, employee: String): Array<Js
     console.log("Employees: ", employees)
 
     return employees.users.orEmpty().map {
+        val profilePic = if (it.thumbnailPhotoUrl.orEmpty().contains("/private")) {
+            val hash = js("require('md5')")(it.primaryEmail?.toLowerCase())
+            "https://www.gravatar.com/avatar/$hash?default=${it.thumbnailPhotoUrl}"
+        } else {
+            it.thumbnailPhotoUrl
+        }
+
         json(
                 "id" to it.id,
                 "name" to it.name?.fullName,
-                "photoUrl" to it.thumbnailPhotoUrl
+                "photoUrl" to profilePic
         )
     }.toTypedArray()
 }

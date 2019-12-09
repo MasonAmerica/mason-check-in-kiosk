@@ -1729,7 +1729,7 @@ external interface `Schema$UserPhone` {
         set(value) = definedExternally
 }
 
-external interface `Schema$UserPhoto` {
+external interface `Schema$UserPhoto` : `Schema$Base`<`Schema$UserPhoto`> {
     var etag: String?
         get() = definedExternally
         set(value) = definedExternally
@@ -3994,7 +3994,7 @@ open external class `Resource$Users$Photos`(context: APIRequestContext) {
     open fun delete(params: `Params$Resource$Users$Photos$Delete`, options: BodyResponseCallback<Unit>, callback: BodyResponseCallback<Unit>)
     open fun delete(params: `Params$Resource$Users$Photos$Delete`, callback: BodyResponseCallback<Unit>)
     open fun delete(callback: BodyResponseCallback<Unit>)
-    open fun get(params: `Params$Resource$Users$Photos$Get`? = definedExternally, options: MethodOptions? = definedExternally): Promise<`Schema$UserPhoto`>
+    open fun get(params: Any? = definedExternally, options: MethodOptions? = definedExternally): Promise<`Schema$UserPhoto`>
     open fun get(params: `Params$Resource$Users$Photos$Get`, options: MethodOptions, callback: BodyResponseCallback<`Schema$UserPhoto`>)
     open fun get(params: `Params$Resource$Users$Photos$Get`, options: BodyResponseCallback<`Schema$UserPhoto`>, callback: BodyResponseCallback<`Schema$UserPhoto`>)
     open fun get(params: `Params$Resource$Users$Photos$Get`, callback: BodyResponseCallback<`Schema$UserPhoto`>)
