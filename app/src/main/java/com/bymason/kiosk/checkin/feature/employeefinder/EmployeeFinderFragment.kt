@@ -23,7 +23,7 @@ class EmployeeFinderFragment(
     private val args by navArgs<EmployeeFinderFragmentArgs>()
 
     private val vm by viewModels<EmployeeFinderViewModel> {
-        EmployeeFinderViewModel.Factory(repository)
+        EmployeeFinderViewModel.Factory(repository, args.guest)
     }
     private val binding by LifecycleAwareLazy {
         EmployeeFinderFragmentBinding.bind(requireView())
@@ -31,21 +31,21 @@ class EmployeeFinderFragment(
         search.clearFocus()
         search.hideKeyboard()
     }
-    private val progress by lazy { requireActivity().findViewById<View>(R.id.progress) }
+    private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenStarted {
             vm.actions.collect { onActionRequested(it) }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.search.doAfterTextChanged {
-            vm.find(it?.toString())
+            vm.onSearch(it?.toString())
         }
 
-        val adapter = EmployeeAdapter(this, vm, args.guest)
+        val adapter = EmployeeAdapter(this, vm)
         binding.employees.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
@@ -68,7 +68,7 @@ class EmployeeFinderFragment(
     }
 
     private fun onViewStateChanged(state: EmployeeFinderViewModel.State, adapter: EmployeeAdapter) {
-        progress.isVisible = state.isLoading
+        progress?.isVisible = state.isLoading
         binding.noEmployeesHint.isVisible = state.isSearchHintVisible
         adapter.submitList(state.employees)
     }

@@ -36,7 +36,7 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-alpha05"
+        const val android = "com.android.tools.build:gradle:4.0.0-alpha06"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val mason = "com.bymason.build:mason-apps:1.0.2"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"

@@ -20,13 +20,15 @@ class NdaFragment(
 ) : FragmentBase(R.layout.nda_fragment) {
     private val args by navArgs<NdaFragmentArgs>()
 
-    private val vm by viewModels<NdaViewModel> { NdaViewModel.Factory(repository) }
+    private val vm by viewModels<NdaViewModel> {
+        NdaViewModel.Factory(repository, args.employee, args.guest)
+    }
     private val binding by LifecycleAwareLazy { NdaFragmentBinding.bind(requireView()) }
-    private val progress by lazy { requireActivity().findViewById<View>(R.id.progress) }
+    private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenStarted {
             vm.actions.collect { onActionRequested(it) }
         }
     }
@@ -35,11 +37,11 @@ class NdaFragment(
         binding.web.webViewClient = vm.createWebViewClient()
         binding.web.webChromeClient = vm.createWebChromeClient()
         binding.web.settings.javaScriptEnabled = true
-        binding.web.restoreState(savedInstanceState)
+        savedInstanceState?.let { binding.web.restoreState(it) }
 
         binding.finishCheckInHint.setOnTouchListener { _, e ->
             if (e.action == MotionEvent.ACTION_UP) {
-                vm.finish(args.employee, args.guest)
+                vm.onNdaSigned()
             }
             true
         }
@@ -60,7 +62,7 @@ class NdaFragment(
     private fun onActionRequested(action: NdaViewModel.Action) {
         when (action) {
             is NdaViewModel.Action.Navigate -> findNavController().navigate(action.directions)
-            NdaViewModel.Action.SignNda -> vm.signNda(args.guest)
+            NdaViewModel.Action.SignNda -> vm.onNdaSigningRequested()
         }
     }
 
@@ -71,7 +73,7 @@ class NdaFragment(
     }
 
     private fun onViewStateChanged(state: NdaViewModel.State) {
-        progress.isVisible = state.isLoading
+        progress?.isVisible = state.isLoading
         binding.web.isVisible = state.isWebViewVisible
         binding.finishCheckInHint.isVisible = state.isFinishButtonVisible
     }

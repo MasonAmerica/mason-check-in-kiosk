@@ -6,13 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentItemBinding
 
 class EmployeeViewHolder(
         private val fragment: Fragment,
         private val vm: EmployeeFinderViewModel,
-        private val guest: Guest,
         private val binding: EmployeeFinderFragmentItemBinding
 ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
     private lateinit var employee: Employee
@@ -33,6 +31,6 @@ class EmployeeViewHolder(
     }
 
     override fun onClick(v: View) {
-        vm.onFound(employee, guest)
+        vm.onFound(employee)
     }
 }

@@ -2,6 +2,7 @@ package com.bymason.kiosk.checkin.feature.employeefinder
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.bymason.kiosk.checkin.core.model.Employee
+import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -20,22 +21,22 @@ class EmployeeFinderViewModelTest {
     val dispatcherRule = TestCoroutineDispatcherRule()
 
     private val mockEmployeeRepository = mock(EmployeeRepository::class.java)
-    private val vm = EmployeeFinderViewModel(mockEmployeeRepository)
+    private val vm = EmployeeFinderViewModel(mockEmployeeRepository, Guest("A", "B"))
 
     @Test
     fun `Searching for null name noops with empty employees`() = dispatcherRule.runBlocking {
-        vm.find(null)
+        vm.onSearch(null)
 
         verify(mockEmployeeRepository, never()).find(any())
-        assertThat(vm.employees.value).isEmpty()
+        assertThat(vm.state.value?.employees).isEmpty()
     }
 
     @Test
     fun `Searching for empty name noops with empty employees`() = dispatcherRule.runBlocking {
-        vm.find(" ")
+        vm.onSearch(" ")
 
         verify(mockEmployeeRepository, never()).find(any())
-        assertThat(vm.employees.value).isEmpty()
+        assertThat(vm.state.value?.employees).isEmpty()
     }
 
     @Test
@@ -43,9 +44,9 @@ class EmployeeFinderViewModelTest {
         val employee = Employee("id", "Mr Robot", null)
         `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(employee))
 
-        vm.find("Mr")
+        vm.onSearch("Mr")
 
-        assertThat(vm.employees.value).containsExactly(employee)
+        assertThat(vm.state.value?.employees).containsExactly(employee)
     }
 
     @Test
@@ -61,16 +62,16 @@ class EmployeeFinderViewModelTest {
                 "2" -> result2
                 else -> error("Unknown $name")
             }.await()
-        })
+        }, Guest("A", "B"))
 
-        vm.find("1")
-        assertThat(vm.employees.value).isNull()
+        vm.onSearch("1")
+        assertThat(vm.state.value?.employees).isEmpty()
 
-        vm.find("2")
+        vm.onSearch("2")
         result2.complete(listOf(employee2))
-        assertThat(vm.employees.value).containsExactly(employee2)
+        assertThat(vm.state.value?.employees).containsExactly(employee2)
 
         result1.complete(listOf(employee1))
-        assertThat(vm.employees.value).containsExactly(employee2)
+        assertThat(vm.state.value?.employees).containsExactly(employee2)
     }
 }

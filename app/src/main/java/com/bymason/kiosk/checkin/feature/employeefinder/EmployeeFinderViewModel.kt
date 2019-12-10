@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class EmployeeFinderViewModel(
-        private val repository: EmployeeRepository
+        private val repository: EmployeeRepository,
+        private val guest: Guest
 ) : ViewModel() {
     private val _state = StateHolder(State())
     val state: LiveData<State> get() = _state.liveData
@@ -28,7 +29,7 @@ class EmployeeFinderViewModel(
 
     private var previousSearch: Job? = null
 
-    fun find(employee: String?) {
+    fun onSearch(employee: String?) {
         previousSearch?.cancel("New search came in")
         if (employee.isNullOrBlank()) {
             _state.value = _state.value.copy(
@@ -50,13 +51,13 @@ class EmployeeFinderViewModel(
 
             _state.value = _state.value.copy(
                     isLoading = false,
-                    isSearchHintVisible = false,
+                    isSearchHintVisible = employees.isEmpty(),
                     employees = employees
             )
         }
     }
 
-    fun onFound(employee: Employee, guest: Guest) {
+    fun onFound(employee: Employee) {
         _actions.offer(Action.Navigate(EmployeeFinderFragmentDirections.next(employee, guest)))
     }
 
@@ -73,13 +74,14 @@ class EmployeeFinderViewModel(
     )
 
     class Factory(
-            private val repository: EmployeeRepository
+            private val repository: EmployeeRepository,
+            private val guest: Guest
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === EmployeeFinderViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return EmployeeFinderViewModel(repository) as T
+            return EmployeeFinderViewModel(repository, guest) as T
         }
     }
 }

@@ -19,7 +19,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class NdaViewModel(
-        private val repository: NdaRepository
+        private val repository: NdaRepository,
+        private val employee: Employee,
+        private val guest: Guest
 ) : ViewModel() {
     private val _state = StateHolder(State())
     val state: LiveData<State> get() = _state.liveData
@@ -36,7 +38,7 @@ class NdaViewModel(
         override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
-        ): Boolean = if (request.url.toString().contains("redirect/docusign/app")) {
+        ): Boolean = if (request.url.toString().contains("/redirect/docusign/app")) {
             onNdaSigned(request.url.getQueryParameter("event") ?: "error")
             true
         } else {
@@ -50,7 +52,7 @@ class NdaViewModel(
         }
     }
 
-    fun signNda(guest: Guest) {
+    fun onNdaSigningRequested() {
         _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
@@ -62,7 +64,7 @@ class NdaViewModel(
         }
     }
 
-    fun finish(employee: Employee, guest: Guest) {
+    fun onNdaSigned() {
         _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
@@ -104,13 +106,15 @@ class NdaViewModel(
     )
 
     class Factory(
-            private val repository: NdaRepository
+            private val repository: NdaRepository,
+            private val employee: Employee,
+            private val guest: Guest
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === NdaViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return NdaViewModel(repository) as T
+            return NdaViewModel(repository, employee, guest) as T
         }
     }
 }
