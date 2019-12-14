@@ -23,7 +23,7 @@ class EmployeeFinderFragment(
     private val args by navArgs<EmployeeFinderFragmentArgs>()
 
     private val vm by viewModels<EmployeeFinderViewModel> {
-        EmployeeFinderViewModel.Factory(repository, args.guest)
+        EmployeeFinderViewModel.Factory(repository, args.sessionId)
     }
     private val binding by LifecycleAwareLazy {
         EmployeeFinderFragmentBinding.bind(requireView())
@@ -48,9 +48,6 @@ class EmployeeFinderFragment(
         val adapter = EmployeeAdapter(this, vm)
         binding.employees.adapter = adapter
 
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            vm.viewActions.collect { onViewActionRequested(it) }
-        }
         vm.state.observe(viewLifecycleOwner) {
             onViewStateChanged(it, adapter)
         }
@@ -61,10 +58,6 @@ class EmployeeFinderFragment(
             is EmployeeFinderViewModel.Action.Navigate ->
                 findNavController().navigate(action.directions)
         }
-    }
-
-    private fun onViewActionRequested(action: EmployeeFinderViewModel.ViewAction) {
-        error("No view actions implemented")
     }
 
     private fun onViewStateChanged(state: EmployeeFinderViewModel.State, adapter: EmployeeAdapter) {

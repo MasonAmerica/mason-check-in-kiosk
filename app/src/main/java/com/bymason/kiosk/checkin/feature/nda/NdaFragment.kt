@@ -21,7 +21,7 @@ class NdaFragment(
     private val args by navArgs<NdaFragmentArgs>()
 
     private val vm by viewModels<NdaViewModel> {
-        NdaViewModel.Factory(repository, args.employee, args.guest)
+        NdaViewModel.Factory(repository, args.sessionId)
     }
     private val binding by LifecycleAwareLazy { NdaFragmentBinding.bind(requireView()) }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }

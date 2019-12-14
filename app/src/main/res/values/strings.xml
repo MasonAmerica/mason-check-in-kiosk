@@ -8,10 +8,8 @@
     <!-- Identity -->
     <string name="kiosk_checkin_identity_title">Tell us a little bit about yourself</string>
 
-    <string name="kiosk_checkin_identity_name_hint">Full Name</string>
-    <string name="kiosk_checkin_identity_name_invalid_error">Name must be specified</string>
-    <string name="kiosk_checkin_identity_email_hint">Email</string>
-    <string name="kiosk_checkin_identity_email_invalid_error">Invalid email address</string>
+    <string name="kiosk_checkin_identity_field_hint_title">%s (Optional)</string>
+    <string name="kiosk_checkin_identity_field_invalid_error">Invalid %s</string>
 
     <string name="kiosk_checkin_identity_continue_button_title">Continue</string>
 

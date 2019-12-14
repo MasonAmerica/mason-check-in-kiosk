@@ -7,65 +7,72 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.bymason.kiosk.checkin.core.logBreadcrumb
 import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.core.ui.StateHolder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class EmployeeFinderViewModel(
         private val repository: EmployeeRepository,
-        private val guest: Guest
+        private val sessionId: String
 ) : ViewModel() {
     private val _state = StateHolder(State())
     val state: LiveData<State> get() = _state.liveData
     private val _actions = Channel<Action>(Channel.CONFLATED)
     val actions: Flow<Action> = flow { for (e in _actions) emit(e) }
-    private val _viewActions = Channel<ViewAction>(Channel.CONFLATED)
-    val viewActions: Flow<ViewAction> = flow { for (e in _viewActions) emit(e) }
 
     private var previousSearch: Job? = null
 
     fun onSearch(employee: String?) {
         previousSearch?.cancel("New search came in")
         if (employee.isNullOrBlank()) {
-            _state.value = _state.value.copy(
-                    isLoading = false,
-                    isSearchHintVisible = true,
-                    employees = emptyList()
-            )
+            _state.update {
+                copy(isLoading = false, isSearchHintVisible = true, employees = emptyList())
+            }
             return
         }
 
-        _state.value = _state.value.copy(isLoading = true)
+        _state.update { copy(isLoading = true) }
         previousSearch = viewModelScope.launch {
             val employees = try {
                 repository.find(employee)
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to fetch list of employees", t)
                 return@launch
+            } finally {
+                ensureActive()
+                _state.update { copy(isLoading = false) }
             }
 
-            _state.value = _state.value.copy(
-                    isLoading = false,
-                    isSearchHintVisible = employees.isEmpty(),
-                    employees = employees
-            )
+            _state.update {
+                copy(isSearchHintVisible = employees.isEmpty(), employees = employees)
+            }
         }
     }
 
     fun onFound(employee: Employee) {
-        _actions.offer(Action.Navigate(EmployeeFinderFragmentDirections.next(employee, guest)))
+        _state.update { copy(isLoading = true) }
+        viewModelScope.launch {
+            val sessionId = try {
+                repository.registerEmployee(sessionId, employee)
+            } catch (t: Throwable) {
+                logBreadcrumb("Failed to register employee", t)
+                return@launch
+            } finally {
+                _state.update { copy(isLoading = false) }
+            }
+
+            _actions.offer(Action.Navigate(EmployeeFinderFragmentDirections.next(sessionId)))
+        }
     }
 
     sealed class Action {
         data class Navigate(val directions: NavDirections) : Action()
     }
-
-    sealed class ViewAction
 
     data class State(
             val isLoading: Boolean = false,
@@ -75,13 +82,13 @@ class EmployeeFinderViewModel(
 
     class Factory(
             private val repository: EmployeeRepository,
-            private val guest: Guest
+            private val sessionId: String
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === EmployeeFinderViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return EmployeeFinderViewModel(repository, guest) as T
+            return EmployeeFinderViewModel(repository, sessionId) as T
         }
     }
 }

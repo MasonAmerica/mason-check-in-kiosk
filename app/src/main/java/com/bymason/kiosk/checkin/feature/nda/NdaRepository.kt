@@ -7,35 +7,26 @@ import kotlinx.coroutines.invoke
 import kotlinx.coroutines.tasks.await
 
 interface NdaRepository {
-    suspend fun sign(guestName: String, guestEmail: String): String
+    suspend fun sign(sessionId: String): String
 
-    suspend fun finish(employeeId: String, guestName: String, guestEmail: String)
+    suspend fun finish(sessionId: String)
 }
 
 class DefaultNdaRepository : NdaRepository {
-    override suspend fun sign(guestName: String, guestEmail: String) = Default {
+    override suspend fun sign(sessionId: String) = Default {
         Firebase.functions.getHttpsCallable("generateNdaLink")
-                .call(mapOf(
-                        "guestName" to guestName,
-                        "guestEmail" to guestEmail
-                ))
+                .call(sessionId)
                 .await()
                 .data as String
     }
 
-    override suspend fun finish(
-            employeeId: String,
-            guestName: String,
-            guestEmail: String
-    ) {
+    override suspend fun finish(sessionId: String) {
         Default {
-            Firebase.functions.getHttpsCallable("finishCheckIn")
-                    .call(mapOf(
-                            "employeeId" to employeeId,
-                            "guestName" to guestName,
-                            "guestEmail" to guestEmail
-                    ))
-                    .await()
+            val data = mapOf(
+                    "operation" to "finalize",
+                    "id" to sessionId
+            )
+            Firebase.functions.getHttpsCallable("updateSession").call(data).await()
         }
     }
 }

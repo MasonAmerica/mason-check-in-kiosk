@@ -1,9 +1,12 @@
 package com.bymason.kiosk.checkin.functions
 
 import com.bymason.kiosk.checkin.utils.createInstance
+import com.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import com.bymason.kiosk.checkin.utils.getAndInitCreds
 import com.bymason.kiosk.checkin.utils.refreshDocusignCreds
 import firebase.firestore.DocumentSnapshot
+import firebase.firestore.FieldValues
+import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
 import firebase.functions.admin
 import firebase.https.CallableContext
@@ -22,24 +25,33 @@ import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
 
-fun generateNdaLink(data: Json, context: CallableContext): Promise<*>? {
+fun generateNdaLink(data: Any?, context: CallableContext): Promise<*>? {
     val auth = context.auth ?: throw HttpsError("unauthenticated")
-    val guestName = data["guestName"] as? String
-    val guestEmail = data["guestEmail"] as? String
-    console.log("Generating DocuSign NDA for guest $guestName ($guestEmail)")
+    val sessionId = data as? String
+    console.log("Generating DocuSign NDA for user '${auth.uid}' with session '$sessionId'")
 
-    if (guestName == null || guestEmail == null) {
+    if (sessionId == null) {
         throw HttpsError("invalid-argument")
     }
 
-    return GlobalScope.async { generateNdaLink(auth, guestName, guestEmail) }.asPromise()
+    return GlobalScope.async { generateNdaLink(auth, sessionId) }.asPromise()
 }
 
-private suspend fun generateNdaLink(auth: AuthContext, name: String, email: String): String {
+private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): String {
+    val session = fetchPopulatedSession(auth.uid, sessionId)
+    val guestFields = session["guestFields"] as Array<Json>
+    val guestName = guestFields.mapNotNull { field ->
+        if (field["type"] == 0) field["value"] as String else null
+    }.single()
+    val guestEmail = guestFields.mapNotNull { field ->
+        if (field["type"] == 1) field["value"] as String else null
+    }.single()
+
+
     val creds = getAndInitCreds(auth.uid, "docusign")
     val metadataRef = admin.firestore()
-            .collection("config")
-            .doc(auth.uid)
+            .collection(auth.uid)
+            .doc("config")
             .collection("metadata")
     val companyName = metadataRef.doc("company").get().await().data()["name"]
     val ndaRef = metadataRef.doc("nda").get().await()
@@ -71,8 +83,8 @@ private suspend fun generateNdaLink(auth: AuthContext, name: String, email: Stri
     envelope.documents = arrayOf(document)
 
     val signer = docusign.Signer.constructFromObject(json(
-            "name" to name,
-            "email" to email,
+            "name" to guestName,
+            "email" to guestEmail,
             "routingOrder" to "1",
             "recipientId" to "1",
             "clientUserId" to auth.uid
@@ -99,6 +111,7 @@ private suspend fun generateNdaLink(auth: AuthContext, name: String, email: Stri
                 handler
         )
     }
+    val envelopeId = envelopeResult.envelopeId
     val viewResult: dynamic = makeDocusignRequest(
             auth,
             creds.getValue("docusign"),
@@ -109,8 +122,8 @@ private suspend fun generateNdaLink(auth: AuthContext, name: String, email: Stri
                 "clientUserId" to auth.uid,
                 "recipientId" to "1",
                 "returnUrl" to "https://mason-check-in-kiosk.firebaseapp.com/redirect/docusign/app",
-                "userName" to name,
-                "email" to email
+                "userName" to guestName,
+                "email" to guestEmail
         ))
         envelopeApi.createRecipientView(
                 accountId,
@@ -120,7 +133,20 @@ private suspend fun generateNdaLink(auth: AuthContext, name: String, email: Stri
         )
     }
 
-    console.log("Generated NDA at ${viewResult.url}")
+    console.log("Generated NDA for $guestName ($guestEmail) to sign: ", viewResult.url)
+
+    val sessionDoc = admin.firestore().collection(auth.uid)
+            .doc("sessions")
+            .collection("visits")
+            .doc(sessionId)
+
+    sessionDoc.set(json(
+            "timestamp" to FieldValues.serverTimestamp(),
+            "documents" to json(
+                    "nda" to "https://appdemo.docusign.com/documents/details/$envelopeId"
+            )
+    ), SetOptions.merge).await()
+
     return viewResult.url
 }
 

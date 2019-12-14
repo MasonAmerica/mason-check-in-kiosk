@@ -2,81 +2,89 @@ package com.bymason.kiosk.checkin.feature.identity
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.widget.doAfterTextChanged
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.EditText
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bymason.kiosk.checkin.R
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.doOnImeDone
 import com.bymason.kiosk.checkin.core.ui.showKeyboard
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
+import kotlinx.coroutines.flow.collect
 
-class IdentityFragment : FragmentBase(R.layout.identity_fragment), View.OnFocusChangeListener {
-    private val vm by viewModels<IdentityViewModel>()
+class IdentityFragment(
+        repository: IdentityRepository
+) : FragmentBase(R.layout.identity_fragment) {
+    private val vm by viewModels<IdentityViewModel> { IdentityViewModel.Factory(repository) }
+
     private val binding by LifecycleAwareLazy { IdentityFragmentBinding.bind(requireView()) }
+    private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycleScope.launchWhenStarted {
+            vm.actions.collect { onActionRequested(it) }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.name.requestFocus()
-        binding.name.showKeyboard()
-        binding.name.onFocusChangeListener = this
-        binding.name.doAfterTextChanged { updateFormValidityStatus() }
+        binding.next.setOnClickListener { vm.onContinue() }
 
-        binding.email.onFocusChangeListener = this
-        binding.email.doAfterTextChanged { updateFormValidityStatus() }
-        binding.email.doOnImeDone { next() }
+        val adapter = IdentityAdapter(vm)
+        binding.fields.adapter = adapter
+        binding.fields.itemAnimator = null
+        binding.fields.viewTreeObserver.addOnGlobalLayoutListener(KeyboardInstaller())
 
-        binding.next.setOnClickListener { next() }
-
-        updateFormValidityStatus()
+        vm.state.observe(viewLifecycleOwner) {
+            onViewStateChanged(it, adapter)
+        }
     }
 
-    override fun onFocusChange(v: View, hasFocus: Boolean) {
-        when {
-            v === binding.name -> if (hasFocus) {
-                binding.nameLayout.error = null
-            } else {
-                validateName()
+    private fun onActionRequested(action: IdentityViewModel.Action) {
+        when (action) {
+            is IdentityViewModel.Action.Navigate -> findNavController().navigate(action.directions)
+        }
+    }
+
+    private fun onViewStateChanged(state: IdentityViewModel.State, adapter: IdentityAdapter) {
+        progress?.isVisible = state.isLoading
+        binding.next.isEnabled = state.isContinueButtonEnabled
+        adapter.submitList(state.fieldStates)
+    }
+
+    inner class KeyboardInstaller : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            val lm = binding.fields.layoutManager ?: return
+            val first = lm.getChildAt(0) ?: return
+            val last = lm.getChildAt(lm.childCount - 1) ?: return
+            val firstInput = (first as? ViewGroup)?.findEditText()
+            val lastInput = (last as? ViewGroup)?.findEditText()
+
+            firstInput?.requestFocus()
+            firstInput?.showKeyboard()
+
+            lastInput?.doOnImeDone { vm.onContinue() }
+
+            binding.fields.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        }
+
+        private fun ViewGroup.findEditText(): EditText? {
+            for (child in children) {
+                if (child is ViewGroup) {
+                    val inner = child.findEditText()
+                    if (inner != null) return inner
+                } else if (child is EditText) {
+                    return child
+                }
             }
-            v === binding.email -> if (hasFocus) {
-                binding.emailLayout.error = null
-            } else {
-                validateEmail()
-            }
-        }
-    }
-
-    private fun updateFormValidityStatus() {
-        binding.next.isEnabled =
-                vm.isNameValid(extractName()) &&
-                        vm.isEmailValid(extractEmail())
-    }
-
-    private fun extractName() = binding.name.text?.toString()
-
-    private fun extractEmail() = binding.email.text?.toString()
-
-    private fun validateName() {
-        binding.nameLayout.error = if (vm.isNameValid(extractName())) {
-            null
-        } else {
-            getString(R.string.kiosk_checkin_identity_name_invalid_error)
-        }
-    }
-
-    private fun validateEmail() {
-        binding.emailLayout.error = if (vm.isEmailValid(extractEmail())) {
-            null
-        } else {
-            getString(R.string.kiosk_checkin_identity_email_invalid_error)
-        }
-    }
-
-    private fun next() {
-        if (binding.next.isEnabled) {
-            findNavController().navigate(IdentityFragmentDirections.next(Guest(
-                    extractName()!!, extractEmail()!!)))
+            return null
         }
     }
 }

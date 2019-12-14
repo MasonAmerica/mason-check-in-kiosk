@@ -8,6 +8,9 @@ import com.bymason.kiosk.checkin.core.data.DefaultAuth
 import com.bymason.kiosk.checkin.feature.employeefinder.DefaultEmployeeRepository
 import com.bymason.kiosk.checkin.feature.employeefinder.EmployeeFinderFragment
 import com.bymason.kiosk.checkin.feature.employeefinder.EmployeeRepository
+import com.bymason.kiosk.checkin.feature.identity.DefaultIdentityRepository
+import com.bymason.kiosk.checkin.feature.identity.IdentityFragment
+import com.bymason.kiosk.checkin.feature.identity.IdentityRepository
 import com.bymason.kiosk.checkin.feature.nda.DefaultNdaRepository
 import com.bymason.kiosk.checkin.feature.nda.NdaFragment
 import com.bymason.kiosk.checkin.feature.nda.NdaRepository
@@ -20,6 +23,7 @@ class CheckInNavHostFragment : NavHostFragment() {
 
     class Factory(
             private val auth: Auth = DefaultAuth(),
+            private val identityRepository: IdentityRepository = DefaultIdentityRepository(),
             private val employeeRepository: EmployeeRepository = DefaultEmployeeRepository(),
             private val ndaRepository: NdaRepository = DefaultNdaRepository()
     ) : FragmentFactory() {
@@ -28,6 +32,7 @@ class CheckInNavHostFragment : NavHostFragment() {
                 className: String
         ) = when (loadFragmentClass(classLoader, className)) {
             WelcomeFragment::class.java -> WelcomeFragment(auth)
+            IdentityFragment::class.java -> IdentityFragment(identityRepository)
             EmployeeFinderFragment::class.java -> EmployeeFinderFragment(employeeRepository)
             NdaFragment::class.java -> NdaFragment(ndaRepository)
             else -> super.instantiate(classLoader, className)

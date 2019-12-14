@@ -52,8 +52,8 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
     }
 
     admin.firestore()
-            .collection("config")
-            .doc(req.query["state"].unsafeCast<String>())
+            .collection(req.query["state"].unsafeCast<String>())
+            .doc("config")
             .collection("credentials")
             .doc("gsuite")
             .set(creds.unsafeCast<Json>(), SetOptions.merge)
@@ -88,8 +88,8 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
     }
 
     val ref = admin.firestore()
-            .collection("config")
-            .doc(req.query["state"].unsafeCast<String>())
+            .collection(req.query["state"].unsafeCast<String>())
+            .doc("config")
             .collection("credentials")
             .doc("docusign")
     ref.set(accountResult.body, SetOptions.merge).await()
@@ -107,8 +107,8 @@ private suspend fun fetchSlackAccessToken(req: Request<Any?>, res: Response<Any?
 
     if (result.body["ok"].unsafeCast<Boolean>()) {
         admin.firestore()
-                .collection("config")
-                .doc(req.query["state"].unsafeCast<String>())
+                .collection(req.query["state"].unsafeCast<String>())
+                .doc("config")
                 .collection("credentials")
                 .doc("slack")
                 .set(result.body, SetOptions.merge)

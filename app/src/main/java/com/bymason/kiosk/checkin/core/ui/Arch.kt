@@ -7,9 +7,17 @@ class StateHolder<T : Any>(state: T) {
     private val _liveData = MutableLiveData(state)
     val liveData: LiveData<T> get() = _liveData
 
-    var value: T = state
-        set(value) {
-            field = value
-            _liveData.postValue(value)
+    private var _value: T = state
+    val value: T get() = _value
+
+    fun update(notify: Boolean = true, block: T.() -> T) {
+        synchronized(LOCK) {
+            _value = block(value)
+            if (notify) _liveData.postValue(value)
         }
+    }
+
+    private companion object {
+        val LOCK = Object()
+    }
 }

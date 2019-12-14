@@ -15,9 +15,14 @@ import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
 
-fun findEmployees(employee: String, context: CallableContext): Promise<Array<Json>> {
+fun findEmployees(data: Any?, context: CallableContext): Promise<Array<Json>> {
     val auth = context.auth ?: throw HttpsError("unauthenticated")
-    console.log("Searching for '$employee'")
+    val employee = data as? String
+    console.log("Searching for employee '$employee' as user '${auth.uid}'")
+
+    if (employee == null) {
+        throw HttpsError("invalid-argument")
+    }
 
     return GlobalScope.async { findEmployees(auth, employee) }.asPromise()
 }
@@ -32,7 +37,7 @@ private suspend fun findEmployees(auth: AuthContext, employee: String): Array<Js
             "query" to employee
     )).await().data
     maybeRefreshGsuiteCreds(auth.uid, state)
-    console.log("Employees: ", employees)
+    console.log("Employees: ", employees.users)
 
     return employees.users.orEmpty().map {
         val profilePic = if (it.thumbnailPhotoUrl.orEmpty().contains("/private")) {

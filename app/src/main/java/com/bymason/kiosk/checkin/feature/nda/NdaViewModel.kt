@@ -10,8 +10,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import androidx.webkit.WebViewClientCompat
 import com.bymason.kiosk.checkin.core.logBreadcrumb
-import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.core.ui.StateHolder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +18,7 @@ import kotlinx.coroutines.launch
 
 class NdaViewModel(
         private val repository: NdaRepository,
-        private val employee: Employee,
-        private val guest: Guest
+        private val sessionId: String
 ) : ViewModel() {
     private val _state = StateHolder(State())
     val state: LiveData<State> get() = _state.liveData
@@ -48,42 +45,42 @@ class NdaViewModel(
 
     fun createWebChromeClient() = object : WebChromeClient() {
         override fun onProgressChanged(view: WebView, newProgress: Int) {
-            _state.value = _state.value.copy(isLoading = newProgress != 100)
+            _state.update { copy(isLoading = newProgress != 100) }
         }
     }
 
     fun onNdaSigningRequested() {
-        _state.value = _state.value.copy(isLoading = true)
+        _state.update { copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                _viewActions.offer(ViewAction.VisitPage(repository.sign(guest.name, guest.email)))
+                _viewActions.offer(ViewAction.VisitPage(repository.sign(sessionId)))
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to get link to sign NDA", t)
+                _state.update { copy(isLoading = false) }
                 return@launch
             }
         }
     }
 
     fun onNdaSigned() {
-        _state.value = _state.value.copy(isLoading = true)
+        _state.update { copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                repository.finish(employee.id, guest.name, guest.email)
-                _actions.offer(Action.Navigate(NdaFragmentDirections.reset()))
-                _state.value = _state.value.copy(isLoading = false)
+                repository.finish(sessionId)
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to fetch list of employees", t)
                 return@launch
+            } finally {
+                _state.update { copy(isLoading = false) }
             }
+
+            _actions.offer(Action.Navigate(NdaFragmentDirections.reset()))
         }
     }
 
     private fun onNdaSigned(result: String) {
         if (result == "signing_complete") {
-            _state.value = _state.value.copy(
-                    isWebViewVisible = false,
-                    isFinishButtonVisible = true
-            )
+            _state.update { copy(isWebViewVisible = false, isFinishButtonVisible = true) }
         } else {
             _actions.offer(Action.SignNda)
         }
@@ -107,14 +104,13 @@ class NdaViewModel(
 
     class Factory(
             private val repository: NdaRepository,
-            private val employee: Employee,
-            private val guest: Guest
+            private val sessionId: String
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === NdaViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return NdaViewModel(repository, employee, guest) as T
+            return NdaViewModel(repository, sessionId) as T
         }
     }
 }

@@ -27,8 +27,8 @@ suspend fun getAndInitCreds(
     val creds = integrations.map { integration ->
         async {
             integration to admin.firestore()
-                    .collection("config")
-                    .doc(uid)
+                    .collection(uid)
+                    .doc("config")
                     .collection("credentials")
                     .doc(integration)
                     .get()
@@ -54,8 +54,8 @@ fun maybeRefreshGsuiteCreds(uid: String, state: GoogleAuthState) {
 
     console.log("Soft refreshing gsuite token")
     admin.firestore()
-            .collection("config")
-            .doc(uid)
+            .collection(uid)
+            .doc("config")
             .collection("credentials")
             .doc("gsuite")
             .set(state.client.credentials.asDynamic(), SetOptions.merge)
@@ -71,8 +71,8 @@ suspend fun refreshDocusignCreds(uid: String, creds: Json): Json {
             )).await()
 
     admin.firestore()
-            .collection("config")
-            .doc(uid)
+            .collection(uid)
+            .doc("config")
             .collection("credentials")
             .doc("docusign")
             .set(credsResult.body, SetOptions.merge)

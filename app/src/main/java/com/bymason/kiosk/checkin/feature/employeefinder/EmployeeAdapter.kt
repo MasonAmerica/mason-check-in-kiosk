@@ -12,14 +12,15 @@ class EmployeeAdapter(
         private val fragment: Fragment,
         private val vm: EmployeeFinderViewModel
 ) : ListAdapter<Employee, EmployeeViewHolder>(differ) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolder {
-        return EmployeeViewHolder(
-                fragment,
-                vm,
-                EmployeeFinderFragmentItemBinding.inflate(
-                        LayoutInflater.from(parent.context), parent, false)
-        )
-    }
+    override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+    ) = EmployeeViewHolder(
+            fragment,
+            vm,
+            EmployeeFinderFragmentItemBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false)
+    )
 
     override fun onBindViewHolder(holder: EmployeeViewHolder, position: Int) {
         holder.bind(getItem(position))

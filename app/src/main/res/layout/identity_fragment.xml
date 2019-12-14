@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:importantForAutofill="no"
     tools:context=".HomeActivity">
 
     <ImageView
@@ -17,49 +17,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_logo" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/name_layout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fields"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_large"
-        android:layout_marginEnd="@dimen/spacing_large"
-        android:layout_marginBottom="@dimen/spacing_normal"
-        android:hint="@string/kiosk_checkin_identity_name_hint"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/spacing_normal"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_large"
+        android:scrollbarStyle="outsideOverlay"
+        app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo"
-        app:layout_constraintVertical_bias=".16">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:importantForAutofill="no"
-            android:inputType="textPersonName|textCapWords" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/email_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_large"
-        android:layout_marginTop="@dimen/spacing_normal"
-        android:layout_marginEnd="@dimen/spacing_large"
-        android:hint="@string/kiosk_checkin_identity_email_hint"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/email"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:importantForAutofill="no"
-            android:inputType="textEmailAddress" />
-
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintVertical_bias=".16"
+        tools:listitem="@layout/employee_finder_fragment_item" />
 
     <Button
         android:id="@+id/next"
