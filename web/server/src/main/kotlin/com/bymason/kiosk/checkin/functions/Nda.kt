@@ -46,7 +46,9 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Strin
     val guestEmail = guestFields.mapNotNull { field ->
         if (field["type"] == 1) field["value"] as String else null
     }.single()
-
+    val guestCompany = guestFields.mapNotNull { field ->
+        if (field["type"] == 2) field["value"] as String else null
+    }.singleOrNull()
 
     val creds = getAndInitCreds(auth.uid, "docusign")
     val metadataRef = admin.firestore()
@@ -54,7 +56,8 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Strin
             .doc("config")
             .collection("metadata")
     val companyName = metadataRef.doc("company").get().await().data()["name"]
-    val ndaRef = metadataRef.doc("nda").get().await()
+    val ndaType = if (guestCompany == null) "individual-nda" else "corporate-nda"
+    val ndaRef = metadataRef.doc(ndaType).get().await()
     if (!ndaRef.exists) throw HttpsError("not-found", "No NDA found.")
     val ndaBase64 = admin.asDynamic().storage().bucket()
             .file(ndaRef.data()["store"])
@@ -91,9 +94,15 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Strin
     ))
     signer.tabs = docusign.Tabs.constructFromObject(json(
             "fullNameTabs" to ndaRef.getTabs(docusign, "names"),
-            "signHereTabs" to ndaRef.getTabs(docusign, "signatures"),
-            "dateSignedTabs" to ndaRef.getTabs(docusign, "dates")
+            "dateSignedTabs" to ndaRef.getTabs(docusign, "dates"),
+            "signHereTabs" to ndaRef.getTabs(docusign, "signatures")
     ))
+    if (guestCompany != null) {
+        signer.tabs.textTabs = ndaRef.getTabs(docusign, "companies")
+        for (tab in signer.tabs.textTabs) {
+            tab.value = guestCompany
+        }
+    }
     envelope.recipients =
             docusign.Recipients.constructFromObject(json("signers" to arrayOf(signer)))
 
