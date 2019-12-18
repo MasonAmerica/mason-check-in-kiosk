@@ -4,8 +4,6 @@ import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.single
@@ -14,7 +12,6 @@ import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
@@ -25,8 +22,8 @@ class NdaViewModelTest {
     @get:Rule
     val dispatcherRule = TestCoroutineDispatcherRule()
 
-    private val mockNdaRepository = Mockito.mock(NdaRepository::class.java)
-    private val vm = NdaViewModel(mockNdaRepository, Employee("id", "A", null), Guest("A", "B"))
+    private val mockNdaRepository = mock(NdaRepository::class.java)
+    private val vm = NdaViewModel(mockNdaRepository, "mySession")
 
     @Test
     fun `NDA signing action is immediately kicked off on create`() = dispatcherRule.runBlocking {
@@ -37,7 +34,7 @@ class NdaViewModelTest {
 
     @Test
     fun `View NDA action is sent after signing request`() = dispatcherRule.runBlocking {
-        `when`(mockNdaRepository.sign(any(), any())).thenReturn("my_url")
+        `when`(mockNdaRepository.sign(any())).thenReturn("my_url")
 
         vm.onNdaSigningRequested()
 
@@ -55,7 +52,7 @@ class NdaViewModelTest {
             assertThat(vm.actions.take(1).single())
                     .isEqualTo(NdaViewModel.Action.Navigate(NdaFragmentDirections.reset()))
         }
-        verify(mockNdaRepository).finish(any(), any(), any())
+        verify(mockNdaRepository).finish(any())
     }
 
     @Test

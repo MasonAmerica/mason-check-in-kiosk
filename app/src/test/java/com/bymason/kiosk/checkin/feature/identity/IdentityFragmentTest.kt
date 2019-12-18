@@ -5,21 +5,31 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
-import com.bymason.kiosk.checkin.core.model.Guest
+import com.bymason.kiosk.checkin.core.data.Auth
+import com.bymason.kiosk.checkin.core.model.GuestField
+import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
+import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class IdentityFragmentTest {
+    private val mockAuth = mock(Auth::class.java)
+    private val mockIdentityRepository = mock(IdentityRepository::class.java)
+
     @Ignore("One glorious summer day, the gods will smile down from the heavens and bestow " +
                     "upon us mortals a nice keyboard API.")
     @Test
@@ -27,20 +37,34 @@ class IdentityFragmentTest {
 
     @Test
     fun `Input fields don't have errors on launch`() {
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
+                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            ))
+        }
+
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+            val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
+            val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
-            assertThat(binding.nameLayout.error).isNull()
-            assertThat(binding.emailLayout.error).isNull()
+            assertThat(inputLayout1.error).isNull()
+            assertThat(inputLayout2.error).isNull()
         }
     }
 
     @Test
     fun `Continue button is disabled on launch`() {
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
+                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            ))
+        }
+
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
 
@@ -48,44 +72,73 @@ class IdentityFragmentTest {
         }
     }
 
+    @Ignore("https://github.com/robolectric/robolectric/issues/5407")
     @Test
     fun `Moving to new field while current one is invalid shows error`() {
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
+                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            ))
+        }
+
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+            val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
+            val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
-            binding.emailLayout.requestFocus()
+            inputLayout2.requestFocus()
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
-            assertThat(binding.nameLayout.error).isNotNull()
-            assertThat(binding.emailLayout.error).isNull()
+            assertThat(inputLayout1.error).isNotNull()
+            assertThat(inputLayout2.error).isNull()
         }
     }
 
+    @Ignore("https://github.com/robolectric/robolectric/issues/5407")
     @Test
     fun `Going back to invalid field clears error`() {
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
+                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            ))
+        }
+
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+            val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
+            val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
-            binding.emailLayout.requestFocus()
-            binding.nameLayout.requestFocus()
+            inputLayout2.requestFocus()
+            inputLayout1.requestFocus()
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
-            assertThat(binding.nameLayout.error).isNull()
-            assertThat(binding.emailLayout.error).isNotNull()
+            assertThat(inputLayout1.error).isNull()
+            assertThat(inputLayout2.error).isNotNull()
         }
     }
 
     @Test
     fun `Continue button becomes enabled when all fields are valid`() {
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
+                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            ))
+        }
+
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+            val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
+            val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
-            binding.name.setText("Name")
-            binding.email.setText("name@exmaple.com")
+            inputLayout1.editText!!.setText("A")
+            inputLayout2.editText!!.setText("B")
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
             assertThat(binding.next.isEnabled).isTrue()
         }
@@ -97,18 +150,29 @@ class IdentityFragmentTest {
 
     @Test
     fun `Continue button navigates to next destination`() {
+        runBlocking {
+            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+                    FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, null))))
+            `when`(mockIdentityRepository.registerFields(any())).thenReturn("foobar")
+        }
+
         val mockNavController = mock(NavController::class.java)
-        val scenario = launchFragmentInContainer<IdentityFragment>(
-                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar)
+        val scenario = launchFragment()
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
         }
-        onView(withId(R.id.name)).perform(typeText("My Name"))
-        onView(withId(R.id.email)).perform(typeText("me@example.com"))
 
         onView(withId(R.id.next)).perform(click())
 
-        verify(mockNavController).navigate(IdentityFragmentDirections.next(Guest(
-                "My Name", "me@example.com")))
+        verify(mockNavController).navigate(IdentityFragmentDirections.next("foobar"))
     }
+
+    private fun launchFragment(
+    ) = launchFragmentInContainer<IdentityFragment>(
+            themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
+            factory = CheckInNavHostFragment.Factory(
+                    auth = mockAuth,
+                    identityRepository = mockIdentityRepository
+            )
+    )
 }

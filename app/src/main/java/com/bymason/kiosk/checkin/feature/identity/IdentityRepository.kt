@@ -1,10 +1,11 @@
 package com.bymason.kiosk.checkin.feature.identity
 
+import com.bymason.kiosk.checkin.core.data.DefaultDispatcherProvider
+import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.model.GuestField
 import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.tasks.await
 
@@ -14,9 +15,11 @@ interface IdentityRepository {
     suspend fun registerFields(fields: List<FieldState>): String
 }
 
-class DefaultIdentityRepository : IdentityRepository {
+class DefaultIdentityRepository(
+        private val dispatchers: DispatcherProvider = DefaultDispatcherProvider
+) : IdentityRepository {
     @Suppress("UNCHECKED_CAST")
-    override suspend fun getGuestFields(): List<FieldState> = Default {
+    override suspend fun getGuestFields(): List<FieldState> = dispatchers.default {
         val result = Firebase.functions.getHttpsCallable("getGuestFields").call().await()
         val data = result.data as List<Map<String, Any>>
         data.map {
@@ -32,7 +35,7 @@ class DefaultIdentityRepository : IdentityRepository {
         }
     }
 
-    override suspend fun registerFields(fields: List<FieldState>) = Default {
+    override suspend fun registerFields(fields: List<FieldState>) = dispatchers.default {
         val processedFields = fields
                 .filter { it.value != null }
                 .map { mapOf("id" to it.field.id, "value" to it.value) }

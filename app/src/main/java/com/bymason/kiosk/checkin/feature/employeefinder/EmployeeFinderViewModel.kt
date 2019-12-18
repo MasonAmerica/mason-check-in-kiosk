@@ -55,6 +55,8 @@ class EmployeeFinderViewModel(
     }
 
     fun onFound(employee: Employee) {
+        if (_state.value.isLoading) return // Prevent repeated clicks
+
         _state.update { copy(isLoading = true) }
         viewModelScope.launch {
             val sessionId = try {

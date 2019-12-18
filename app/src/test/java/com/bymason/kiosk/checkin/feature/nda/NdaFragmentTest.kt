@@ -11,8 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.Auth
-import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.databinding.NdaFragmentBinding
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -31,7 +29,7 @@ class NdaFragmentTest {
     @Test
     fun `NDA signing page loads on create`() {
         runBlocking {
-            `when`(mockNdaRepository.sign(any(), any())).thenReturn("https://google.com")
+            `when`(mockNdaRepository.sign(any())).thenReturn("https://google.com")
         }
 
         val scenario = launchFragment()
@@ -46,7 +44,7 @@ class NdaFragmentTest {
     @Test
     fun `Finish check-in button finishes check-in`() {
         runBlocking {
-            `when`(mockNdaRepository.sign(any(), any())).thenReturn("https://google.com")
+            `when`(mockNdaRepository.sign(any())).thenReturn("https://google.com")
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -63,16 +61,15 @@ class NdaFragmentTest {
         }
 
         runBlocking {
-            verify(mockNdaRepository).finish(any(), any(), any())
+            verify(mockNdaRepository).finish(any())
         }
         verify(mockNavController).navigate(NdaFragmentDirections.reset())
     }
 
     private fun launchFragment(
-            employee: Employee = Employee("Name", "foobar@example.com", null),
-            guest: Guest = Guest("Name", "foobar@example.com")
+            sessionId: String = "mySession"
     ) = launchFragmentInContainer<NdaFragment>(
-            NdaFragmentArgs(employee, guest).toBundle(),
+            NdaFragmentArgs(sessionId).toBundle(),
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
                     auth = mockAuth,

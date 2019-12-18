@@ -15,7 +15,6 @@ import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.core.model.Employee
-import com.bymason.kiosk.checkin.core.model.Guest
 import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentBinding
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -92,29 +91,29 @@ class EmployeeFinderFragmentTest {
 
     @Test
     fun `Selecting employee result navigates to next destination`() {
-        val guest = Guest("Name", "foobar@example.com")
         val employee = Employee("id", "name", null)
         val mockNavController = mock(NavController::class.java)
-        val scenario = launchFragment(guest)
+        val scenario = launchFragment("foobar")
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
 
             val binding = EmployeeFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockEmployeeRepository.find(any())).thenReturn(listOf(employee))
+                `when`(mockEmployeeRepository.registerEmployee(any(), any())).thenReturn("foobar")
             }
             binding.search.setText("Person")
         }
 
         onView(withId(R.id.name)).perform(click())
 
-        verify(mockNavController).navigate(EmployeeFinderFragmentDirections.next(employee, guest))
+        verify(mockNavController).navigate(EmployeeFinderFragmentDirections.next("foobar"))
     }
 
     private fun launchFragment(
-            guest: Guest = Guest("Name", "foobar@example.com")
+            sessionId: String = "mySession"
     ) = launchFragmentInContainer<EmployeeFinderFragment>(
-            EmployeeFinderFragmentArgs(guest).toBundle(),
+            EmployeeFinderFragmentArgs(sessionId).toBundle(),
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
                     auth = mockAuth,
