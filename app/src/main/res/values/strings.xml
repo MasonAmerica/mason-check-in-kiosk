@@ -13,11 +13,11 @@
 
     <string name="kiosk_checkin_identity_continue_button_title">Continue</string>
 
-    <!-- Employee Finder -->
-    <string name="kiosk_checkin_employee_finder_title">Who are you here to see?</string>
-    <string name="kiosk_checkin_employee_finder_search_hint">Employee name</string>
-    <string name="kiosk_checkin_employee_finder_no_employees_message">
-        Try searching for a current employee.
+    <!-- Host Finder -->
+    <string name="kiosk_checkin_host_finder_title">Who are you here to see?</string>
+    <string name="kiosk_checkin_host_finder_search_hint">Host name</string>
+    <string name="kiosk_checkin_host_finder_no_hosts_message">
+        Try searching for a current employee, intern, or TVC.
     </string>
 
     <!-- NDA -->

@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.employeefinder
+package com.bymason.kiosk.checkin.feature.hostfinder
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.bymason.kiosk.checkin.core.logBreadcrumb
-import com.bymason.kiosk.checkin.core.model.Employee
+import com.bymason.kiosk.checkin.core.model.Host
 import com.bymason.kiosk.checkin.core.ui.StateHolder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-class EmployeeFinderViewModel(
-        private val repository: EmployeeRepository,
+class HostFinderViewModel(
+        private val repository: HostRepository,
         private val sessionId: String
 ) : ViewModel() {
     private val _state = StateHolder(State())
@@ -27,21 +27,21 @@ class EmployeeFinderViewModel(
 
     private var previousSearch: Job? = null
 
-    fun onSearch(employee: String?) {
+    fun onSearch(name: String?) {
         previousSearch?.cancel("New search came in")
-        if (employee.isNullOrBlank()) {
+        if (name.isNullOrBlank()) {
             _state.update {
-                copy(isLoading = false, isSearchHintVisible = true, employees = emptyList())
+                copy(isLoading = false, isSearchHintVisible = true, hosts = emptyList())
             }
             return
         }
 
         _state.update { copy(isLoading = true) }
         previousSearch = viewModelScope.launch {
-            val employees = try {
-                repository.find(employee)
+            val hosts = try {
+                repository.find(name)
             } catch (t: Throwable) {
-                logBreadcrumb("Failed to fetch list of employees", t)
+                logBreadcrumb("Failed to fetch list of hosts", t)
                 return@launch
             } finally {
                 ensureActive()
@@ -49,26 +49,26 @@ class EmployeeFinderViewModel(
             }
 
             _state.update {
-                copy(isSearchHintVisible = employees.isEmpty(), employees = employees)
+                copy(isSearchHintVisible = hosts.isEmpty(), hosts = hosts)
             }
         }
     }
 
-    fun onFound(employee: Employee) {
+    fun onFound(host: Host) {
         if (_state.value.isLoading) return // Prevent repeated clicks
 
         _state.update { copy(isLoading = true) }
         viewModelScope.launch {
             val sessionId = try {
-                repository.registerEmployee(sessionId, employee)
+                repository.registerHost(sessionId, host)
             } catch (t: Throwable) {
-                logBreadcrumb("Failed to register employee", t)
+                logBreadcrumb("Failed to register host", t)
                 return@launch
             } finally {
                 _state.update { copy(isLoading = false) }
             }
 
-            _actions.offer(Action.Navigate(EmployeeFinderFragmentDirections.next(sessionId)))
+            _actions.offer(Action.Navigate(HostFinderFragmentDirections.next(sessionId)))
         }
     }
 
@@ -79,18 +79,18 @@ class EmployeeFinderViewModel(
     data class State(
             val isLoading: Boolean = false,
             val isSearchHintVisible: Boolean = true,
-            val employees: List<Employee> = emptyList()
+            val hosts: List<Host> = emptyList()
     )
 
     class Factory(
-            private val repository: EmployeeRepository,
+            private val repository: HostRepository,
             private val sessionId: String
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            check(modelClass === EmployeeFinderViewModel::class.java)
+            check(modelClass === HostFinderViewModel::class.java)
 
             @Suppress("UNCHECKED_CAST")
-            return EmployeeFinderViewModel(repository, sessionId) as T
+            return HostFinderViewModel(repository, sessionId) as T
         }
     }
 }

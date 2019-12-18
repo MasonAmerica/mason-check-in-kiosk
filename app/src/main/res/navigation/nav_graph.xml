@@ -37,7 +37,7 @@
 
         <action
             android:id="@+id/next"
-            app:destination="@id/employee_finder"
+            app:destination="@id/host_finder"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -46,10 +46,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/employee_finder"
-        android:name="com.bymason.kiosk.checkin.feature.employeefinder.EmployeeFinderFragment"
-        android:label="@string/kiosk_checkin_employee_finder_title"
-        tools:layout="@layout/employee_finder_fragment">
+        android:id="@+id/host_finder"
+        android:name="com.bymason.kiosk.checkin.feature.hostfinder.HostFinderFragment"
+        android:label="@string/kiosk_checkin_host_finder_title"
+        tools:layout="@layout/host_finder_fragment">
 
         <argument
             android:name="sessionId"

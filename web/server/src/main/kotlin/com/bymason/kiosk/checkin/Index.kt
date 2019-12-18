@@ -1,6 +1,6 @@
 package com.bymason.kiosk.checkin
 
-import com.bymason.kiosk.checkin.functions.findEmployees
+import com.bymason.kiosk.checkin.functions.findHosts
 import com.bymason.kiosk.checkin.functions.generateNdaLink
 import com.bymason.kiosk.checkin.functions.getGuestFields
 import com.bymason.kiosk.checkin.functions.handleDocusignAuth
@@ -28,8 +28,8 @@ fun main() {
             .onCall<Any?> { _, context -> getGuestFields(context) }
     exports.updateSession = functions.runWith(json("memory" to "1GB")).https
             .onCall<Json> { data, context -> updateSession(data, context) }
-    exports.findEmployees = functions.runWith(json("memory" to "512MB")).https
-            .onCall<Any?> { data, context -> findEmployees(data, context) }
+    exports.findHosts = functions.runWith(json("memory" to "512MB")).https
+            .onCall<Any?> { data, context -> findHosts(data, context) }
     exports.generateNdaLink = functions.runWith(json("memory" to "512MB")).https
             .onCall<Any?> { data, context -> generateNdaLink(data, context) }
 }

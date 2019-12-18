@@ -217,7 +217,7 @@ class IdentityViewModelTest {
     }
 
     @Test
-    fun `Finding employee navigates to next destinations`() = dispatcherRule.runBlocking {
+    fun `Finding host navigates to next destinations`() = dispatcherRule.runBlocking {
         val result1 = CompletableDeferred<String>()
         val result2 = CompletableDeferred<String>()
         val field = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))

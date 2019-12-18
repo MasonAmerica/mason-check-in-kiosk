@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentFactory
 import androidx.navigation.fragment.NavHostFragment
 import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.core.data.DefaultAuth
-import com.bymason.kiosk.checkin.feature.employeefinder.DefaultEmployeeRepository
-import com.bymason.kiosk.checkin.feature.employeefinder.EmployeeFinderFragment
-import com.bymason.kiosk.checkin.feature.employeefinder.EmployeeRepository
+import com.bymason.kiosk.checkin.feature.hostfinder.DefaultHostRepository
+import com.bymason.kiosk.checkin.feature.hostfinder.HostFinderFragment
+import com.bymason.kiosk.checkin.feature.hostfinder.HostRepository
 import com.bymason.kiosk.checkin.feature.identity.DefaultIdentityRepository
 import com.bymason.kiosk.checkin.feature.identity.IdentityFragment
 import com.bymason.kiosk.checkin.feature.identity.IdentityRepository
@@ -24,7 +24,7 @@ class CheckInNavHostFragment : NavHostFragment() {
     class Factory(
             private val auth: Auth = DefaultAuth(),
             private val identityRepository: IdentityRepository = DefaultIdentityRepository(),
-            private val employeeRepository: EmployeeRepository = DefaultEmployeeRepository(),
+            private val hostRepository: HostRepository = DefaultHostRepository(),
             private val ndaRepository: NdaRepository = DefaultNdaRepository()
     ) : FragmentFactory() {
         override fun instantiate(
@@ -33,7 +33,7 @@ class CheckInNavHostFragment : NavHostFragment() {
         ) = when (loadFragmentClass(classLoader, className)) {
             WelcomeFragment::class.java -> WelcomeFragment(auth)
             IdentityFragment::class.java -> IdentityFragment(identityRepository)
-            EmployeeFinderFragment::class.java -> EmployeeFinderFragment(employeeRepository)
+            HostFinderFragment::class.java -> HostFinderFragment(hostRepository)
             NdaFragment::class.java -> NdaFragment(ndaRepository)
             else -> super.instantiate(classLoader, className)
         }

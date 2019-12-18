@@ -31,7 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintVertical_bias=".16"
-        tools:listitem="@layout/employee_finder_fragment_item" />
+        tools:listitem="@layout/host_finder_fragment_item" />
 
     <Button
         android:id="@+id/next"

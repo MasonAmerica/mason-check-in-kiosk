@@ -68,7 +68,7 @@ class NdaViewModel(
             try {
                 repository.finish(sessionId)
             } catch (t: Throwable) {
-                logBreadcrumb("Failed to fetch list of employees", t)
+                logBreadcrumb("Failed to complete check-in", t)
                 return@launch
             } finally {
                 _state.update { copy(isLoading = false) }

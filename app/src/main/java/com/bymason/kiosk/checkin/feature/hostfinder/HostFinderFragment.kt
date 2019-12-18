@@ -1,4 +1,4 @@
-package com.bymason.kiosk.checkin.feature.employeefinder
+package com.bymason.kiosk.checkin.feature.hostfinder
 
 import android.os.Bundle
 import android.view.View
@@ -14,19 +14,19 @@ import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.hideKeyboard
 import com.bymason.kiosk.checkin.core.ui.onDestroy
-import com.bymason.kiosk.checkin.databinding.EmployeeFinderFragmentBinding
+import com.bymason.kiosk.checkin.databinding.HostFinderFragmentBinding
 import kotlinx.coroutines.flow.collect
 
-class EmployeeFinderFragment(
-        repository: EmployeeRepository
-) : FragmentBase(R.layout.employee_finder_fragment) {
-    private val args by navArgs<EmployeeFinderFragmentArgs>()
+class HostFinderFragment(
+        repository: HostRepository
+) : FragmentBase(R.layout.host_finder_fragment) {
+    private val args by navArgs<HostFinderFragmentArgs>()
 
-    private val vm by viewModels<EmployeeFinderViewModel> {
-        EmployeeFinderViewModel.Factory(repository, args.sessionId)
+    private val vm by viewModels<HostFinderViewModel> {
+        HostFinderViewModel.Factory(repository, args.sessionId)
     }
     private val binding by LifecycleAwareLazy {
-        EmployeeFinderFragmentBinding.bind(requireView())
+        HostFinderFragmentBinding.bind(requireView())
     } onDestroy {
         search.clearFocus()
         search.hideKeyboard()
@@ -45,24 +45,24 @@ class EmployeeFinderFragment(
             vm.onSearch(it?.toString())
         }
 
-        val adapter = EmployeeAdapter(this, vm)
-        binding.employees.adapter = adapter
+        val adapter = HostAdapter(this, vm)
+        binding.hosts.adapter = adapter
 
         vm.state.observe(viewLifecycleOwner) {
             onViewStateChanged(it, adapter)
         }
     }
 
-    private fun onActionRequested(action: EmployeeFinderViewModel.Action) {
+    private fun onActionRequested(action: HostFinderViewModel.Action) {
         when (action) {
-            is EmployeeFinderViewModel.Action.Navigate ->
+            is HostFinderViewModel.Action.Navigate ->
                 findNavController().navigate(action.directions)
         }
     }
 
-    private fun onViewStateChanged(state: EmployeeFinderViewModel.State, adapter: EmployeeAdapter) {
+    private fun onViewStateChanged(state: HostFinderViewModel.State, adapter: HostAdapter) {
         progress?.isVisible = state.isLoading
-        binding.noEmployeesHint.isVisible = state.isSearchHintVisible
-        adapter.submitList(state.employees)
+        binding.noHostsHint.isVisible = state.isSearchHintVisible
+        adapter.submitList(state.hosts)
     }
 }
