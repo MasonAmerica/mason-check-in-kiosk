@@ -2,8 +2,14 @@
     <string name="app_name">Mason Check-in Kiosk</string>
 
     <!-- Welcome -->
-    <string name="kiosk_welcome_checkin_info_title">Welcome to Mason!</string>
-    <string name="kiosk_welcome_checkin_info_body">Tap anywhere to get started.</string>
+    <string name="kiosk_checkin_welcome_info_title">Welcome to Mason!</string>
+    <string name="kiosk_checkin_welcome_info_body">Tap anywhere to get started.</string>
+
+    <!-- Welcome -->
+    <string name="kiosk_checkin_sign_in_title">Sign in</string>
+    <string name="kiosk_checkin_sign_in_email_hint">Email</string>
+    <string name="kiosk_checkin_sign_in_password_hint">Password</string>
+    <string name="kiosk_checkin_sign_in_submit_button_title">Sign in</string>
 
     <!-- Identity -->
     <string name="kiosk_checkin_identity_title">Tell us a little bit about yourself</string>

@@ -1,0 +1,119 @@
+{
+  "kind": "discovery#restDescription",
+  "discoveryVersion": "v1",
+  "id": "tokenservice:v1",
+  "name": "tokenservice",
+  "canonicalName": "Token Service",
+  "version": "v1",
+  "title": "Google Token Service API",
+  "description": "The Token Service API lets you exchange either an ID token or a refresh token for an access token and a new refresh token. You can use the access token to securely call APIs that require user authorization.",
+  "ownerDomain": "google.com",
+  "ownerName": "Google",
+  "icons": {
+    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+  },
+  "documentationLink": "https://developers.google.com/identity/toolkit/reference/securetoken/rest/v1/token",
+  "protocol": "rest",
+  "baseUrl": "https://securetoken.googleapis.com/v1/",
+  "basePath": "v1/",
+  "rootUrl": "https://securetoken.googleapis.com/",
+  "servicePath": "v1/",
+  "parameters": {
+    "alt": {
+      "type": "string",
+      "description": "Data format for the response.",
+      "default": "json",
+      "enum": [
+        "json"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json"
+      ],
+      "location": "query"
+    },
+    "key": {
+      "type": "string",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "location": "query"
+    }
+  },
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "View and manage your data across Google Cloud Platform services"
+        },
+        "https://www.googleapis.com/auth/firebase": {
+          "description": "View and administer all your Firebase data and settings"
+        }
+      }
+    }
+  },
+  "schemas": {
+    "ExchangeTokenResponse": {
+      "id": "ExchangeTokenResponse",
+      "type": "object",
+      "description": "Response of exchanging a token.",
+      "properties": {
+        "access_token": {
+          "type": "string",
+          "description": "The granted access token."
+        },
+        "expires_in": {
+          "type": "string",
+          "description": "Expiration time of access_token in seconds.",
+          "format": "int64"
+        },
+        "token_type": {
+          "type": "string",
+          "description": "The type of access_token. Included to conform with the OAuth 2.0 specification; always Bearer."
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "The granted refresh token; might be the same as refresh_token in the request."
+        }
+      }
+    },
+    "ExchangeTokenRequest": {
+      "id": "ExchangeTokenRequest",
+      "type": "object",
+      "description": "Request for exchanging token.",
+      "properties": {
+        "grant_type": {
+          "type": "string",
+          "description": "The type of token you're sending:\n\nauthorization_code to send an ID token.\nrefresh_token to send a refresh token.\n"
+        },
+        "code": {
+          "type": "string",
+          "description": "ID token to exchange for an access token and a refresh token. This field is called code to conform with the OAuth 2.0 specification. This field is ignored if grant_type isn't authorization_code."
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "Refresh token to exchange for an access token. This field is ignored if grant_type isn't refresh_token."
+        }
+      }
+    }
+  },
+  "resources": {
+    "v1": {
+      "methods": {
+        "token": {
+          "id": "tokenservice.v1.token",
+          "path": "token",
+          "httpMethod": "POST",
+          "description": "The Token Service API lets you exchange either an ID token or a refresh token for an access token and a new refresh token. You can use the access token to securely call APIs that require user authorization.",
+          "request": {
+            "$ref": "ExchangeTokenRequest"
+          },
+          "response": {
+            "$ref": "ExchangeTokenResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        }
+      }
+    }
+  }
+}

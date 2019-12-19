@@ -81,8 +81,10 @@ object Config {
 
         object Firebase {
             const val analytics = "com.google.firebase:firebase-analytics:17.2.1"
-            const val auth = "com.google.firebase:firebase-auth:19.2.0"
-            const val fuiAuth = "com.firebaseui:firebase-ui-auth:6.1.0"
+            const val identityToolkit =
+                    "com.google.apis:google-api-services-identitytoolkit:v3-rev253-1.25.0"
+            const val jwt = "com.auth0.android:jwtdecode:1.4.0"
+            const val authInterop = "com.google.firebase:firebase-auth-interop:19.0.0"
             const val functions = "com.google.firebase:firebase-functions-ktx:19.0.1"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
         }

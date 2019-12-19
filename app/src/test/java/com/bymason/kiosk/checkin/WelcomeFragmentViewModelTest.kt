@@ -1,9 +1,9 @@
 package com.bymason.kiosk.checkin
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -18,29 +18,30 @@ class WelcomeFragmentViewModelTest {
     @get:Rule
     val dispatcherRule = TestCoroutineDispatcherRule()
 
-    private val mockAuth = mock(Auth::class.java)
+    private val mockAuth = mock(FirebaseAuthCompat::class.java)
     private val vm = WelcomeFragmentViewModel(mockAuth)
 
     @Test
     fun `Signed in user starts check-in flow`() = dispatcherRule.runBlocking {
-        `when`(mockAuth.isSignedIn).thenReturn(true)
+        `when`(mockAuth.uid).thenReturn("uid")
 
-        vm.start()
+        vm.onTap()
 
         launch {
-            assertThat(vm.navEvents.take(1).single())
-                    .isEqualTo(WelcomeFragmentDirections.next())
+            assertThat(vm.actions.take(1).single()).isEqualTo(
+                    WelcomeFragmentViewModel.Action.Navigate(WelcomeFragmentDirections.next()))
         }
     }
 
     @Test
     fun `Signed out user is redirected to sign-in flow`() = dispatcherRule.runBlocking {
-        `when`(mockAuth.isSignedIn).thenReturn(false)
+        `when`(mockAuth.uid).thenReturn(null)
 
-        vm.start()
+        vm.onTap()
 
         launch {
-            assertThat(vm.intentEvents.take(1).single()).isNotNull()
+            assertThat(vm.actions.take(1).single()).isEqualTo(
+                    WelcomeFragmentViewModel.Action.Navigate(WelcomeFragmentDirections.signIn()))
         }
     }
 }

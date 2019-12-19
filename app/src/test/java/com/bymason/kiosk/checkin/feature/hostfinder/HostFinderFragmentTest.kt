@@ -11,12 +11,13 @@ import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
-import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.core.model.Host
 import com.bymason.kiosk.checkin.databinding.HostFinderFragmentBinding
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +28,7 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class HostFinderFragmentTest {
-    private val mockAuth = mock(Auth::class.java)
+    private val mockAuth = mock(FirebaseAuthCompat::class.java)
     private val mockHostRepository = mock(HostRepository::class.java)
 
     @Test
@@ -51,6 +52,7 @@ class HostFinderFragmentTest {
             }
 
             binding.search.setText("Person")
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
 
             onView(withId(R.id.hosts)).check(matches(hasDescendant(withText("Mr Robot"))))
         }

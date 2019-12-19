@@ -7,7 +7,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.bymason.kiosk.checkin.core.data.Auth
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -16,10 +16,12 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class WelcomeFragmentTest {
-    private val mockAuth = mock(Auth::class.java)
+    private val mockAuth = mock(FirebaseAuthCompat::class.java)
 
     @Test
     fun `Clicking anywhere moves to the next screen`() {
+        `when`(mockAuth.uid).thenReturn("uid")
+
         val mockNavController = mock(NavController::class.java)
         val scenario = launchFragmentInContainer<WelcomeFragment>(
                 factory = CheckInNavHostFragment.Factory(auth = mockAuth)
@@ -27,7 +29,6 @@ class WelcomeFragmentTest {
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
         }
-        `when`(mockAuth.isSignedIn).thenReturn(true)
 
         onView(withId(R.id.root)).perform(click())
 

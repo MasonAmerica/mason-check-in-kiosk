@@ -10,9 +10,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
-import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.databinding.NdaFragmentBinding
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class NdaFragmentTest {
-    private val mockAuth = mock(Auth::class.java)
+    private val mockAuth = mock(FirebaseAuthCompat::class.java)
     private val mockNdaRepository = mock(NdaRepository::class.java)
 
     @Test

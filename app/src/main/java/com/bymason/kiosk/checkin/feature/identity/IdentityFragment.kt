@@ -15,6 +15,7 @@ import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.doOnImeDone
+import com.bymason.kiosk.checkin.core.ui.onDestroy
 import com.bymason.kiosk.checkin.core.ui.showKeyboard
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
 import kotlinx.coroutines.flow.collect
@@ -24,8 +25,13 @@ class IdentityFragment(
 ) : FragmentBase(R.layout.identity_fragment) {
     private val vm by viewModels<IdentityViewModel> { IdentityViewModel.Factory(repository) }
 
-    private val binding by LifecycleAwareLazy { IdentityFragmentBinding.bind(requireView()) }
+    private val binding by LifecycleAwareLazy {
+        IdentityFragmentBinding.bind(requireView())
+    } onDestroy {
+        fields.viewTreeObserver.removeOnGlobalLayoutListener(installer)
+    }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
+    private val installer = KeyboardInstaller()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +46,7 @@ class IdentityFragment(
         val adapter = IdentityAdapter(vm)
         binding.fields.adapter = adapter
         binding.fields.itemAnimator = null
-        binding.fields.viewTreeObserver.addOnGlobalLayoutListener(KeyboardInstaller())
+        binding.fields.viewTreeObserver.addOnGlobalLayoutListener(installer)
 
         vm.state.observe(viewLifecycleOwner) {
             onViewStateChanged(it, adapter)

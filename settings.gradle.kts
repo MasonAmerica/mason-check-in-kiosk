@@ -5,7 +5,9 @@ plugins {
 include(
         ":app",
         ":web:site",
-        ":web:server"
+        ":web:server",
+
+        ":auth"
 )
 
 sourceControl {

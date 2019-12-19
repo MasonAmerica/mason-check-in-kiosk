@@ -10,12 +10,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
-import com.bymason.kiosk.checkin.core.data.Auth
 import com.bymason.kiosk.checkin.core.model.GuestField
 import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
 import org.junit.Test
@@ -27,7 +27,7 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class IdentityFragmentTest {
-    private val mockAuth = mock(Auth::class.java)
+    private val mockAuth = mock(FirebaseAuthCompat::class.java)
     private val mockIdentityRepository = mock(IdentityRepository::class.java)
 
     @Ignore("One glorious summer day, the gods will smile down from the heavens and bestow " +

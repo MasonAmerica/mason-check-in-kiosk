@@ -105,8 +105,7 @@ dependencies {
     implementation(Config.Libs.Jetpack.webkit)
 
     implementation(Config.Libs.Firebase.analytics)
-    implementation(Config.Libs.Firebase.auth)
-    implementation(Config.Libs.Firebase.fuiAuth)
+    implementation(project(":auth"))
     implementation(Config.Libs.Firebase.functions)
     implementation(Config.Libs.Firebase.crashlytics)
     debugImplementation(Config.Libs.Misc.leakCanary)

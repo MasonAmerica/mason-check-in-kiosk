@@ -1,32 +1,39 @@
 package com.bymason.kiosk.checkin
 
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
-import com.bymason.kiosk.checkin.core.data.Auth
+import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class WelcomeFragmentViewModel(
-        private val auth: Auth
+        private val auth: FirebaseAuthCompat
 ) : ViewModel() {
-    private val _navEvents = Channel<NavDirections>(Channel.CONFLATED)
-    val navEvents: Flow<NavDirections> = flow { for (e in _navEvents) emit(e) }
-    private val _intentEvents = Channel<Pair<Int, Intent>>(Channel.CONFLATED)
-    val intentEvents: Flow<Pair<Int, Intent>> = flow { for (e in _intentEvents) emit(e) }
+    private val _actions = Channel<Action>(Channel.CONFLATED)
+    val actions: Flow<Action> = flow { for (e in _actions) emit(e) }
 
-    fun start() {
-        if (auth.isSignedIn) {
-            _navEvents.offer(WelcomeFragmentDirections.next())
-        } else {
-            _intentEvents.offer(SIGN_IN_RC to auth.newSignInIntent())
+    init {
+        if (auth.uid == null) {
+            _actions.offer(Action.Navigate(WelcomeFragmentDirections.signIn()))
         }
     }
 
+    fun onTap() {
+        if (auth.uid == null) {
+            _actions.offer(Action.Navigate(WelcomeFragmentDirections.signIn()))
+        } else {
+            _actions.offer(Action.Navigate(WelcomeFragmentDirections.next()))
+        }
+    }
+
+    sealed class Action {
+        data class Navigate(val directions: NavDirections) : Action()
+    }
+
     class Factory(
-            private val auth: Auth
+            private val auth: FirebaseAuthCompat
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === WelcomeFragmentViewModel::class.java)
@@ -34,9 +41,5 @@ class WelcomeFragmentViewModel(
             @Suppress("UNCHECKED_CAST")
             return WelcomeFragmentViewModel(auth) as T
         }
-    }
-
-    private companion object {
-        const val SIGN_IN_RC = 876
     }
 }
