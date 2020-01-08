@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+
 buildscript {
     repositories.deps()
 
@@ -24,6 +26,17 @@ buildScan {
 
 allprojects {
     repositories.deps()
+
+    afterEvaluate {
+        convention.findByType<KotlinProjectExtension>()?.apply {
+            sourceSets.configureEach {
+                languageSettings.progressiveMode = true
+                languageSettings.enableLanguageFeature("NewInference")
+                languageSettings.useExperimentalAnnotation(
+                        "kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+    }
 }
 
 tasks.wrapper {

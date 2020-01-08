@@ -1,8 +1,8 @@
 package com.bymason.build.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
@@ -28,26 +28,28 @@ internal abstract class DeployWeb : DefaultTask() {
     @TaskAction
     fun deploy() {
         project.serviceOf<WorkerExecutor>().noIsolation().submit(Deployer::class) {
+            projectDir.set(project.projectDir)
+            buildDir.set(project.buildDir)
+
             devArg.set(dev)
             onlyArgs.set(only)
         }
     }
 
     abstract class Deployer @Inject constructor(
-            private val layout: ProjectLayout,
             private val fileOps: FileSystemOperations,
             private val execOps: ExecOperations
     ) : WorkAction<Deployer.Params> {
         override fun execute() {
             fileOps.copy {
-                from(layout.buildDirectory.dir(
+                from(parameters.buildDir.dir(
                         "js/packages/mason-check-in-kiosk-server/kotlin/mason-check-in-kiosk-server.js"))
-                into(layout.projectDirectory.dir("web/server/functions"))
+                into(parameters.projectDir.dir("web/server/functions"))
                 rename { "index.js" }
             }
             fileOps.copy {
-                from(layout.projectDirectory.dir("web/site/build/processedResources/Js/main"))
-                into(layout.projectDirectory.dir("web/site/build/distributions"))
+                from(parameters.projectDir.dir("web/site/build/processedResources/Js/main"))
+                into(parameters.projectDir.dir("web/site/build/distributions"))
             }
 
             if (!parameters.devArg.get()) {
@@ -56,7 +58,7 @@ internal abstract class DeployWeb : DefaultTask() {
                 }
                 execOps.exec {
                     commandLine("npm", "ci")
-                    workingDir = layout.projectDirectory.dir("web/server/functions").asFile
+                    workingDir = parameters.projectDir.dir("web/server/functions").get().asFile
                 }
             }
             execOps.exec {
@@ -66,11 +68,14 @@ internal abstract class DeployWeb : DefaultTask() {
                 }
 
                 commandLine("sh", "-c", "\$(npm bin -g)/$command")
-                workingDir = layout.projectDirectory.dir("web").asFile
+                workingDir = parameters.projectDir.dir("web").get().asFile
             }
         }
 
         interface Params : WorkParameters {
+            val projectDir: DirectoryProperty
+            val buildDir: DirectoryProperty
+
             val devArg: Property<Boolean>
             val onlyArgs: Property<String>
         }

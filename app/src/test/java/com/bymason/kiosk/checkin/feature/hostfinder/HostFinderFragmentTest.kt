@@ -29,7 +29,7 @@ import org.mockito.Mockito.verify
 @RunWith(AndroidJUnit4::class)
 class HostFinderFragmentTest {
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockHostRepository = mock(HostRepository::class.java)
+    private val mockRepository = mock(HostRepository::class.java)
 
     @Test
     fun `No hosts found hint is visible on launch`() {
@@ -47,7 +47,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockHostRepository.find(any())).thenReturn(listOf(
+                `when`(mockRepository.find(any())).thenReturn(listOf(
                         Host("id", "Mr Robot", null)))
             }
 
@@ -64,7 +64,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockHostRepository.find(any())).thenReturn(listOf(
+                `when`(mockRepository.find(any())).thenReturn(listOf(
                         Host("id", "name", null)))
             }
 
@@ -80,7 +80,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockHostRepository.find(any())).thenReturn(emptyList())
+                `when`(mockRepository.find(any())).thenReturn(emptyList())
             }
 
             binding.search.setText("Person")
@@ -99,8 +99,8 @@ class HostFinderFragmentTest {
 
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockHostRepository.find(any())).thenReturn(listOf(host))
-                `when`(mockHostRepository.registerHost(any(), any())).thenReturn("foobar")
+                `when`(mockRepository.find(any())).thenReturn(listOf(host))
+                `when`(mockRepository.registerHost(any(), any())).thenReturn("foobar")
             }
             binding.search.setText("Person")
         }
@@ -117,7 +117,7 @@ class HostFinderFragmentTest {
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
                     auth = mockAuth,
-                    hostRepository = mockHostRepository
+                    hostRepository = mockRepository
             )
     )
 }

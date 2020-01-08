@@ -69,6 +69,7 @@ class DefaultIdentityRepository(
 
     private suspend fun loadRawGuestFields(): List<Map<String, Any>> {
         val result = Firebase.functions.getHttpsCallable("getGuestFields").call().await()
+        @Suppress("UNCHECKED_CAST")
         return result.data as List<Map<String, Any>>
     }
 

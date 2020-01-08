@@ -21,28 +21,13 @@ class IdentityViewModel(
         private val repository: IdentityRepository,
         private val dispatchers: DispatcherProvider
 ) : ViewModel() {
-    private val _state = StateHolder(State(isLoading = true))
+    private val _state = StateHolder(State())
     val state: LiveData<State> get() = _state.liveData
     private val _actions = Channel<Action>(Channel.CONFLATED)
     val actions: Flow<Action> = flow { for (e in _actions) emit(e) }
 
     init {
-        viewModelScope.launch {
-            val fields = try {
-                repository.getGuestFields()
-            } catch (t: Throwable) {
-                logBreadcrumb("Failed to get guest fields", t)
-                _actions.offer(Action.Navigate(IdentityFragmentDirections.reset()))
-                return@launch
-            } finally {
-                _state.update { copy(isLoading = false) }
-            }
-
-            val processedFields = dispatchers.default {
-                fields.map { it.copy(hasError = it.field.hasError(null)) }
-            }
-            _state.update { copy(fieldStates = processedFields) }
-        }
+        fetchGuestFields()
     }
 
     fun onFieldChanged(state: FieldState, newValue: String?, hasFocus: Boolean) {
@@ -66,6 +51,25 @@ class IdentityViewModel(
             }
 
             _actions.offer(Action.Navigate(IdentityFragmentDirections.next(sessionId)))
+        }
+    }
+
+    private fun fetchGuestFields() {
+        viewModelScope.launch {
+            val fields = try {
+                repository.getGuestFields()
+            } catch (t: Throwable) {
+                logBreadcrumb("Failed to get guest fields", t)
+                _actions.offer(Action.Navigate(IdentityFragmentDirections.reset()))
+                return@launch
+            } finally {
+                _state.update { copy(isLoading = false) }
+            }
+
+            val processedFields = dispatchers.default {
+                fields.map { it.copy(hasError = it.field.hasError(null)) }
+            }
+            _state.update { copy(fieldStates = processedFields) }
         }
     }
 
@@ -96,15 +100,15 @@ class IdentityViewModel(
         else -> !Pattern.compile(regex).matcher(newValue).matches()
     }
 
-    sealed class Action {
-        data class Navigate(val directions: NavDirections) : Action()
-    }
-
     data class State(
-            val isLoading: Boolean = false,
+            val isLoading: Boolean = true,
             val isContinueButtonEnabled: Boolean = false,
             val fieldStates: List<FieldState> = emptyList()
     )
+
+    sealed class Action {
+        data class Navigate(val directions: NavDirections) : Action()
+    }
 
     class Factory(
             private val repository: IdentityRepository,

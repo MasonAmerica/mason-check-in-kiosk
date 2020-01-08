@@ -72,15 +72,15 @@ class HostFinderViewModel(
         }
     }
 
-    sealed class Action {
-        data class Navigate(val directions: NavDirections) : Action()
-    }
-
     data class State(
             val isLoading: Boolean = false,
             val isSearchHintVisible: Boolean = true,
             val hosts: List<Host> = emptyList()
     )
+
+    sealed class Action {
+        data class Navigate(val directions: NavDirections) : Action()
+    }
 
     class Factory(
             private val repository: HostRepository,

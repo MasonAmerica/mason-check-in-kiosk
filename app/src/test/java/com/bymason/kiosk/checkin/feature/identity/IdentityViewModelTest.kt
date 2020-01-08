@@ -23,10 +23,10 @@ class IdentityViewModelTest {
     val dispatcherRule = TestCoroutineDispatcherRule()
     @get:Rule
     val vmField = Resettable {
-        IdentityViewModel(mockIdentityRepository, dispatcherRule.dispatchers)
+        IdentityViewModel(mockRepository, dispatcherRule.dispatchers)
     }
 
-    private val mockIdentityRepository = mock(IdentityRepository::class.java)
+    private val mockRepository = mock(IdentityRepository::class.java)
     private val vm by vmField
 
     @Test
@@ -39,7 +39,7 @@ class IdentityViewModelTest {
     @Test
     fun `Guest fields are loaded`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, null))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         assertThat(vm.state.value?.isLoading).isFalse()
         assertThat(vm.state.value?.fieldStates).containsExactly(state)
@@ -48,7 +48,7 @@ class IdentityViewModelTest {
     @Test
     fun `Guest fields with regex are processed`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         assertThat(vm.state.value?.isLoading).isFalse()
         assertThat(vm.state.value?.fieldStates)
@@ -58,7 +58,7 @@ class IdentityViewModelTest {
     @Test
     fun `Invalid field gaining focus marks field as interacted with`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, true)
 
@@ -68,7 +68,7 @@ class IdentityViewModelTest {
     @Test
     fun `Invalid field losing focus shows error`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, true)
         vm.onFieldChanged(state, null, false)
@@ -80,7 +80,7 @@ class IdentityViewModelTest {
     @Test
     fun `Invalid field re-gaining focus hides error`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, true)
         vm.onFieldChanged(state, null, false)
@@ -94,7 +94,7 @@ class IdentityViewModelTest {
     @Test
     fun `Updating field with valid value processes correctly`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "goo", false)
 
@@ -106,7 +106,7 @@ class IdentityViewModelTest {
     @Test
     fun `Empty field with no regex is valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, null))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, false)
 
@@ -116,7 +116,7 @@ class IdentityViewModelTest {
     @Test
     fun `Field with no regex is valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, null))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "foo", false)
 
@@ -126,7 +126,7 @@ class IdentityViewModelTest {
     @Test
     fun `Empty optional field with regex is valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, false)
 
@@ -136,7 +136,7 @@ class IdentityViewModelTest {
     @Test
     fun `Invalid optional field with regex is invalid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "", false)
 
@@ -146,7 +146,7 @@ class IdentityViewModelTest {
     @Test
     fun `Optional field with regex is valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "foo", false)
 
@@ -156,7 +156,7 @@ class IdentityViewModelTest {
     @Test
     fun `Empty required field with regex is invalid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, false)
 
@@ -166,7 +166,7 @@ class IdentityViewModelTest {
     @Test
     fun `Invalid required field with regex is invalid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "", false)
 
@@ -176,7 +176,7 @@ class IdentityViewModelTest {
     @Test
     fun `Required field with regex is valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "foo", false)
 
@@ -186,7 +186,7 @@ class IdentityViewModelTest {
     @Test
     fun `Continue button is disabled while fields are invalid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, null, true)
 
@@ -196,7 +196,7 @@ class IdentityViewModelTest {
     @Test
     fun `Continue button is enabled when all fields are valid`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
-        `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(state))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
 
         vm.onFieldChanged(state, "foo", true)
 
@@ -205,7 +205,7 @@ class IdentityViewModelTest {
 
     @Test
     fun `Continuing navigates to next destination`() = dispatcherRule.runBlocking {
-        `when`(mockIdentityRepository.registerFields(any())).thenReturn("foobar")
+        `when`(mockRepository.registerFields(any())).thenReturn("foobar")
 
         vm.onContinue()
 

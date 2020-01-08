@@ -2,7 +2,8 @@
     <string name="app_name">Mason Check-in Kiosk</string>
 
     <!-- Welcome -->
-    <string name="kiosk_checkin_welcome_info_title">Welcome to Mason!</string>
+    <string name="kiosk_checkin_welcome_info_plain_title">Welcome!</string>
+    <string name="kiosk_checkin_welcome_info_company_title">Welcome to %s!</string>
     <string name="kiosk_checkin_welcome_info_body">Tap anywhere to get started.</string>
 
     <!-- Welcome -->

@@ -9,21 +9,23 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias=".33"
-        app:srcCompat="@drawable/ic_logo" />
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent=".8" />
 
     <TextView
         android:id="@+id/welcome_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_xlarge"
-        android:text="@string/kiosk_checkin_welcome_info_title"
+        android:gravity="center"
+        android:text="@string/kiosk_checkin_welcome_info_plain_title"
         android:textAppearance="?attr/textAppearanceHeadline4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

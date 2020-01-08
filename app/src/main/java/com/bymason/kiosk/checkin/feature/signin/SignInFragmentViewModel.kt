@@ -59,14 +59,14 @@ class SignInFragmentViewModel(
         _state.update { copy(isSubmitButtonEnabled = isLoginValid) }
     }
 
-    sealed class Action {
-        data class Navigate(val directions: NavDirections) : Action()
-    }
-
     data class State(
             val isLoading: Boolean = false,
             val isSubmitButtonEnabled: Boolean = false
     )
+
+    sealed class Action {
+        data class Navigate(val directions: NavDirections) : Action()
+    }
 
     class Factory(
             private val auth: FirebaseAuthCompat

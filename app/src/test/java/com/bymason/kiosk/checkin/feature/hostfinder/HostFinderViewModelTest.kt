@@ -22,14 +22,14 @@ class HostFinderViewModelTest {
     @get:Rule
     val dispatcherRule = TestCoroutineDispatcherRule()
 
-    private val mockHostRepository = mock(HostRepository::class.java)
-    private val vm = HostFinderViewModel(mockHostRepository, "mySession")
+    private val mockRepository = mock(HostRepository::class.java)
+    private val vm = HostFinderViewModel(mockRepository, "mySession")
 
     @Test
     fun `Searching for null name noops with empty hosts`() = dispatcherRule.runBlocking {
         vm.onSearch(null)
 
-        verify(mockHostRepository, never()).find(any())
+        verify(mockRepository, never()).find(any())
         assertThat(vm.state.value?.hosts).isEmpty()
     }
 
@@ -37,14 +37,14 @@ class HostFinderViewModelTest {
     fun `Searching for empty name noops with empty hosts`() = dispatcherRule.runBlocking {
         vm.onSearch(" ")
 
-        verify(mockHostRepository, never()).find(any())
+        verify(mockRepository, never()).find(any())
         assertThat(vm.state.value?.hosts).isEmpty()
     }
 
     @Test
     fun `Searching for valid name lists hosts`() = dispatcherRule.runBlocking {
         val host = Host("id", "Mr Robot", null)
-        `when`(mockHostRepository.find(any())).thenReturn(listOf(host))
+        `when`(mockRepository.find(any())).thenReturn(listOf(host))
 
         vm.onSearch("Mr")
 
@@ -85,7 +85,7 @@ class HostFinderViewModelTest {
     @Test
     fun `Finding host navigates to next destination`() = dispatcherRule.runBlocking {
         val host = Host("id", "Mr Robot", null)
-        `when`(mockHostRepository.registerHost(any(), any())).thenReturn("foobar")
+        `when`(mockRepository.registerHost(any(), any())).thenReturn("foobar")
 
         vm.onFound(host)
 

@@ -2,6 +2,7 @@ package com.bymason.kiosk.checkin
 
 import com.bymason.kiosk.checkin.functions.findHosts
 import com.bymason.kiosk.checkin.functions.generateNdaLink
+import com.bymason.kiosk.checkin.functions.getCompanyMetadata
 import com.bymason.kiosk.checkin.functions.getGuestFields
 import com.bymason.kiosk.checkin.functions.handleDocusignAuth
 import com.bymason.kiosk.checkin.functions.handleGSuiteAuth
@@ -24,6 +25,8 @@ fun main() {
     exports.slackAuthHandler = functions.https
             .onRequest<Any?> { req, res -> handleSlackAuth(req, res) }
 
+    exports.getCompanyMetadata = functions.https
+            .onCall<Any?> { _, context -> getCompanyMetadata(context) }
     exports.getGuestFields = functions.https
             .onCall<Any?> { _, context -> getGuestFields(context) }
     exports.updateSession = functions.runWith(json("memory" to "1GB")).https

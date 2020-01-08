@@ -12,7 +12,7 @@ fun File.safeMkdirs(): File = apply {
 
 /** @return this file after ensuring that it either already exists or was created */
 fun File.safeCreateNewFile(): File = apply {
-    parentFile.safeMkdirs()
+    parentFile?.safeMkdirs()
     check(exists() || createNewFile()) { "Unable to create $this" }
 }
 

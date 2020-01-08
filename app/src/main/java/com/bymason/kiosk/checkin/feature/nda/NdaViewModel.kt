@@ -86,6 +86,12 @@ class NdaViewModel(
         }
     }
 
+    data class State(
+            val isLoading: Boolean = false,
+            val isWebViewVisible: Boolean = true,
+            val isFinishButtonVisible: Boolean = false
+    )
+
     sealed class Action {
         data class Navigate(val directions: NavDirections) : Action()
 
@@ -95,12 +101,6 @@ class NdaViewModel(
     sealed class ViewAction {
         data class VisitPage(val url: String) : ViewAction()
     }
-
-    data class State(
-            val isLoading: Boolean = false,
-            val isWebViewVisible: Boolean = true,
-            val isFinishButtonVisible: Boolean = false
-    )
 
     class Factory(
             private val repository: NdaRepository,

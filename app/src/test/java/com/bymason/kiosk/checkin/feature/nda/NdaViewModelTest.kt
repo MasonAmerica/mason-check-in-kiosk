@@ -22,8 +22,8 @@ class NdaViewModelTest {
     @get:Rule
     val dispatcherRule = TestCoroutineDispatcherRule()
 
-    private val mockNdaRepository = mock(NdaRepository::class.java)
-    private val vm = NdaViewModel(mockNdaRepository, "mySession")
+    private val mockRepository = mock(NdaRepository::class.java)
+    private val vm = NdaViewModel(mockRepository, "mySession")
 
     @Test
     fun `NDA signing action is immediately kicked off on create`() = dispatcherRule.runBlocking {
@@ -34,7 +34,7 @@ class NdaViewModelTest {
 
     @Test
     fun `View NDA action is sent after signing request`() = dispatcherRule.runBlocking {
-        `when`(mockNdaRepository.sign(any())).thenReturn("my_url")
+        `when`(mockRepository.sign(any())).thenReturn("my_url")
 
         vm.onNdaSigningRequested()
 
@@ -52,7 +52,7 @@ class NdaViewModelTest {
             assertThat(vm.actions.take(1).single())
                     .isEqualTo(NdaViewModel.Action.Navigate(NdaFragmentDirections.reset()))
         }
-        verify(mockNdaRepository).finish(any())
+        verify(mockRepository).finish(any())
     }
 
     @Test

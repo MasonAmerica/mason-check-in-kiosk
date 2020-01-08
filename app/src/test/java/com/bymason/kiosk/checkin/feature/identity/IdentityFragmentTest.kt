@@ -28,7 +28,7 @@ import org.mockito.Mockito.verify
 @RunWith(AndroidJUnit4::class)
 class IdentityFragmentTest {
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockIdentityRepository = mock(IdentityRepository::class.java)
+    private val mockRepository = mock(IdentityRepository::class.java)
 
     @Ignore("One glorious summer day, the gods will smile down from the heavens and bestow " +
                     "upon us mortals a nice keyboard API.")
@@ -38,7 +38,7 @@ class IdentityFragmentTest {
     @Test
     fun `Input fields don't have errors on launch`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
                     FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
             ))
@@ -58,7 +58,7 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button is disabled on launch`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
                     FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
             ))
@@ -76,7 +76,7 @@ class IdentityFragmentTest {
     @Test
     fun `Moving to new field while current one is invalid shows error`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
                     FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
             ))
@@ -100,7 +100,7 @@ class IdentityFragmentTest {
     @Test
     fun `Going back to invalid field clears error`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
                     FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
             ))
@@ -124,7 +124,7 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button becomes enabled when all fields are valid`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
                     FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
             ))
@@ -151,9 +151,9 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button navigates to next destination`() {
         runBlocking {
-            `when`(mockIdentityRepository.getGuestFields()).thenReturn(listOf(
+            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
                     FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, null))))
-            `when`(mockIdentityRepository.registerFields(any())).thenReturn("foobar")
+            `when`(mockRepository.registerFields(any())).thenReturn("foobar")
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -172,7 +172,7 @@ class IdentityFragmentTest {
             themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             factory = CheckInNavHostFragment.Factory(
                     auth = mockAuth,
-                    identityRepository = mockIdentityRepository
+                    identityRepository = mockRepository
             )
     )
 }

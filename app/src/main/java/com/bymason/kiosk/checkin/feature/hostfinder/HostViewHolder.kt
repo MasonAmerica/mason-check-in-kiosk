@@ -4,6 +4,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.model.Host
 import com.bymason.kiosk.checkin.databinding.HostFinderFragmentItemBinding
@@ -27,6 +28,7 @@ class HostViewHolder(
                 .load(host.photoUrl)
                 .placeholder(R.drawable.ic_person_24dp)
                 .circleCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.profile)
     }
 

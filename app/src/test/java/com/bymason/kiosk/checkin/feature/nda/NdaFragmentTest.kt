@@ -24,12 +24,12 @@ import org.mockito.Mockito.verify
 @RunWith(AndroidJUnit4::class)
 class NdaFragmentTest {
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockNdaRepository = mock(NdaRepository::class.java)
+    private val mockRepository = mock(NdaRepository::class.java)
 
     @Test
     fun `NDA signing page loads on create`() {
         runBlocking {
-            `when`(mockNdaRepository.sign(any())).thenReturn("https://google.com")
+            `when`(mockRepository.sign(any())).thenReturn("https://google.com")
         }
 
         val scenario = launchFragment()
@@ -44,7 +44,7 @@ class NdaFragmentTest {
     @Test
     fun `Finish check-in button finishes check-in`() {
         runBlocking {
-            `when`(mockNdaRepository.sign(any())).thenReturn("https://google.com")
+            `when`(mockRepository.sign(any())).thenReturn("https://google.com")
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -61,7 +61,7 @@ class NdaFragmentTest {
         }
 
         runBlocking {
-            verify(mockNdaRepository).finish(any())
+            verify(mockRepository).finish(any())
         }
         verify(mockNavController).navigate(NdaFragmentDirections.reset())
     }
@@ -73,7 +73,7 @@ class NdaFragmentTest {
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
                     auth = mockAuth,
-                    ndaRepository = mockNdaRepository
+                    ndaRepository = mockRepository
             )
     )
 }
