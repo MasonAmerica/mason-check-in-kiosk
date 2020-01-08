@@ -37,7 +37,7 @@ private suspend fun findHosts(auth: AuthContext, hostName: String): Array<Json> 
             "query" to hostName
     )).await().data
     maybeRefreshGsuiteCreds(auth.uid, state)
-    console.log("Hosts: ", hosts.users)
+    console.log("Hosts: ", JSON.stringify(hosts.users))
 
     return hosts.users.orEmpty().map {
         val profilePic = if (it.thumbnailPhotoUrl.orEmpty().contains("/private")) {

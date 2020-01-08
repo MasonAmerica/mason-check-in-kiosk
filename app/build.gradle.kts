@@ -58,16 +58,16 @@ android {
         }
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
 
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
-    }
-
-    viewBinding {
-        isEnabled = true
     }
 
     compileOptions {
@@ -116,8 +116,6 @@ dependencies {
     implementation(Config.Libs.Misc.glide)
 
     implementation(Config.Libs.Misc.permissions)
-    implementation(Config.Libs.Misc.gauth)
-    implementation(Config.Libs.Misc.gsuiteSdk)
 
     testImplementation(Config.Libs.Testing.junit)
     testImplementation(Config.Libs.Testing.truth)

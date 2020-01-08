@@ -1,5 +1,5 @@
 buildscript {
-    Config.run { repositories.deps() }
+    repositories.deps()
 
     dependencies {
         classpath(Config.Plugins.android)
@@ -23,7 +23,7 @@ buildScan {
 }
 
 allprojects {
-    Config.run { repositories.deps() }
+    repositories.deps()
 }
 
 tasks.wrapper {
