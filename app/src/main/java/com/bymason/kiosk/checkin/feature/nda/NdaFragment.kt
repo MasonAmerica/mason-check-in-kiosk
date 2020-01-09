@@ -6,22 +6,22 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.databinding.NdaFragmentBinding
 import kotlinx.coroutines.flow.collect
 
 class NdaFragment(
-        repository: NdaRepository
+        api: CheckInApi
 ) : FragmentBase(R.layout.nda_fragment) {
     private val args by navArgs<NdaFragmentArgs>()
 
     private val vm by viewModels<NdaViewModel> {
-        NdaViewModel.Factory(repository, args.sessionId)
+        NdaViewModel.Factory(DefaultNdaRepository(api), args.sessionId)
     }
     private val binding by LifecycleAwareLazy { NdaFragmentBinding.bind(requireView()) }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }

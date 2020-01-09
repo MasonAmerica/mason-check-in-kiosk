@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
-import com.bymason.kiosk.checkin.core.data.DefaultDispatcherProvider
 import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.logBreadcrumb
 import com.bymason.kiosk.checkin.core.model.GuestField
@@ -111,8 +110,8 @@ class IdentityViewModel(
     }
 
     class Factory(
-            private val repository: IdentityRepository,
-            private val dispatchers: DispatcherProvider = DefaultDispatcherProvider
+            private val dispatchers: DispatcherProvider,
+            private val repository: IdentityRepository
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             check(modelClass === IdentityViewModel::class.java)

@@ -14,11 +14,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.model.Host
 import com.bymason.kiosk.checkin.databinding.HostFinderFragmentBinding
+import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.runBlocking
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -28,8 +31,11 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class HostFinderFragmentTest {
+    @get:Rule
+    val dispatcherRule = TestCoroutineDispatcherRule()
+
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockRepository = mock(HostRepository::class.java)
+    private val mockApi = mock(CheckInApi::class.java)
 
     @Test
     fun `No hosts found hint is visible on launch`() {
@@ -47,7 +53,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockRepository.find(any())).thenReturn(listOf(
+                `when`(mockApi.findHosts(any())).thenReturn(listOf(
                         Host("id", "Mr Robot", null)))
             }
 
@@ -64,7 +70,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockRepository.find(any())).thenReturn(listOf(
+                `when`(mockApi.findHosts(any())).thenReturn(listOf(
                         Host("id", "name", null)))
             }
 
@@ -80,7 +86,7 @@ class HostFinderFragmentTest {
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockRepository.find(any())).thenReturn(emptyList())
+                `when`(mockApi.findHosts(any())).thenReturn(emptyList())
             }
 
             binding.search.setText("Person")
@@ -99,8 +105,8 @@ class HostFinderFragmentTest {
 
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
-                `when`(mockRepository.find(any())).thenReturn(listOf(host))
-                `when`(mockRepository.registerHost(any(), any())).thenReturn("foobar")
+                `when`(mockApi.findHosts(any())).thenReturn(listOf(host))
+                `when`(mockApi.updateSession(any(), any(), any())).thenReturn("foobar")
             }
             binding.search.setText("Person")
         }
@@ -116,8 +122,9 @@ class HostFinderFragmentTest {
             HostFinderFragmentArgs(sessionId).toBundle(),
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
+                    dispatchers = dispatcherRule.dispatchers,
                     auth = mockAuth,
-                    hostRepository = mockRepository
+                    api = mockApi
             )
     )
 }

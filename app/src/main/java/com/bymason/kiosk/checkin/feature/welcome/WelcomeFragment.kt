@@ -10,6 +10,8 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
+import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.databinding.WelcomeFragmentBinding
@@ -17,11 +19,12 @@ import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.flow.collect
 
 class WelcomeFragment(
+        dispatchers: DispatcherProvider,
         auth: FirebaseAuthCompat,
-        repository: WelcomeRepository
+        api: CheckInApi
 ) : FragmentBase(R.layout.welcome_fragment) {
     private val vm by viewModels<WelcomeViewModel> {
-        WelcomeViewModel.Factory(auth, repository)
+        WelcomeViewModel.Factory(auth, DefaultWelcomeRepository(dispatchers, api))
     }
     private val binding by LifecycleAwareLazy { WelcomeFragmentBinding.bind(requireView()) }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }

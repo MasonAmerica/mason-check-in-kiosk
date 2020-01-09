@@ -10,14 +10,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.model.GuestField
 import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
+import com.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
 import kotlinx.coroutines.runBlocking
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
@@ -27,8 +30,11 @@ import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class IdentityFragmentTest {
+    @get:Rule
+    val dispatcherRule = TestCoroutineDispatcherRule()
+
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockRepository = mock(IdentityRepository::class.java)
+    private val mockApi = mock(CheckInApi::class.java)
 
     @Ignore("One glorious summer day, the gods will smile down from the heavens and bestow " +
                     "upon us mortals a nice keyboard API.")
@@ -38,9 +44,9 @@ class IdentityFragmentTest {
     @Test
     fun `Input fields don't have errors on launch`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
-                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
             ))
         }
 
@@ -58,9 +64,9 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button is disabled on launch`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
-                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
             ))
         }
 
@@ -76,9 +82,9 @@ class IdentityFragmentTest {
     @Test
     fun `Moving to new field while current one is invalid shows error`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
-                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
             ))
         }
 
@@ -100,9 +106,9 @@ class IdentityFragmentTest {
     @Test
     fun `Going back to invalid field clears error`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
-                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
             ))
         }
 
@@ -124,9 +130,9 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button becomes enabled when all fields are valid`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id1", GuestFieldType.NAME, "foo", true, ".+")),
-                    FieldState(GuestField("id2", GuestFieldType.NAME, "foo", true, ".+"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
             ))
         }
 
@@ -151,9 +157,9 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button navigates to next destination`() {
         runBlocking {
-            `when`(mockRepository.getGuestFields()).thenReturn(listOf(
-                    FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, null))))
-            `when`(mockRepository.registerFields(any())).thenReturn("foobar")
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id", GuestFieldType.NAME, "foo", false, null)))
+            `when`(mockApi.updateSession(any(), any(), any())).thenReturn("foobar")
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -171,8 +177,9 @@ class IdentityFragmentTest {
     ) = launchFragmentInContainer<IdentityFragment>(
             themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             factory = CheckInNavHostFragment.Factory(
+                    dispatchers = dispatcherRule.dispatchers,
                     auth = mockAuth,
-                    identityRepository = mockRepository
+                    api = mockApi
             )
     )
 }

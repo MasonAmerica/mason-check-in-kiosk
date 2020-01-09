@@ -1,12 +1,11 @@
 package com.bymason.kiosk.checkin.feature.hostfinder
 
-import com.bymason.kiosk.checkin.core.data.DefaultDispatcherProvider
+import com.bymason.kiosk.checkin.core.data.Cache
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.data.DispatcherProvider
+import com.bymason.kiosk.checkin.core.data.FreshCache
 import com.bymason.kiosk.checkin.core.model.Host
-import com.google.firebase.functions.ktx.functions
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.invoke
-import kotlinx.coroutines.tasks.await
+import com.google.gson.Gson
 
 interface HostRepository {
     suspend fun find(name: String): List<Host>
@@ -15,24 +14,39 @@ interface HostRepository {
 }
 
 class DefaultHostRepository(
-        private val dispatchers: DispatcherProvider = DefaultDispatcherProvider
+        dispatchers: DispatcherProvider,
+        private val api: CheckInApi,
+        private val cache: Cache = FreshCache(dispatchers)
 ) : HostRepository {
-    override suspend fun find(name: String): List<Host> = dispatchers.default {
-        val result = Firebase.functions.getHttpsCallable("findHosts").call(name).await()
-        @Suppress("UNCHECKED_CAST") val data = result.data as List<Map<String, String>>
-        data.map { Host(it.getValue("id"), it.getValue("name"), it.getValue("photoUrl")) }
+    private val gson = Gson()
+
+    override suspend fun find(name: String): List<Host> {
+        val input = Cache.Input(
+                keys = *arrayOf("findHosts", name),
+                processedToRaw = { gson.toJson(it) },
+                rawToProcessed = ::parseSerializedHosts
+        )
+        return cache.memoize(input) {
+            api.findHosts(name)
+        }
     }
 
     override suspend fun registerHost(
             sessionId: String,
             host: Host
-    ) = dispatchers.default {
-        val data = mapOf(
-                "operation" to "here-to-see",
-                "id" to sessionId,
-                "hostId" to host.id
-        )
-        val result = Firebase.functions.getHttpsCallable("updateSession").call(data).await()
-        result.data as String
+    ): String {
+        return api.updateSession("here-to-see", sessionId, "hostId" to host.id)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseSerializedHosts(raw: String): List<Host> {
+        val rawObjects = gson.fromJson(raw, List::class.java) as List<Map<String, Any>>
+        return rawObjects.map {
+            Host(
+                    it.getValue("id") as String,
+                    it.getValue("name") as String,
+                    it["photoUrl"] as String?
+            )
+        }
     }
 }

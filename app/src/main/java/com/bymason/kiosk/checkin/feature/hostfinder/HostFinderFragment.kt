@@ -6,10 +6,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
+import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.hideKeyboard
@@ -18,12 +19,13 @@ import com.bymason.kiosk.checkin.databinding.HostFinderFragmentBinding
 import kotlinx.coroutines.flow.collect
 
 class HostFinderFragment(
-        repository: HostRepository
+        dispatchers: DispatcherProvider,
+        api: CheckInApi
 ) : FragmentBase(R.layout.host_finder_fragment) {
     private val args by navArgs<HostFinderFragmentArgs>()
 
     private val vm by viewModels<HostFinderViewModel> {
-        HostFinderViewModel.Factory(repository, args.sessionId)
+        HostFinderViewModel.Factory(DefaultHostRepository(dispatchers, api), args.sessionId)
     }
     private val binding by LifecycleAwareLazy {
         HostFinderFragmentBinding.bind(requireView())

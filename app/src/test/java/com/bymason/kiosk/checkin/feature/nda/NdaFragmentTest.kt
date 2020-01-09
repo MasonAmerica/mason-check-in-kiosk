@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.databinding.NdaFragmentBinding
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
@@ -24,12 +25,12 @@ import org.mockito.Mockito.verify
 @RunWith(AndroidJUnit4::class)
 class NdaFragmentTest {
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockRepository = mock(NdaRepository::class.java)
+    private val mockApi = mock(CheckInApi::class.java)
 
     @Test
     fun `NDA signing page loads on create`() {
         runBlocking {
-            `when`(mockRepository.sign(any())).thenReturn("https://google.com")
+            `when`(mockApi.generateNdaLink(any())).thenReturn("https://google.com")
         }
 
         val scenario = launchFragment()
@@ -44,7 +45,7 @@ class NdaFragmentTest {
     @Test
     fun `Finish check-in button finishes check-in`() {
         runBlocking {
-            `when`(mockRepository.sign(any())).thenReturn("https://google.com")
+            `when`(mockApi.generateNdaLink(any())).thenReturn("https://google.com")
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -61,7 +62,7 @@ class NdaFragmentTest {
         }
 
         runBlocking {
-            verify(mockRepository).finish(any())
+            verify(mockApi).updateSession(any(), any(), any())
         }
         verify(mockNavController).navigate(NdaFragmentDirections.reset())
     }
@@ -73,7 +74,7 @@ class NdaFragmentTest {
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
             CheckInNavHostFragment.Factory(
                     auth = mockAuth,
-                    ndaRepository = mockRepository
+                    api = mockApi
             )
     )
 }

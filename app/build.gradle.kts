@@ -114,6 +114,7 @@ dependencies {
     implementation(Config.Libs.Misc.retrofitGson)
     implementation(Config.Libs.Misc.gson)
     implementation(Config.Libs.Misc.glide)
+    implementation(Config.Libs.Misc.guava)
 
     implementation(Config.Libs.Misc.permissions)
 

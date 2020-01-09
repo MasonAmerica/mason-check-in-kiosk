@@ -9,9 +9,10 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
+import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.ui.FragmentBase
 import com.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import com.bymason.kiosk.checkin.core.ui.doOnImeDone
@@ -21,9 +22,12 @@ import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
 import kotlinx.coroutines.flow.collect
 
 class IdentityFragment(
-        repository: IdentityRepository
+        dispatchers: DispatcherProvider,
+        api: CheckInApi
 ) : FragmentBase(R.layout.identity_fragment) {
-    private val vm by viewModels<IdentityViewModel> { IdentityViewModel.Factory(repository) }
+    private val vm by viewModels<IdentityViewModel> {
+        IdentityViewModel.Factory(dispatchers, DefaultIdentityRepository(dispatchers, api))
+    }
 
     private val binding by LifecycleAwareLazy {
         IdentityFragmentBinding.bind(requireView())

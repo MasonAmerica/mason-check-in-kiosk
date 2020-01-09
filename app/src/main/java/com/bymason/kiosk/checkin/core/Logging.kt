@@ -5,6 +5,7 @@ import com.bymason.kiosk.checkin.BuildConfig
 import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletionHandler
+import kotlinx.coroutines.CoroutineExceptionHandler
 import retrofit2.HttpException
 
 fun logBreadcrumb(message: String, throwable: Throwable? = null) {
@@ -25,6 +26,8 @@ fun logBreadcrumb(message: String, throwable: Throwable? = null) {
 }
 
 object CrashLogger : CompletionHandler {
+    val handler = CoroutineExceptionHandler { _, t -> invoke(t) }
+
     override fun invoke(t: Throwable?) {
         if (t == null || t is CancellationException) return
         if (BuildConfig.DEBUG) {

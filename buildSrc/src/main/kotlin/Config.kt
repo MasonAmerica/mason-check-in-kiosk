@@ -99,6 +99,7 @@ object Config {
             const val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
             const val gson = "com.google.code.gson:gson:2.8.6"
             const val glide = "com.github.bumptech.glide:glide:4.10.0"
+            const val guava = "com.google.guava:guava:28.2-android"
 
             const val permissions = "pub.devrel:easypermissions:3.0.0"
         }

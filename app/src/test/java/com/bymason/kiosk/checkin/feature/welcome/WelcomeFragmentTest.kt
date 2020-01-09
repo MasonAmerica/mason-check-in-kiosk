@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
+import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.model.Company
 import com.bymason.kiosk.checkin.databinding.WelcomeFragmentBinding
 import com.google.common.truth.Truth.assertThat
@@ -25,13 +26,13 @@ import org.robolectric.Robolectric
 @RunWith(AndroidJUnit4::class)
 class WelcomeFragmentTest {
     private val mockAuth = mock(FirebaseAuthCompat::class.java)
-    private val mockRepository = mock(WelcomeRepository::class.java)
+    private val mockApi = mock(CheckInApi::class.java)
 
     @Test
     fun `Clicking anywhere moves to the next screen`() {
         `when`(mockAuth.uid).thenReturn("uid")
         runBlocking {
-            `when`(mockRepository.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
         }
 
         val mockNavController = mock(NavController::class.java)
@@ -49,7 +50,7 @@ class WelcomeFragmentTest {
     fun `Company metadata is populated on launch`() {
         `when`(mockAuth.uid).thenReturn("uid")
         runBlocking {
-            `when`(mockRepository.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
         }
 
         val scenario = launchFragment()
@@ -70,7 +71,7 @@ class WelcomeFragmentTest {
                 themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
                 factory = CheckInNavHostFragment.Factory(
                         auth = mockAuth,
-                        welcomeRepository = mockRepository
+                        api = mockApi
                 )
         )
         Robolectric.getBackgroundThreadScheduler().unPause()
