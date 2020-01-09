@@ -9,6 +9,7 @@ plugins {
 
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.android.extensions")
+    id("org.jetbrains.kotlin.plugin.serialization")
 
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -88,6 +89,7 @@ dependencies {
     implementation(Config.Libs.Kotlin.jvm)
     implementation(Config.Libs.Kotlin.coroutinesAndroid)
     implementation(Config.Libs.Kotlin.coroutinesTasks)
+    implementation(Config.Libs.Kotlin.serialization)
 
     implementation(Config.Libs.Jetpack.core)
     implementation(Config.Libs.Jetpack.appCompat)
@@ -111,8 +113,6 @@ dependencies {
     debugImplementation(Config.Libs.Misc.leakCanary)
 
     implementation(Config.Libs.Misc.retrofit)
-    implementation(Config.Libs.Misc.retrofitGson)
-    implementation(Config.Libs.Misc.gson)
     implementation(Config.Libs.Misc.glide)
     implementation(Config.Libs.Misc.guava)
 

@@ -6,6 +6,7 @@ buildscript {
     dependencies {
         classpath(Config.Plugins.android)
         classpath(Config.Plugins.kotlin)
+        classpath(Config.Plugins.kotlinSerialization)
         classpath(Config.Plugins.mason)
         classpath(Config.Plugins.navArgs)
         classpath(Config.Plugins.google)

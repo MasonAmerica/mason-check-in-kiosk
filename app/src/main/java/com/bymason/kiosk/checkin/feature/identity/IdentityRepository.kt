@@ -5,9 +5,10 @@ import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.core.data.FreshCache
 import com.bymason.kiosk.checkin.core.model.GuestField
-import com.bymason.kiosk.checkin.core.model.GuestFieldType
-import com.google.gson.Gson
 import kotlinx.coroutines.invoke
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.list
 
 interface IdentityRepository {
     suspend fun getGuestFields(): List<FieldState>
@@ -20,13 +21,13 @@ class DefaultIdentityRepository(
         private val api: CheckInApi,
         private val cache: Cache = FreshCache(dispatchers)
 ) : IdentityRepository {
-    private val gson = Gson()
+    private val json = Json(JsonConfiguration.Stable)
 
     override suspend fun getGuestFields(): List<FieldState> {
         val input = Cache.Input(
                 keys = *arrayOf("getGuestFields"),
-                processedToRaw = { gson.toJson(it) },
-                rawToProcessed = ::parseSerializedGuestFields
+                processedToRaw = { json.stringify(GuestField.serializer().list, it) },
+                rawToProcessed = { json.parse(GuestField.serializer().list, it) }
         )
         val fields = cache.memoize(input) {
             api.getGuestFields()
@@ -44,19 +45,5 @@ class DefaultIdentityRepository(
                     .map { mapOf("id" to it.field.id, "value" to it.value) }
         }
         return api.updateSession("create", null, "guestFields" to processedFields)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun parseSerializedGuestFields(raw: String): List<GuestField> {
-        val rawObjects = gson.fromJson(raw, List::class.java) as List<Map<String, Any>>
-        return rawObjects.map {
-            GuestField(
-                    it.getValue("id") as String,
-                    GuestFieldType.valueOf(it.getValue("type") as String),
-                    it.getValue("name") as String,
-                    it.getValue("required") as Boolean,
-                    it["regex"] as String?
-            )
-        }
     }
 }

@@ -35,6 +35,7 @@ object Config {
     object Plugins {
         const val android = "com.android.tools.build:gradle:4.0.0-alpha08"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
         const val mason = "com.bymason.build:mason-apps:1.0.2"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
         const val google = "com.google.gms:google-services:4.3.3"
@@ -55,6 +56,8 @@ object Config {
                     "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinesVersion"
             const val coroutinesJs =
                     "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion"
+
+            const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
         }
 
         object Jetpack {
@@ -96,8 +99,6 @@ object Config {
 
             const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.1"
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
-            const val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-            const val gson = "com.google.code.gson:gson:2.8.6"
             const val glide = "com.github.bumptech.glide:glide:4.10.0"
             const val guava = "com.google.guava:guava:28.2-android"
 

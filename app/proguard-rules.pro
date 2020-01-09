@@ -8,12 +8,6 @@
 -keepnames class * extends com.bymason.kiosk.checkin.core.ui.FragmentBase
 -keepnames class * extends com.bymason.kiosk.checkin.core.ui.DialogFragmentBase
 
-# Don't touch Gson fields
--keep @interface com.google.gson.annotations.SerializedName
--keepclassmembers class * {
-  @com.google.gson.annotations.SerializedName *;
-}
-
 # 🤷‍♂️
 -dontwarn org.apache.commons.**
 -dontnote kotlin.**
