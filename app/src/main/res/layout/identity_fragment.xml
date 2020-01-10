@@ -7,21 +7,33 @@
     android:importantForAutofill="no"
     tools:context=".HomeActivity">
 
-    <ImageView
-        android:id="@+id/logo"
+    <FrameLayout
+        android:id="@+id/logo_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/spacing_xlarge"
-        android:paddingBottom="@dimen/spacing_xlarge"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/spacing_xlarge"
+        android:layout_marginBottom="@dimen/spacing_large"
+        app:layout_constraintBottom_toTopOf="@id/fields"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="wrap"
+        app:layout_constraintHeight_percent=".33"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="wrap"
-        app:layout_constraintWidth_percent=".67" />
+        app:layout_constraintWidth_percent=".67">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:src="@tools:sample/avatars" />
+
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fields"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/spacing_normal"
         android:clipToPadding="false"
@@ -31,8 +43,9 @@
         app:layout_constraintBottom_toTopOf="@id/next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintTop_toBottomOf="@id/logo_container"
         app:layout_constraintVertical_bias=".16"
+        app:layout_constraintWidth_max="500dp"
         tools:listitem="@layout/host_finder_fragment_item" />
 
     <Button

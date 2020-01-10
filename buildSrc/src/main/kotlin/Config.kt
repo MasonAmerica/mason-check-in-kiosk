@@ -67,7 +67,7 @@ object Config {
             const val appCompat = "androidx.appcompat:appcompat:1.1.0"
             const val fragment = "androidx.fragment:fragment-ktx:1.2.0-rc04"
             const val rvSelection = "androidx.recyclerview:recyclerview-selection:1.1.0-beta01"
-            const val constraint = "androidx.constraintlayout:constraintlayout:1.1.3"
+            const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
 
             const val material = "com.google.android.material:material:1.1.0-beta02"
 
