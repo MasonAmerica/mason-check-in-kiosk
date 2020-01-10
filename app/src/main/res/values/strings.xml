@@ -1,12 +1,7 @@
 <resources>
     <string name="app_name">Mason Check-in Kiosk</string>
 
-    <!-- Welcome -->
-    <string name="kiosk_checkin_welcome_info_plain_title">Welcome!</string>
-    <string name="kiosk_checkin_welcome_info_company_title">Welcome to %s!</string>
-    <string name="kiosk_checkin_welcome_info_body">Tap anywhere to get started.</string>
-
-    <!-- Welcome -->
+    <!-- Sign in -->
     <string name="kiosk_checkin_sign_in_title">Sign in</string>
     <string name="kiosk_checkin_sign_in_email_hint">Email</string>
     <string name="kiosk_checkin_sign_in_password_hint">Password</string>

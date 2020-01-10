@@ -30,7 +30,7 @@ class CheckInNavHostFragment : NavHostFragment() {
                 className: String
         ) = when (loadFragmentClass(classLoader, className)) {
             SignInFragment::class.java -> SignInFragment(auth)
-            WelcomeFragment::class.java -> WelcomeFragment(dispatchers, auth, api)
+            WelcomeFragment::class.java -> WelcomeFragment(auth)
             IdentityFragment::class.java -> IdentityFragment(dispatchers, api)
             HostFinderFragment::class.java -> HostFinderFragment(dispatchers, api)
             NdaFragment::class.java -> NdaFragment(api)

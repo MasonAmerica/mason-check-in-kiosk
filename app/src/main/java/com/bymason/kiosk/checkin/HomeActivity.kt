@@ -11,7 +11,7 @@ import com.bymason.kiosk.checkin.databinding.HomeActivityBinding
 class HomeActivity : ActivityBase() {
     private val controller by lazy { findNavController(R.id.content) }
     private val configuration by lazy {
-        AppBarConfiguration(setOf(R.id.welcome, R.id.login))
+        AppBarConfiguration(setOf(R.id.welcome, R.id.login, R.id.identity))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
