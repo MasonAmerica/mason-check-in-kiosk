@@ -64,12 +64,12 @@ object Config {
             private const val lifecycleVersion = "2.2.0-rc03"
 
             const val core = "androidx.core:core-ktx:1.2.0-rc01"
-            const val appCompat = "androidx.appcompat:appcompat:1.1.0"
-            const val fragment = "androidx.fragment:fragment-ktx:1.2.0-rc04"
+            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha01"
+            const val fragment = "androidx.fragment:fragment-ktx:1.2.0-rc05"
             const val rvSelection = "androidx.recyclerview:recyclerview-selection:1.1.0-beta01"
             const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
 
-            const val material = "com.google.android.material:material:1.1.0-beta02"
+            const val material = "com.google.android.material:material:1.2.0-alpha03"
 
             const val common = "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
             const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
@@ -80,7 +80,7 @@ object Config {
             const val navFragments = "androidx.navigation:navigation-fragment-ktx:$navVersion"
             const val navUi = "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-            const val webkit = "androidx.webkit:webkit:1.1.0"
+            const val webkit = "androidx.webkit:webkit:1.2.0-alpha01"
         }
 
         object Firebase {
@@ -109,9 +109,9 @@ object Config {
             const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha03"
             const val truth = "androidx.test.ext:truth:1.3.0-alpha03"
             const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha03"
-            const val core = "androidx.test:core-ktx:1.2.0"
+            const val core = "androidx.test:core-ktx:1.3.0-alpha03"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
-            const val fragment = "androidx.fragment:fragment-testing:1.2.0-rc04"
+            const val fragment = "androidx.fragment:fragment-testing:1.2.0-rc05"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
             const val mockito = "org.mockito:mockito-core:3.2.4"
             const val coroutines =
