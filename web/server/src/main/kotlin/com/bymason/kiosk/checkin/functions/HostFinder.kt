@@ -40,12 +40,13 @@ private suspend fun findHosts(auth: AuthContext, hostName: String): Array<Json> 
     console.log("Hosts: ", JSON.stringify(hosts.users))
 
     return hosts.users.orEmpty().map {
-        val profilePic = if (it.thumbnailPhotoUrl.orEmpty().contains("/private")) {
-            val hash = js("require('md5')")(it.primaryEmail?.toLowerCase())
-            "https://www.gravatar.com/avatar/$hash?default=${it.thumbnailPhotoUrl}"
+        val emailHash = js("require('md5')")(it.primaryEmail?.toLowerCase())
+        val fallbackPic = if (it.thumbnailPhotoUrl.isNullOrBlank()) {
+            "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"
         } else {
             it.thumbnailPhotoUrl
         }
+        val profilePic = "https://www.gravatar.com/avatar/$emailHash?default=$fallbackPic"
 
         json(
                 "id" to it.id,
