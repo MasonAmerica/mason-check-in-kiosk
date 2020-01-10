@@ -1,5 +1,6 @@
 package com.bymason.kiosk.checkin.feature.identity
 
+import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -11,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bymason.kiosk.checkin.CheckInNavHostFragment
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
+import com.bymason.kiosk.checkin.core.model.Company
 import com.bymason.kiosk.checkin.core.model.GuestField
 import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
@@ -27,6 +29,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.robolectric.Robolectric
 
 @RunWith(AndroidJUnit4::class)
 class IdentityFragmentTest {
@@ -44,6 +47,7 @@ class IdentityFragmentTest {
     @Test
     fun `Input fields don't have errors on launch`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -64,6 +68,7 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button is disabled on launch`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -82,6 +87,7 @@ class IdentityFragmentTest {
     @Test
     fun `Moving to new field while current one is invalid shows error`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -106,6 +112,7 @@ class IdentityFragmentTest {
     @Test
     fun `Going back to invalid field clears error`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -130,6 +137,7 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button becomes enabled when all fields are valid`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -157,6 +165,7 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button navigates to next destination`() {
         runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id", GuestFieldType.NAME, "foo", false, null)))
             `when`(mockApi.updateSession(any(), any(), any())).thenReturn("foobar")
@@ -173,13 +182,21 @@ class IdentityFragmentTest {
         verify(mockNavController).navigate(IdentityFragmentDirections.next("foobar"))
     }
 
-    private fun launchFragment(
-    ) = launchFragmentInContainer<IdentityFragment>(
-            themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-            factory = CheckInNavHostFragment.Factory(
-                    dispatchers = dispatcherRule.dispatchers,
-                    auth = mockAuth,
-                    api = mockApi
-            )
-    )
+    private fun launchFragment(): FragmentScenario<IdentityFragment> {
+        // TODO remove scheduler hacks after this gets fixed:
+        //  https://github.com/robolectric/robolectric/issues/1306#issuecomment-192641680
+        Robolectric.getBackgroundThreadScheduler().pause()
+        Robolectric.getForegroundThreadScheduler().pause()
+        val fragment = launchFragmentInContainer<IdentityFragment>(
+                themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
+                factory = CheckInNavHostFragment.Factory(
+                        dispatchers = dispatcherRule.dispatchers,
+                        auth = mockAuth,
+                        api = mockApi
+                )
+        )
+        Robolectric.getBackgroundThreadScheduler().unPause()
+        Robolectric.getForegroundThreadScheduler().unPause()
+        return fragment
+    }
 }

@@ -10,6 +10,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.data.DispatcherProvider
@@ -67,6 +69,10 @@ class IdentityFragment(
         progress?.isVisible = state.isLoading
         binding.next.isEnabled = state.isContinueButtonEnabled
         adapter.submitList(state.fieldStates)
+        Glide.with(this)
+                .load(state.companyLogoUrl)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.logo)
     }
 
     inner class KeyboardInstaller : ViewTreeObserver.OnGlobalLayoutListener {

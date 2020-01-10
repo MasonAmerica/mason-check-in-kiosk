@@ -1,6 +1,7 @@
 package com.bymason.kiosk.checkin.feature.identity
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.bymason.kiosk.checkin.core.model.Company
 import com.bymason.kiosk.checkin.core.model.GuestField
 import com.bymason.kiosk.checkin.core.model.GuestFieldType
 import com.bymason.kiosk.checkin.helpers.Resettable
@@ -43,6 +44,14 @@ class IdentityViewModelTest {
 
         assertThat(vm.state.value?.isLoading).isFalse()
         assertThat(vm.state.value?.fieldStates).containsExactly(state)
+    }
+
+    @Test
+    fun `Company metadata is loaded`() = dispatcherRule.runBlocking {
+        `when`(mockRepository.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+
+        assertThat(vm.state.value?.isLoading).isFalse()
+        assertThat(vm.state.value?.companyLogoUrl).isEqualTo("url")
     }
 
     @Test
@@ -222,6 +231,8 @@ class IdentityViewModelTest {
         val result2 = CompletableDeferred<String>()
         val field = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
         val vm = IdentityViewModel(object : IdentityRepository {
+            override suspend fun getCompanyMetadata() = Company("Mason", "url")
+
             override suspend fun getGuestFields() = listOf(field)
 
             override suspend fun registerFields(fields: List<FieldState>) = when {

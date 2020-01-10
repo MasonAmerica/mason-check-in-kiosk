@@ -9,13 +9,15 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xlarge"
+        android:paddingTop="@dimen/spacing_xlarge"
+        android:paddingBottom="@dimen/spacing_xlarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_logo" />
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent=".67" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fields"

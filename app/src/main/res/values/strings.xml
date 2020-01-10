@@ -13,12 +13,12 @@
     <string name="kiosk_checkin_sign_in_submit_button_title">Sign in</string>
 
     <!-- Identity -->
-    <string name="kiosk_checkin_identity_title">Tell us a little bit about yourself</string>
+    <string name="kiosk_checkin_identity_title">Welcome!</string>
 
     <string name="kiosk_checkin_identity_field_hint_title">%s (Optional)</string>
     <string name="kiosk_checkin_identity_field_invalid_error">Invalid %s</string>
 
-    <string name="kiosk_checkin_identity_continue_button_title">Continue</string>
+    <string name="kiosk_checkin_identity_continue_button_title">Check in</string>
 
     <!-- Host Finder -->
     <string name="kiosk_checkin_host_finder_title">Who are you here to see?</string>

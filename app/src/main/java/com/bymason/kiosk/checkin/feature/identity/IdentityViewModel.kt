@@ -26,6 +26,7 @@ class IdentityViewModel(
     val actions: Flow<Action> = flow { for (e in _actions) emit(e) }
 
     init {
+        fetchCompanyMetadata()
         fetchGuestFields()
     }
 
@@ -72,6 +73,19 @@ class IdentityViewModel(
         }
     }
 
+    private fun fetchCompanyMetadata() {
+        viewModelScope.launch {
+            val company = try {
+                repository.getCompanyMetadata()
+            } catch (t: Throwable) {
+                logBreadcrumb("Failed to get company metadata", t)
+                return@launch
+            }
+
+            _state.update { copy(companyLogoUrl = company.logoUrl) }
+        }
+    }
+
     private suspend fun processFocusChange(
             field: GuestField,
             newValue: String?,
@@ -102,7 +116,8 @@ class IdentityViewModel(
     data class State(
             val isLoading: Boolean = true,
             val isContinueButtonEnabled: Boolean = false,
-            val fieldStates: List<FieldState> = emptyList()
+            val fieldStates: List<FieldState> = emptyList(),
+            val companyLogoUrl: String? = null
     )
 
     sealed class Action {
