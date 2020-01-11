@@ -121,6 +121,7 @@ dependencies {
     testImplementation(Config.Libs.Testing.junit)
     testImplementation(Config.Libs.Testing.truth)
     testImplementation(Config.Libs.Testing.espresso)
+    testImplementation(Config.Libs.Testing.espressoWeb)
     testImplementation(Config.Libs.Testing.core)
     testImplementation(Config.Libs.Testing.arch)
     debugImplementation(Config.Libs.Testing.fragment)

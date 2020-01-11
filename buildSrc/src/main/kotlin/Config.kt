@@ -109,6 +109,7 @@ object Config {
             const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha03"
             const val truth = "androidx.test.ext:truth:1.3.0-alpha03"
             const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha03"
+            const val espressoWeb = "androidx.test.espresso:espresso-web:3.3.0-alpha03"
             const val core = "androidx.test:core-ktx:1.3.0-alpha03"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
             const val fragment = "androidx.fragment:fragment-testing:1.2.0-rc05"

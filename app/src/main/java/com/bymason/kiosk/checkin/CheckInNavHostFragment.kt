@@ -10,6 +10,7 @@ import com.bymason.kiosk.checkin.core.data.DispatcherProvider
 import com.bymason.kiosk.checkin.feature.hostfinder.HostFinderFragment
 import com.bymason.kiosk.checkin.feature.identity.IdentityFragment
 import com.bymason.kiosk.checkin.feature.nda.NdaFragment
+import com.bymason.kiosk.checkin.feature.report.ReportFragment
 import com.bymason.kiosk.checkin.feature.signin.SignInFragment
 import com.bymason.kiosk.checkin.feature.welcome.WelcomeFragment
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
@@ -34,6 +35,7 @@ class CheckInNavHostFragment : NavHostFragment() {
             IdentityFragment::class.java -> IdentityFragment(dispatchers, api)
             HostFinderFragment::class.java -> HostFinderFragment(dispatchers, api)
             NdaFragment::class.java -> NdaFragment(api)
+            ReportFragment::class.java -> ReportFragment()
             else -> super.instantiate(classLoader, className)
         }
     }

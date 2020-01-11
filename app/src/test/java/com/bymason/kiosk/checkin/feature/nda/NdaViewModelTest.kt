@@ -45,17 +45,6 @@ class NdaViewModelTest {
     }
 
     @Test
-    fun `Finish action is sent after signing is complete`() = dispatcherRule.runBlocking {
-        vm.onNdaSigned()
-
-        launch {
-            assertThat(vm.actions.take(1).single())
-                    .isEqualTo(NdaViewModel.Action.Navigate(NdaFragmentDirections.reset()))
-        }
-        verify(mockRepository).finish(any())
-    }
-
-    @Test
     fun `WebView client loads random web pages normally`() {
         val result = vm.createWebViewClient().shouldOverrideUrlLoading(
                 WebView(null), createFakeRequest("https://google.com"))
@@ -64,7 +53,7 @@ class NdaViewModelTest {
     }
 
     @Test
-    fun `WebView client sends NDA signed event on successful docusign response`() {
+    fun `WebView client sends NDA signed event on successful docusign response`() = dispatcherRule.runBlocking {
         val result = vm.createWebViewClient().shouldOverrideUrlLoading(
                 WebView(null),
                 createFakeRequest("https://mason-check-in-kiosk.firebaseapp.com" +
@@ -72,8 +61,11 @@ class NdaViewModelTest {
         )
 
         assertThat(result).isTrue()
-        assertThat(vm.state.value?.isWebViewVisible).isFalse()
-        assertThat(vm.state.value?.isFinishButtonVisible).isTrue()
+        launch {
+            assertThat(vm.actions.take(1).single())
+                    .isEqualTo(NdaViewModel.Action.Navigate(NdaFragmentDirections.next()))
+        }
+        verify(mockRepository).finish(any())
     }
 
     @Test

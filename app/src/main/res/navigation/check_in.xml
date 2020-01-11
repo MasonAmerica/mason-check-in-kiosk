@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/check_in"
     app:startDestination="@id/welcome">
 
     <action
@@ -10,8 +10,7 @@
         app:destination="@id/welcome"
         app:enterAnim="@anim/slide_in_left"
         app:exitAnim="@anim/slide_out_right"
-        app:popUpTo="@id/identity"
-        app:popUpToInclusive="true" />
+        app:popUpTo="@id/check_in" />
 
     <fragment
         android:id="@+id/login"
@@ -96,6 +95,21 @@
             android:name="sessionId"
             app:argType="string" />
 
+        <action
+            android:id="@+id/next"
+            app:destination="@id/report"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/check_in" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/report"
+        android:name="com.bymason.kiosk.checkin.feature.report.ReportFragment"
+        android:label="@string/kiosk_checkin_report_title"
+        tools:layout="@layout/report_fragment" />
 
 </navigation>

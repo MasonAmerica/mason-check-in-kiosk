@@ -1,7 +1,6 @@
 package com.bymason.kiosk.checkin.feature.nda
 
 import android.os.Bundle
-import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -34,17 +33,10 @@ class NdaFragment(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.web.webViewClient = vm.createWebViewClient()
-        binding.web.webChromeClient = vm.createWebChromeClient()
-        binding.web.settings.javaScriptEnabled = true
-        savedInstanceState?.let { binding.web.restoreState(it) }
-
-        binding.finishCheckInHint.setOnTouchListener { _, e ->
-            if (e.action == MotionEvent.ACTION_UP) {
-                vm.onNdaSigned()
-            }
-            true
-        }
+        binding.root.webViewClient = vm.createWebViewClient()
+        binding.root.webChromeClient = vm.createWebChromeClient()
+        binding.root.settings.javaScriptEnabled = true
+        savedInstanceState?.let { binding.root.restoreState(it) }
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             vm.viewActions.collect { onViewActionRequested(it) }
@@ -56,7 +48,7 @@ class NdaFragment(
 
     override fun onSaveInstanceState(outState: Bundle) {
         if (view == null) return
-        binding.web.saveState(outState)
+        binding.root.saveState(outState)
     }
 
     private fun onActionRequested(action: NdaViewModel.Action) {
@@ -68,13 +60,11 @@ class NdaFragment(
 
     private fun onViewActionRequested(action: NdaViewModel.ViewAction) {
         when (action) {
-            is NdaViewModel.ViewAction.VisitPage -> binding.web.loadUrl(action.url)
+            is NdaViewModel.ViewAction.VisitPage -> binding.root.loadUrl(action.url)
         }
     }
 
     private fun onViewStateChanged(state: NdaViewModel.State) {
         progress?.isVisible = state.isLoading
-        binding.web.isVisible = state.isWebViewVisible
-        binding.finishCheckInHint.isVisible = state.isFinishButtonVisible
     }
 }

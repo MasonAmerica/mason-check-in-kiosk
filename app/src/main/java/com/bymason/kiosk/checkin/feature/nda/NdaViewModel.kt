@@ -62,7 +62,15 @@ class NdaViewModel(
         }
     }
 
-    fun onNdaSigned() {
+    private fun onNdaSigned(result: String) {
+        if (result == "signing_complete") {
+            finishCheckIn()
+        } else {
+            _actions.offer(Action.SignNda)
+        }
+    }
+
+    private fun finishCheckIn() {
         _state.update { copy(isLoading = true) }
         viewModelScope.launch {
             try {
@@ -74,22 +82,12 @@ class NdaViewModel(
                 _state.update { copy(isLoading = false) }
             }
 
-            _actions.offer(Action.Navigate(NdaFragmentDirections.reset()))
-        }
-    }
-
-    private fun onNdaSigned(result: String) {
-        if (result == "signing_complete") {
-            _state.update { copy(isWebViewVisible = false, isFinishButtonVisible = true) }
-        } else {
-            _actions.offer(Action.SignNda)
+            _actions.offer(Action.Navigate(NdaFragmentDirections.next()))
         }
     }
 
     data class State(
-            val isLoading: Boolean = false,
-            val isWebViewVisible: Boolean = true,
-            val isFinishButtonVisible: Boolean = false
+            val isLoading: Boolean = false
     )
 
     sealed class Action {
