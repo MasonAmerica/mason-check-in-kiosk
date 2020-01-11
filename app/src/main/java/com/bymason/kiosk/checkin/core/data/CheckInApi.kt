@@ -58,7 +58,8 @@ class DefaultCheckInApi(
         for ((key, value) in params) data[key] = value
 
         val result = Firebase.functions.getHttpsCallable("updateSession").call(data).await()
-        result.data as String
+        @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
+        response.getValue("id")
     }
 
     override suspend fun findHosts(name: String): List<Host> = dispatchers.default {
@@ -69,6 +70,7 @@ class DefaultCheckInApi(
 
     override suspend fun generateNdaLink(sessionId: String): String = dispatchers.default {
         val result = Firebase.functions.getHttpsCallable("generateNdaLink").call(sessionId).await()
-        result.data as String
+        @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
+        response.getValue("url")
     }
 }

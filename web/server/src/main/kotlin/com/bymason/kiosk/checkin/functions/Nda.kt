@@ -25,7 +25,7 @@ import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
 
-fun generateNdaLink(data: Any?, context: CallableContext): Promise<*>? {
+fun generateNdaLink(data: Any?, context: CallableContext): Promise<Json>? {
     val auth = context.auth ?: throw HttpsError("unauthenticated")
     val sessionId = data as? String
     console.log("Generating DocuSign NDA for user '${auth.uid}' with session '$sessionId'")
@@ -37,7 +37,7 @@ fun generateNdaLink(data: Any?, context: CallableContext): Promise<*>? {
     return GlobalScope.async { generateNdaLink(auth, sessionId) }.asPromise()
 }
 
-private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): String {
+private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json {
     val session = fetchPopulatedSession(auth.uid, sessionId)
     val guestFields = session["guestFields"] as Array<Json>
     val guestName = guestFields.mapNotNull { field ->
@@ -156,7 +156,7 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Strin
             )
     ), SetOptions.merge).await()
 
-    return viewResult.url
+    return json("url" to viewResult.url)
 }
 
 private fun DocumentSnapshot.getTabs(

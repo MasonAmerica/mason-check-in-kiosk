@@ -22,7 +22,7 @@ import kotlin.js.Json
 import kotlin.js.Promise
 import kotlin.js.json
 
-fun updateSession(data: Json, context: CallableContext): Promise<String>? {
+fun updateSession(data: Json, context: CallableContext): Promise<Json>? {
     val auth = context.auth ?: throw HttpsError("unauthenticated")
     val operation = data["operation"] as? String
     val sessionId = data["id"] as? String
@@ -47,7 +47,7 @@ fun updateSession(data: Json, context: CallableContext): Promise<String>? {
     }.asPromise()
 }
 
-private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>?): String {
+private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>?): Json {
     if (guestFields == null) {
         throw HttpsError("invalid-argument")
     }
@@ -55,7 +55,7 @@ private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>?):
     return createSession(auth, guestFields)
 }
 
-private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): String {
+private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): Json {
     val sessionDoc = admin.firestore().collection(auth.uid)
             .doc("sessions")
             .collection("visits")
@@ -70,14 +70,14 @@ private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): 
     )).await()
 
     console.log("Created session '${sessionDoc.id}'")
-    return sessionDoc.id
+    return json("id" to sessionDoc.id)
 }
 
 private suspend fun hereToSee(
         auth: AuthContext,
         sessionId: String?,
         hostId: String?
-): String {
+): Json {
     if (sessionId == null || hostId == null) {
         throw HttpsError("invalid-argument")
     }
@@ -89,7 +89,7 @@ private suspend fun hereToSee(
         auth: AuthContext,
         sessionId: String,
         hostId: String
-): String {
+): Json {
     val sessionDoc = admin.firestore().collection(auth.uid)
             .doc("sessions")
             .collection("visits")
@@ -100,10 +100,10 @@ private suspend fun hereToSee(
             "hereToSee" to arrayOf(json("gsuite" to hostId))
     ), SetOptions.merge).await()
 
-    return sessionDoc.id
+    return json("id" to sessionDoc.id)
 }
 
-private suspend fun finalizeSession(auth: AuthContext, sessionId: String?): String {
+private suspend fun finalizeSession(auth: AuthContext, sessionId: String?): Json {
     if (sessionId == null) {
         throw HttpsError("invalid-argument")
     }
@@ -122,7 +122,7 @@ private suspend fun finalizeSession(
         sessionId: String,
         hostId: String,
         guestName: String
-): String {
+): Json {
     val creds = getAndInitCreds(auth.uid, "gsuite")
     val state = installGoogleAuth(creds.getValue("gsuite"))
     val directory = google.admin(json("version" to "directory_v1"))
@@ -145,7 +145,7 @@ private suspend fun finalizeSession(
             "timestamp" to FieldValues.serverTimestamp()
     ), SetOptions.merge).await()
 
-    return sessionDoc.id
+    return json("id" to sessionDoc.id)
 }
 
 private suspend fun notifyHost(auth: AuthContext, host: `Schema$User`, guestName: String) {
