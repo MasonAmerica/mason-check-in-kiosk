@@ -12,12 +12,17 @@ package firebase.functions
 import firebase.auth.Auth
 import firebase.firestore.Firestore
 import firebase.firestore.NamespaceBuilder
+import firebase.firestore.Timestamps
 import firebase.https.Https
+import firebase.https.Pubsub
+import kotlin.js.Date
 import kotlin.js.Json
 import kotlin.js.Promise
 
-val functions = js("require('firebase-functions')").unsafeCast<Functions>()
 val admin = js("require('firebase-admin')").unsafeCast<Admin>()
+val functions = js("require('firebase-functions')").unsafeCast<Functions>()
+val moment: dynamic by lazy { js("require('moment')") }
+val epoch by lazy { Timestamps.fromDate(Date(0)) }
 
 external val SDK_VERSION: String = definedExternally
 external val apps: Array<App> = definedExternally
@@ -78,7 +83,7 @@ external interface ChangeJson {
 
 external class Functions {
     val firestore: NamespaceBuilder = definedExternally
-    //    val pubsub: Pubsub = definedExternally
+    val pubsub: Pubsub = definedExternally
     val https: Https = definedExternally
 
     fun runWith(options: dynamic): Functions

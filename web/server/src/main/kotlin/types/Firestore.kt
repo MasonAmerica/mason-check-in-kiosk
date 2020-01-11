@@ -18,6 +18,7 @@ import kotlin.js.json
 
 external class Firestore(options: Any? = definedExternally) {
     fun collection(collectionPath: String): CollectionReference = definedExternally
+    fun collectionGroup(collectionId: String): Query = definedExternally
     fun doc(documentPath: String): DocumentReference = definedExternally
     fun getAll(vararg documentRef: DocumentReference): Promise<Array<DocumentSnapshot>> = definedExternally
     fun <T> runTransaction(updateFunction: (transaction: Transaction) -> Promise<T>): Promise<T> = definedExternally

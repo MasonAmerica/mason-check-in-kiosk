@@ -5,6 +5,8 @@ import com.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import com.bymason.kiosk.checkin.utils.getAndInitCreds
 import com.bymason.kiosk.checkin.utils.installGoogleAuth
 import com.bymason.kiosk.checkin.utils.maybeRefreshGsuiteCreds
+import com.bymason.kiosk.checkin.utils.validateSession
+import firebase.firestore.DocumentSnapshot
 import firebase.firestore.FieldValues
 import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
@@ -58,7 +60,7 @@ private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>?):
 private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): Json {
     val sessionDoc = admin.firestore().collection(auth.uid)
             .doc("sessions")
-            .collection("visits")
+            .collection("guest-visits")
             .doc()
 
     sessionDoc.set(json(
@@ -82,20 +84,17 @@ private suspend fun hereToSee(
         throw HttpsError("invalid-argument")
     }
 
-    return hereToSee(auth, sessionId, hostId)
+    val sessionDoc = validateSession(auth.uid, sessionId)
+
+    return hereToSee(sessionDoc, hostId)
 }
 
 private suspend fun hereToSee(
-        auth: AuthContext,
-        sessionId: String,
+        sessionDoc: DocumentSnapshot,
         hostId: String
 ): Json {
-    val sessionDoc = admin.firestore().collection(auth.uid)
-            .doc("sessions")
-            .collection("visits")
-            .doc(sessionId)
-
-    sessionDoc.set(json(
+    sessionDoc.ref.set(json(
+            "state" to 1,
             "timestamp" to FieldValues.serverTimestamp(),
             "hereToSee" to arrayOf(json("gsuite" to hostId))
     ), SetOptions.merge).await()
@@ -108,18 +107,18 @@ private suspend fun finalizeSession(auth: AuthContext, sessionId: String?): Json
         throw HttpsError("invalid-argument")
     }
 
-    val session = fetchPopulatedSession(auth.uid, sessionId)
+    val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
     val hostId = session.asDynamic().hereToSee[0].gsuite
     val guestName = (session["guestFields"] as Array<Json>).mapNotNull { field ->
         if (field["type"] == 0) field["value"] as String else null
     }.single()
 
-    return finalizeSession(auth, sessionId, hostId, guestName)
+    return finalizeSession(auth, sessionDoc, hostId, guestName)
 }
 
 private suspend fun finalizeSession(
         auth: AuthContext,
-        sessionId: String,
+        sessionDoc: DocumentSnapshot,
         hostId: String,
         guestName: String
 ): Json {
@@ -135,13 +134,8 @@ private suspend fun finalizeSession(
 
     notifyHost(auth, host, guestName)
 
-    val sessionDoc = admin.firestore().collection(auth.uid)
-            .doc("sessions")
-            .collection("visits")
-            .doc(sessionId)
-
-    sessionDoc.set(json(
-            "state" to 1,
+    sessionDoc.ref.set(json(
+            "state" to -1,
             "timestamp" to FieldValues.serverTimestamp()
     ), SetOptions.merge).await()
 

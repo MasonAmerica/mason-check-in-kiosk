@@ -38,7 +38,7 @@ fun generateNdaLink(data: Any?, context: CallableContext): Promise<Json>? {
 }
 
 private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json {
-    val session = fetchPopulatedSession(auth.uid, sessionId)
+    val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
     val guestFields = session["guestFields"] as Array<Json>
     val guestName = guestFields.mapNotNull { field ->
         if (field["type"] == 0) field["value"] as String else null
@@ -144,12 +144,8 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
 
     console.log("Generated NDA for $guestName ($guestEmail) to sign: ", viewResult.url)
 
-    val sessionDoc = admin.firestore().collection(auth.uid)
-            .doc("sessions")
-            .collection("visits")
-            .doc(sessionId)
-
-    sessionDoc.set(json(
+    sessionDoc.ref.set(json(
+            "state" to 2,
             "timestamp" to FieldValues.serverTimestamp(),
             "documents" to json(
                     "nda" to "https://appdemo.docusign.com/documents/details/$envelopeId"
