@@ -39,7 +39,7 @@ class IdentityViewModel(
     fun onContinue() {
         if (_state.value.isLoading) return // Prevent repeated clicks
 
-        _state.update { copy(isLoading = true) }
+        _state.update { copy(isLoading = true, areViewEnabled = false) }
         viewModelScope.launch {
             val sessionId = try {
                 repository.registerFields(_state.value.fieldStates)
@@ -47,7 +47,7 @@ class IdentityViewModel(
                 logBreadcrumb("Failed to register fields", t)
                 return@launch
             } finally {
-                _state.update { copy(isLoading = false) }
+                _state.update { copy(isLoading = false, areViewEnabled = true) }
             }
 
             _actions.offer(Action.Navigate(IdentityFragmentDirections.next(sessionId)))
@@ -115,6 +115,7 @@ class IdentityViewModel(
 
     data class State(
             val isLoading: Boolean = true,
+            val areViewEnabled: Boolean = true,
             val isContinueButtonEnabled: Boolean = false,
             val fieldStates: List<FieldState> = emptyList(),
             val companyLogoUrl: String? = null

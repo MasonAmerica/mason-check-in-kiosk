@@ -67,12 +67,20 @@ class IdentityFragment(
 
     private fun onViewStateChanged(state: IdentityViewModel.State, adapter: IdentityAdapter) {
         progress?.isVisible = state.isLoading
-        binding.next.isEnabled = state.isContinueButtonEnabled
+        updateEnabledStatus(binding.root, state.areViewEnabled)
+        binding.next.isEnabled = state.areViewEnabled && state.isContinueButtonEnabled
         adapter.submitList(state.fieldStates)
         Glide.with(this)
                 .load(state.companyLogoUrl)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.logo)
+    }
+
+    private fun updateEnabledStatus(group: ViewGroup, enabled: Boolean) {
+        for (child in group.children) {
+            if (child is ViewGroup) updateEnabledStatus(child, enabled)
+            child.isEnabled = enabled
+        }
     }
 
     inner class KeyboardInstaller : ViewTreeObserver.OnGlobalLayoutListener {
