@@ -49,6 +49,10 @@ class NdaViewModel(
         }
     }
 
+    fun onRestartRequested() {
+        _actions.offer(Action.Navigate(NdaFragmentDirections.reset()))
+    }
+
     fun onNdaSigningRequested() {
         _state.update { copy(isLoading = true) }
         viewModelScope.launch {

@@ -15,6 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
@@ -35,6 +36,7 @@ class ReportFragmentTest {
 
         pressBack()
         verify(mockNavController).navigate(ReportFragmentDirections.reset())
+        dispatcherRule.advanceUntilIdle()
     }
 
     @Test
@@ -48,6 +50,20 @@ class ReportFragmentTest {
             binding.next.performClick()
         }
 
+        verify(mockNavController).navigate(ReportFragmentDirections.reset())
+        dispatcherRule.advanceUntilIdle()
+    }
+
+    @Test
+    fun `Check-in is reset after timeout`() {
+        val mockNavController = mock(NavController::class.java)
+        val scenario = launchFragment()
+        scenario.onFragment { fragment ->
+            Navigation.setViewNavController(fragment.requireView(), mockNavController)
+        }
+
+        verify(mockNavController, never()).navigate(ReportFragmentDirections.reset())
+        dispatcherRule.advanceUntilIdle()
         verify(mockNavController).navigate(ReportFragmentDirections.reset())
     }
 

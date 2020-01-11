@@ -27,6 +27,10 @@ class HostFinderViewModel(
 
     private var previousSearch: Job? = null
 
+    fun onRestartRequested() {
+        _actions.offer(Action.Navigate(HostFinderFragmentDirections.reset()))
+    }
+
     fun onSearch(name: String?) {
         previousSearch?.cancel("New search came in")
         if (name.isNullOrBlank()) {

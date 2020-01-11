@@ -1,6 +1,9 @@
 package com.bymason.kiosk.checkin.feature.identity
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -39,6 +42,10 @@ class IdentityFragment(
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
     private val installer = KeyboardInstaller()
 
+    init {
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenStarted {
@@ -57,6 +64,19 @@ class IdentityFragment(
         vm.state.observe(viewLifecycleOwner) {
             onViewStateChanged(it, adapter)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.check_in_options, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_restart -> vm.onRestartRequested()
+            else -> return false
+        }
+
+        return true
     }
 
     private fun onActionRequested(action: IdentityViewModel.Action) {

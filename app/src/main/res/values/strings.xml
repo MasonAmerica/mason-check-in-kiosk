@@ -7,6 +7,9 @@
     <string name="kiosk_checkin_sign_in_password_hint">Password</string>
     <string name="kiosk_checkin_sign_in_submit_button_title">Sign in</string>
 
+    <!-- Check-in -->
+    <string name="kiosk_checkin_menu_option_restart_title">Restart</string>
+
     <!-- Identity -->
     <string name="kiosk_checkin_identity_title">Welcome!</string>
 

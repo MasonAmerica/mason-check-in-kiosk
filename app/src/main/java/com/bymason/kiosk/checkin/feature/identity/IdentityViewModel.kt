@@ -30,6 +30,10 @@ class IdentityViewModel(
         fetchGuestFields()
     }
 
+    fun onRestartRequested() {
+        _actions.offer(Action.Navigate(IdentityFragmentDirections.reset()))
+    }
+
     fun onFieldChanged(state: FieldState, newValue: String?, hasFocus: Boolean) {
         viewModelScope.launch {
             processFocusChange(state.field, newValue, hasFocus)
