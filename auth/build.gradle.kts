@@ -10,6 +10,14 @@ android {
         targetSdkVersion(Config.SdkVersions.target)
     }
 
+    buildTypes {
+        named("release") {
+            postprocessing {
+                consumerProguardFile("auth.pro")
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
