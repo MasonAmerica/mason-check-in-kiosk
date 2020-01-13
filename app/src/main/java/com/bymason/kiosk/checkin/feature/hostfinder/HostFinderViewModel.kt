@@ -40,7 +40,7 @@ class HostFinderViewModel(
             return
         }
 
-        _state.update { copy(isLoading = true) }
+        _state.update { copy(isLoading = true, isSearchHintVisible = false) }
         previousSearch = viewModelScope.launch {
             val hosts = try {
                 repository.find(name)
