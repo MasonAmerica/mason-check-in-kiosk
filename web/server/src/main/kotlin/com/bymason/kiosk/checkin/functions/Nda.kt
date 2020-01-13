@@ -51,6 +51,7 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     }.singleOrNull()
 
     val creds = getAndInitCreds(auth.uid, "docusign")
+    val docusignCreds = creds.getValue("docusign")
     val metadataRef = admin.firestore()
             .collection(auth.uid)
             .doc("config")
@@ -68,9 +69,9 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
 
     val docusign = js("require('docusign-esign')")
     val docusignClient: dynamic = createInstance(docusign.ApiClient)
-    docusignClient.setBasePath("https://demo.docusign.net/restapi")
+    docusignClient.setBasePath(docusignCreds.asDynamic().accounts[0].base_uri + "/restapi")
     docusignClient.addDefaultHeader(
-            "Authorization", "Bearer ${creds.getValue("docusign")["access_token"]}")
+            "Authorization", "Bearer ${docusignCreds["access_token"]}")
     docusign.Configuration.default.setDefaultApiClient(docusignClient)
 
     val envelope: dynamic = createInstance(docusign.EnvelopeDefinition)
@@ -106,12 +107,12 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     envelope.recipients =
             docusign.Recipients.constructFromObject(json("signers" to arrayOf(signer)))
 
-    val accountId = creds.getValue("docusign")["accounts"]
+    val accountId = docusignCreds["accounts"]
             .unsafeCast<Array<Json>>().first()["account_id"]
     val envelopeApi: dynamic = createInstance(docusign.EnvelopesApi)
     val envelopeResult: dynamic = makeDocusignRequest(
             auth,
-            creds.getValue("docusign"),
+            docusignCreds,
             docusignClient
     ) { handler ->
         envelopeApi.createEnvelope(
@@ -123,7 +124,7 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     val envelopeId = envelopeResult.envelopeId
     val viewResult: dynamic = makeDocusignRequest(
             auth,
-            creds.getValue("docusign"),
+            docusignCreds,
             docusignClient
     ) { handler ->
         val viewRequest = docusign.RecipientViewRequest.constructFromObject(json(
