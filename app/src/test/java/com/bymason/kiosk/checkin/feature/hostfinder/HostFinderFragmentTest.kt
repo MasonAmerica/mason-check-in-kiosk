@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.bymason.kiosk.checkin.CheckInNavHostFragment
+import com.bymason.kiosk.checkin.HomeActivity
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.model.Host
@@ -121,7 +121,7 @@ class HostFinderFragmentTest {
     ) = launchFragmentInContainer<HostFinderFragment>(
             HostFinderFragmentArgs(sessionId).toBundle(),
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-            CheckInNavHostFragment.Factory(
+            HomeActivity.Factory(
                     dispatchers = dispatcherRule.dispatchers,
                     auth = mockAuth,
                     api = mockApi

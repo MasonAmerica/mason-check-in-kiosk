@@ -9,7 +9,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.bymason.kiosk.checkin.CheckInNavHostFragment
+import com.bymason.kiosk.checkin.HomeActivity
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.core.model.Company
@@ -189,7 +189,7 @@ class IdentityFragmentTest {
         Robolectric.getForegroundThreadScheduler().pause()
         val fragment = launchFragmentInContainer<IdentityFragment>(
                 themeResId = R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-                factory = CheckInNavHostFragment.Factory(
+                factory = HomeActivity.Factory(
                         dispatchers = dispatcherRule.dispatchers,
                         auth = mockAuth,
                         api = mockApi

@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.bymason.kiosk.checkin.CheckInNavHostFragment
+import com.bymason.kiosk.checkin.HomeActivity
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.databinding.ReportFragmentBinding
@@ -71,7 +71,7 @@ class ReportFragmentTest {
     ) = launchFragmentInContainer<ReportFragment>(
             null,
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-            CheckInNavHostFragment.Factory(
+            HomeActivity.Factory(
                     dispatchers = dispatcherRule.dispatchers,
                     auth = mockAuth,
                     api = mockApi

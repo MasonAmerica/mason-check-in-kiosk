@@ -2,7 +2,7 @@ package com.bymason.kiosk.checkin.feature.nda
 
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.bymason.kiosk.checkin.CheckInNavHostFragment
+import com.bymason.kiosk.checkin.HomeActivity
 import com.bymason.kiosk.checkin.R
 import com.bymason.kiosk.checkin.core.data.CheckInApi
 import com.bymason.kiosk.checkin.databinding.NdaFragmentBinding
@@ -44,7 +44,7 @@ class NdaFragmentTest {
     ) = launchFragmentInContainer<NdaFragment>(
             NdaFragmentArgs(sessionId).toBundle(),
             R.style.Theme_MaterialComponents_DayNight_DarkActionBar,
-            CheckInNavHostFragment.Factory(
+            HomeActivity.Factory(
                     dispatchers = dispatcherRule.dispatchers,
                     auth = mockAuth,
                     api = mockApi
