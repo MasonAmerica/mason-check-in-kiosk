@@ -45,7 +45,7 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
     val creds = try {
         client.getToken(req.query["code"].unsafeCast<String>()).await().tokens
     } catch (e: Throwable) {
-        val error = e.asDynamic().response.data
+        val error = e.asDynamic().response?.data ?: e.toString()
         console.log(error)
         res.status(401).send(error)
         return
@@ -70,7 +70,7 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
                         "code" to req.query["code"]
                 )).await()
     } catch (e: Throwable) {
-        val error = e.asDynamic().response.text
+        val error = e.asDynamic().response?.text ?: e.toString()
         console.log(error)
         res.status(401).send(error)
         return
@@ -81,7 +81,7 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
                 .set(json("Authorization" to "Bearer ${credsResult.body["access_token"]}"))
                 .await()
     } catch (e: Throwable) {
-        val error = e.asDynamic().response.text
+        val error = e.asDynamic().response?.text ?: e.toString()
         console.log(error)
         res.status(401).send(error)
         return
