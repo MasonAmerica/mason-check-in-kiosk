@@ -14,7 +14,7 @@
 
     <fragment
         android:id="@+id/login"
-        android:name="com.bymason.kiosk.checkin.feature.signin.SignInFragment"
+        android:name="support.bymason.kiosk.checkin.feature.signin.SignInFragment"
         android:label="@string/kiosk_checkin_sign_in_title"
         tools:layout="@layout/sign_in_fragment">
 
@@ -32,7 +32,7 @@
 
     <fragment
         android:id="@+id/welcome"
-        android:name="com.bymason.kiosk.checkin.feature.welcome.WelcomeFragment"
+        android:name="support.bymason.kiosk.checkin.feature.welcome.WelcomeFragment"
         android:label="@string/app_name">
 
         <action
@@ -51,7 +51,7 @@
 
     <fragment
         android:id="@+id/identity"
-        android:name="com.bymason.kiosk.checkin.feature.identity.IdentityFragment"
+        android:name="support.bymason.kiosk.checkin.feature.identity.IdentityFragment"
         android:label="@string/kiosk_checkin_identity_title"
         tools:layout="@layout/identity_fragment">
 
@@ -67,7 +67,7 @@
 
     <fragment
         android:id="@+id/host_finder"
-        android:name="com.bymason.kiosk.checkin.feature.hostfinder.HostFinderFragment"
+        android:name="support.bymason.kiosk.checkin.feature.hostfinder.HostFinderFragment"
         android:label="@string/kiosk_checkin_host_finder_title"
         tools:layout="@layout/host_finder_fragment">
 
@@ -87,7 +87,7 @@
 
     <fragment
         android:id="@+id/nda"
-        android:name="com.bymason.kiosk.checkin.feature.nda.NdaFragment"
+        android:name="support.bymason.kiosk.checkin.feature.nda.NdaFragment"
         android:label="@string/kiosk_checkin_nda_title"
         tools:layout="@layout/nda_fragment">
 
@@ -108,7 +108,7 @@
 
     <fragment
         android:id="@+id/report"
-        android:name="com.bymason.kiosk.checkin.feature.report.ReportFragment"
+        android:name="support.bymason.kiosk.checkin.feature.report.ReportFragment"
         android:label="@string/kiosk_checkin_report_title"
         tools:layout="@layout/report_fragment" />
 

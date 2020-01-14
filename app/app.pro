@@ -5,8 +5,8 @@
 -dontobfuscate
 
 # For screen analytics
--keepnames class * extends com.bymason.kiosk.checkin.core.ui.FragmentBase
--keepnames class * extends com.bymason.kiosk.checkin.core.ui.DialogFragmentBase
+-keepnames class * extends support.bymason.kiosk.checkin.core.ui.FragmentBase
+-keepnames class * extends support.bymason.kiosk.checkin.core.ui.DialogFragmentBase
 
 # 🤷‍♂️
 -dontwarn org.apache.commons.**
