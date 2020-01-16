@@ -105,6 +105,8 @@ class IdentityFragment(
 
     inner class KeyboardInstaller : ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
+            if (view == null) return
+
             val lm = binding.fields.layoutManager ?: return
             val first = lm.getChildAt(0) ?: return
             val last = lm.getChildAt(lm.childCount - 1) ?: return

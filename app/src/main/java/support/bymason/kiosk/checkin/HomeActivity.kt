@@ -26,10 +26,13 @@ class HomeActivity : ActivityBase() {
         AppBarConfiguration(setOf(R.id.welcome, R.id.login, R.id.identity, R.id.report))
     }
 
+    init {
+        supportFragmentManager.fragmentFactory = Factory()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.MasonKiosk_NoActionBar)
         super.onCreate(savedInstanceState)
-        supportFragmentManager.fragmentFactory = Factory()
 
         val binding = HomeActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)

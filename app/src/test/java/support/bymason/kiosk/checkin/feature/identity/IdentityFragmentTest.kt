@@ -45,6 +45,17 @@ class IdentityFragmentTest {
     fun `Keyboard is visible on launch`() = Unit
 
     @Test
+    fun `Config change succeeds`() {
+        runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getGuestFields()).thenReturn(emptyList())
+        }
+
+        val scenario = launchFragment()
+        scenario.recreate()
+    }
+
+    @Test
     fun `Input fields don't have errors on launch`() {
         runBlocking {
             `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
