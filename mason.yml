@@ -1,6 +1,6 @@
 os:
   name: office-os
-  version: 1
+  version: 3
   configurations:
     mason-management:
       direct_boot_package: support.bymason.kiosk.checkin

@@ -84,7 +84,7 @@ object Config {
         }
 
         object Firebase {
-            const val analytics = "com.google.firebase:firebase-analytics:17.2.1"
+            const val analytics = "com.google.firebase:firebase-analytics:17.2.2"
             const val functions = "com.google.firebase:firebase-functions-ktx:19.0.1"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
 
