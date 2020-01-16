@@ -42,6 +42,7 @@ class IdentityViewModel(
 
     fun onContinue() {
         if (_state.value.isLoading) return // Prevent repeated clicks
+        if (_state.value.fieldStates.any { it.hasError }) return
 
         _state.update { copy(isLoading = true, areViewEnabled = false) }
         viewModelScope.launch {

@@ -11,6 +11,8 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import support.bymason.kiosk.checkin.core.model.Company
 import support.bymason.kiosk.checkin.core.model.GuestField
 import support.bymason.kiosk.checkin.core.model.GuestFieldType
@@ -213,6 +215,16 @@ class IdentityViewModelTest {
     }
 
     @Test
+    fun `Continue does nothing if fields contain errors`() = dispatcherRule.runBlocking {
+        val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
+
+        vm.onContinue()
+
+        verify(mockRepository, never()).registerFields(any())
+    }
+
+    @Test
     fun `Continuing navigates to next destination`() = dispatcherRule.runBlocking {
         `when`(mockRepository.registerFields(any())).thenReturn("foobar")
 
@@ -229,7 +241,7 @@ class IdentityViewModelTest {
     fun `Finding host navigates to next destinations`() = dispatcherRule.runBlocking {
         val result1 = CompletableDeferred<String>()
         val result2 = CompletableDeferred<String>()
-        val field = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
+        val field = FieldState(GuestField("id", GuestFieldType.NAME, "foo", false, ".+"))
         val vm = IdentityViewModel(object : IdentityRepository {
             override suspend fun getCompanyMetadata() = Company("Mason", "url")
 
