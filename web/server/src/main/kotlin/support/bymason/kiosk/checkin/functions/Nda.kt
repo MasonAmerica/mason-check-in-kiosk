@@ -1,5 +1,6 @@
 package support.bymason.kiosk.checkin.functions
 
+import firebase.firestore.DocumentSnapshot
 import firebase.firestore.FieldValues
 import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
@@ -12,6 +13,7 @@ import kotlinx.coroutines.asPromise
 import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
+import superagent.superagent
 import support.bymason.kiosk.checkin.utils.createInstance
 import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
@@ -49,8 +51,6 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
         if (field["type"] == 2) field["value"] as String else null
     }.singleOrNull()
 
-    val creds = getAndInitCreds(auth.uid, "docusign")
-    val docusignCreds = creds.getValue("docusign")
     val metadataRef = admin.firestore()
             .collection(auth.uid)
             .doc("config")
@@ -58,9 +58,46 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     val companyName = metadataRef.doc("company").get().await().data()["name"]
     val ndaType = if (guestCompany == null) "individual-nda" else "corporate-nda"
     val documentsRef = metadataRef.doc("documents").get().await()
-    val templateId = documentsRef.data()[ndaType] as String?
+    val ndaProvider = documentsRef.data()["nda"] as String?
             ?: throw HttpsError("not-found", "No NDA found.")
 
+    return when (ndaProvider) {
+        "docusign" -> generateDocusignLink(
+                auth,
+                ndaType,
+                companyName,
+                documentsRef.data().asDynamic().docusign[ndaType],
+                guestCompany,
+                guestName,
+                guestEmail,
+                sessionDoc
+        )
+        "esignatures" -> generateEsignaturesLink(
+                auth,
+                ndaType,
+                companyName,
+                documentsRef.data().asDynamic().esignatures[ndaType],
+                guestCompany,
+                guestName,
+                guestEmail,
+                sessionDoc
+        )
+        else -> throw HttpsError("failed-precondition", "No NDA providers configured.")
+    }
+}
+
+private suspend fun generateDocusignLink(
+        auth: AuthContext,
+        ndaType: String,
+        companyName: Any?,
+        templateId: String,
+        guestCompany: String?,
+        guestName: String,
+        guestEmail: String,
+        sessionDoc: DocumentSnapshot
+): Json {
+    val creds = getAndInitCreds(auth.uid, "docusign")
+    val docusignCreds = creds.getValue("docusign")
     val docusign = js("require('docusign-esign')")
     val docusignClient: dynamic = createInstance(docusign.ApiClient)
     docusignClient.setBasePath(docusignCreds.asDynamic().accounts[0].base_uri + "/restapi")
@@ -125,7 +162,7 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
         )
     }
 
-    console.log("Generated NDA for $guestName ($guestEmail) to sign: ", viewResult.url)
+    console.log("Generated NDA for $guestName ($guestEmail) to sign: ", JSON.stringify(viewResult))
 
     sessionDoc.ref.set(json(
             "state" to 2,
@@ -136,6 +173,57 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     ), SetOptions.merge).await()
 
     return json("url" to viewResult.url)
+}
+
+private suspend fun generateEsignaturesLink(
+        auth: AuthContext,
+        ndaType: String,
+        companyName: Any?,
+        templateId: String,
+        guestCompany: String?,
+        guestName: String,
+        guestEmail: String,
+        sessionDoc: DocumentSnapshot
+): Json {
+    val creds = getAndInitCreds(auth.uid, "esignatures")
+    val esignaturesCreds = creds.getValue("esignatures")
+    val esignaturesSecret = esignaturesCreds["secret"]
+
+    val userVisibleNdaType = if (ndaType == "individual-nda") "Individual" else "Corporate"
+    val signer = json(
+            "name" to guestName,
+            "email" to guestEmail,
+            "redirect_url" to "https://mason-check-in-kiosk.firebaseapp.com/redirect/docusign/app" +
+                    "?event=signing_complete",
+            "embedded_sign_page" to "yes",
+            "skip_signature_request_email" to "yes"
+    )
+    if (guestCompany != null) {
+        signer["company_name"] = guestCompany
+    }
+
+    val contract = superagent.post("https://$esignaturesSecret:@esignatures.io/api/contracts")
+            .send(json(
+                    "template_id" to templateId,
+                    "title" to "$companyName $userVisibleNdaType Nondisclosure Agreement",
+                    "signers" to arrayOf(signer)
+            ))
+            .await().body
+    val contractData = contract.asDynamic().data.contract
+    val url = contractData.signers[0].embedded_url
+
+    console.log("Generated NDA for $guestName ($guestEmail) to sign: ",
+                JSON.stringify(contractData))
+
+    sessionDoc.ref.set(json(
+            "state" to 2,
+            "timestamp" to FieldValues.serverTimestamp(),
+            "documents" to json(
+                    "nda" to "https://esignatures.io/contracts/${contractData.id}"
+            )
+    ), SetOptions.merge).await()
+
+    return json("url" to url)
 }
 
 private suspend fun <T> makeDocusignRequest(
