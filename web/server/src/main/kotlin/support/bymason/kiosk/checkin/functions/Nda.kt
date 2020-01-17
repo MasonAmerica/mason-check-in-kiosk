@@ -1,6 +1,5 @@
 package support.bymason.kiosk.checkin.functions
 
-import firebase.firestore.DocumentSnapshot
 import firebase.firestore.FieldValues
 import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
@@ -58,14 +57,9 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
             .collection("metadata")
     val companyName = metadataRef.doc("company").get().await().data()["name"]
     val ndaType = if (guestCompany == null) "individual-nda" else "corporate-nda"
-    val ndaRef = metadataRef.doc(ndaType).get().await()
-    if (!ndaRef.exists) throw HttpsError("not-found", "No NDA found.")
-    val ndaBase64 = admin.asDynamic().storage().bucket()
-            .file(ndaRef.data()["store"])
-            .download()
-            .unsafeCast<Promise<dynamic>>()
-            .await()[0]
-            .toString("base64")
+    val documentsRef = metadataRef.doc("documents").get().await()
+    val templateId = documentsRef.data()[ndaType] as String?
+            ?: throw HttpsError("not-found", "No NDA found.")
 
     val docusign = js("require('docusign-esign')")
     val docusignClient: dynamic = createInstance(docusign.ApiClient)
@@ -76,36 +70,24 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
 
     val envelope: dynamic = createInstance(docusign.EnvelopeDefinition)
     envelope.status = "sent"
-    envelope.emailSubject = "$companyName Nondisclosure Agreement"
+    val userVisibleNdaType = if (ndaType == "individual-nda") "Individual" else "Corporate"
+    envelope.emailSubject = "$companyName $userVisibleNdaType Nondisclosure Agreement"
+    envelope.templateId = templateId
 
-    val document = docusign.Document.constructFromObject(json(
-            "documentBase64" to ndaBase64,
-            "fileExtension" to "pdf",
-            "name" to "$companyName Nondisclosure Agreement",
-            "documentId" to "1"
-    ))
-    envelope.documents = arrayOf(document)
+    val tabs = docusign.Tabs.constructFromObject(json())
+    if (guestCompany != null) {
+        tabs.textTabs = arrayOf(json("tabLabel" to "SignerCompany", "value" to guestCompany))
+    }
 
-    val signer = docusign.Signer.constructFromObject(json(
+    val role = docusign.TemplateRole.constructFromObject(json(
+            "roleName" to "Signer",
             "name" to guestName,
             "email" to guestEmail,
-            "routingOrder" to "1",
-            "recipientId" to "1",
+            "tabs" to tabs,
             "clientUserId" to auth.uid
     ))
-    signer.tabs = docusign.Tabs.constructFromObject(json(
-            "fullNameTabs" to ndaRef.getTabs(docusign, "names"),
-            "dateSignedTabs" to ndaRef.getTabs(docusign, "dates"),
-            "signHereTabs" to ndaRef.getTabs(docusign, "signatures")
-    ))
-    if (guestCompany != null) {
-        signer.tabs.textTabs = ndaRef.getTabs(docusign, "companies")
-        for (tab in signer.tabs.textTabs) {
-            tab.value = guestCompany
-        }
-    }
-    envelope.recipients =
-            docusign.Recipients.constructFromObject(json("signers" to arrayOf(signer)))
+
+    envelope.templateRoles = arrayOf(role)
 
     val accountId = docusignCreds["accounts"]
             .unsafeCast<Array<Json>>().first()["account_id"]
@@ -155,19 +137,6 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
 
     return json("url" to viewResult.url)
 }
-
-private fun DocumentSnapshot.getTabs(
-        docusign: dynamic,
-        type: String
-): Array<dynamic> = data()[type].unsafeCast<Array<Json>>().map { tab ->
-    docusign.SignHere.constructFromObject(json(
-            "documentId" to "1",
-            "recipientId" to "1",
-            "pageNumber" to tab["page"],
-            "xPosition" to tab["x"],
-            "yPosition" to tab["y"]
-    ))
-}.toTypedArray()
 
 private suspend fun <T> makeDocusignRequest(
         auth: AuthContext,
