@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.0.0-alpha09" client="gradle" variant="all" version="4.0.0-alpha09">
+
+    <issue id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`androidx.annotation.experimental.lint.ExperimentalIssueRegistry`) which did not specify the Lint API version it was compiled with.&#xA;&#xA;**This means that the lint checks are likely not compatible.**&#xA;&#xA;If you are the author of this lint check, make your lint `IssueRegistry` class contain&#xA;  override val api: Int = com.android.tools.lint.detector.api.CURRENT_API&#xA;or from Java,&#xA;  @Override public int getApi() { return com.android.tools.lint.detector.api.ApiKt.CURRENT_API; }&#xA;&#xA;If you are just using lint checks from a third party library you have no control over, you can disable these lint checks (if they misbehave) like this:&#xA;&#xA;    android {&#xA;        lintOptions {&#xA;            disable &quot;UnsafeExperimentalUsageError&quot;,&#xA;                    &quot;UnsafeExperimentalUsageWarning&quot;&#xA;        }&#xA;    }&#xA;"
+        includedVariants="debug" excludedVariants="release">
+        <location
+            file="../../../.gradle/caches/transforms-2/files-2.1/a716b18eb831cc8ea76bbe12d438bd64/jetified-annotation-experimental-1.0.0/jars/lint.jar" />
+    </issue>
+
+    <issue id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`androidx.fragment.lint.FragmentIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 6 (3.6), current lint API level is 7 (4.0+)"
+        includedVariants="debug" excludedVariants="release">
+        <location
+            file="../../../.gradle/caches/transforms-2/files-2.1/6c8a931e534a03031d9bacb1422c06ad/fragment-1.2.0/jars/lint.jar" />
+    </issue>
+
+    <issue id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`androidx.lifecycle.lint.LifecycleRuntimeIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 6 (3.6), current lint API level is 7 (4.0+)"
+        includedVariants="debug" excludedVariants="release">
+        <location
+            file="../../../.gradle/caches/transforms-2/files-2.1/4687f69622c3e9a49afc126853fbf090/jetified-lifecycle-runtime-ktx-2.2.0/jars/lint.jar" />
+    </issue>
+
+    <issue id="MissingDefaultResource"
+        message="The color &quot;launch_background&quot; in values-night has no declaration in the base `values` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
+        errorLine1="    &lt;color name=&quot;launch_background&quot;>@color/material_grey_800&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values-night/colors.xml" line="6" column="12" />
+    </issue>
+
+    <issue id="FragmentTagUsage" message="Replace the &lt;fragment> tag with FragmentContainerView."
+        errorLine1="    &lt;fragment" errorLine2="     ~~~~~~~~">
+        <location file="src/main/res/layout/home_activity.xml" line="24" column="6" />
+    </issue>
+
+    <issue id="SetJavaScriptEnabled"
+        message="Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully."
+        errorLine1="        binding.root.settings.javaScriptEnabled = true"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/support/bymason/kiosk/checkin/feature/nda/NdaFragment.kt"
+            line="45" column="9" />
+    </issue>
+
+    <issue id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2=" ~~~~~~~~~~~~">
+        <location file="src/main/res/layout/host_finder_fragment_item.xml" line="2" column="2" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.navigation.check_in` appears to be unused"
+        errorLine1="&lt;navigation xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location file="src/main/res/navigation/check_in.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.color.launch_background` appears to be unused"
+        errorLine1="    &lt;color name=&quot;launch_background&quot;>@color/material_grey_800&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values-night/colors.xml" line="6" column="12" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.dimen.spacing_mlarge` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;spacing_mlarge&quot;>24dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/dimens.xml" line="5" column="12" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.dimen.spacing_xxlarge` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;spacing_xxlarge&quot;>64dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/dimens.xml" line="7" column="12" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.layout.home_activity` appears to be unused"
+        errorLine1="&lt;androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location file="src/main/res/layout/home_activity.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.layout.identity_fragment_item_type_company` appears to be unused"
+        errorLine1="&lt;com.google.android.material.textfield.TextInputLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location file="src/main/res/layout/identity_fragment_item_type_company.xml" line="2"
+            column="1" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.layout.identity_fragment_item_type_email` appears to be unused"
+        errorLine1="&lt;com.google.android.material.textfield.TextInputLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location file="src/main/res/layout/identity_fragment_item_type_email.xml" line="2"
+            column="1" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.layout.identity_fragment_item_type_name` appears to be unused"
+        errorLine1="&lt;com.google.android.material.textfield.TextInputLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location file="src/main/res/layout/identity_fragment_item_type_name.xml" line="2"
+            column="1" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.anim.slide_in_left` appears to be unused"
+        errorLine1="&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location file="src/main/res/anim/slide_in_left.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.anim.slide_in_right` appears to be unused"
+        errorLine1="&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location file="src/main/res/anim/slide_in_right.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.anim.slide_out_left` appears to be unused"
+        errorLine1="&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location file="src/main/res/anim/slide_out_left.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources" message="The resource `R.anim.slide_out_right` appears to be unused"
+        errorLine1="&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location file="src/main/res/anim/slide_out_right.xml" line="2" column="1" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.string.kiosk_checkin_sign_in_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;kiosk_checkin_sign_in_title&quot;>Sign in&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/strings.xml" line="5" column="13" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.string.kiosk_checkin_identity_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;kiosk_checkin_identity_title&quot;>Welcome!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/strings.xml" line="14" column="13" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.string.kiosk_checkin_host_finder_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;kiosk_checkin_host_finder_title&quot;>Who are you here to see?&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/strings.xml" line="22" column="13" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.string.kiosk_checkin_nda_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;kiosk_checkin_nda_title&quot;>Sign the NDA&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/strings.xml" line="29" column="13" />
+    </issue>
+
+    <issue id="UnusedResources"
+        message="The resource `R.string.kiosk_checkin_report_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;kiosk_checkin_report_title&quot;>You\&apos;re all set&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/res/values/strings.xml" line="32" column="13" />
+    </issue>
+
+    <issue id="ContentDescription" message="Missing `contentDescription` attribute on image"
+        errorLine1="    &lt;ImageView" errorLine2="     ~~~~~~~~~">
+        <location file="src/main/res/layout/host_finder_fragment_item.xml" line="10" column="6" />
+    </issue>
+
+    <issue id="ContentDescription" message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~">
+        <location file="src/main/res/layout-land/identity_fragment.xml" line="24" column="10" />
+    </issue>
+
+    <issue id="ContentDescription" message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView" errorLine2="         ~~~~~~~~~">
+        <location file="src/main/res/layout/identity_fragment.xml" line="26" column="10" />
+    </issue>
+
+</issues>

@@ -23,7 +23,7 @@ fun RepositoryHandler.deps() {
 
 object Config {
     private const val kotlinVersion = "1.3.61"
-    private const val navVersion = "2.2.0-rc04"
+    private const val navVersion = "2.2.0"
     private const val coroutinesVersion = "1.3.3"
 
     object SdkVersions {
@@ -33,7 +33,7 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-alpha08"
+        const val android = "com.android.tools.build:gradle:4.0.0-alpha09"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
         const val mason = "com.bymason.build:mason-apps:1.0.3"
@@ -61,19 +61,18 @@ object Config {
         }
 
         object Jetpack {
-            private const val lifecycleVersion = "2.2.0-rc03"
+            private const val lifecycleVersion = "2.2.0"
 
             const val core = "androidx.core:core-ktx:1.2.0-rc01"
             const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha01"
-            const val fragment = "androidx.fragment:fragment-ktx:1.2.0-rc05"
+            const val fragment = "androidx.fragment:fragment-ktx:1.2.0"
             const val rvSelection = "androidx.recyclerview:recyclerview-selection:1.1.0-beta01"
             const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
 
-            const val material = "com.google.android.material:material:1.2.0-alpha03"
+            const val material = "com.google.android.material:material:1.2.0-alpha04"
 
             const val common = "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
             const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
             const val liveData = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
 
@@ -99,7 +98,7 @@ object Config {
 
             const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.1"
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
-            const val glide = "com.github.bumptech.glide:glide:4.10.0"
+            const val glide = "com.github.bumptech.glide:glide:4.11.0"
             const val guava = "com.google.guava:guava:28.2-android"
 
             const val permissions = "pub.devrel:easypermissions:3.0.0"
@@ -112,7 +111,7 @@ object Config {
             const val espressoWeb = "androidx.test.espresso:espresso-web:3.3.0-alpha03"
             const val core = "androidx.test:core-ktx:1.3.0-alpha03"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
-            const val fragment = "androidx.fragment:fragment-testing:1.2.0-rc05"
+            const val fragment = "androidx.fragment:fragment-testing:1.2.0"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
             const val mockito = "org.mockito:mockito-core:3.2.4"
             const val coroutines =

@@ -59,6 +59,10 @@ android {
         }
     }
 
+    lintOptions {
+        baseline(file("lint-baseline.xml"))
+    }
+
     buildFeatures {
         viewBinding = true
     }
@@ -99,7 +103,6 @@ dependencies {
     implementation(Config.Libs.Jetpack.material)
     implementation(Config.Libs.Jetpack.common)
     implementation(Config.Libs.Jetpack.runtime)
-    implementation(Config.Libs.Jetpack.extensions)
     implementation(Config.Libs.Jetpack.liveData)
     implementation(Config.Libs.Jetpack.viewModel)
     implementation(Config.Libs.Jetpack.navFragments)

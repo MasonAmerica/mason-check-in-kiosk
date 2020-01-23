@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.0.0-alpha09" client="gradle" variant="all" version="4.0.0-alpha09">
+
+    <issue id="InvalidPackage"
+        message="Invalid package reference in org.apache.httpcomponents:httpclient; not included in Android: `javax.naming.directory`. Referenced from `org.apache.http.conn.ssl.DefaultHostnameVerifier`.">
+        <location
+            file="../../../.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.8/c27c9d6f15435dc2b6947112027b418b0eef32b9/httpclient-4.5.8.jar" />
+    </issue>
+
+    <issue id="InvalidPackage"
+        message="Invalid package reference in org.apache.httpcomponents:httpclient; not included in Android: `javax.naming.ldap`. Referenced from `org.apache.http.conn.ssl.DefaultHostnameVerifier`.">
+        <location
+            file="../../../.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.5.8/c27c9d6f15435dc2b6947112027b418b0eef32b9/httpclient-4.5.8.jar" />
+    </issue>
+
+    <issue id="TrustAllX509TrustManager"
+        message="`checkClientTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
+        <location file="com/google/api/client/util/SslUtils$1.class" />
+    </issue>
+
+    <issue id="TrustAllX509TrustManager"
+        message="`checkServerTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers">
+        <location file="com/google/api/client/util/SslUtils$1.class" />
+    </issue>
+
+</issues>
