@@ -1,6 +1,6 @@
 os:
-  name: office-os
-  version: 4
+  name: officeos-g450
+  version: 7
   configurations:
     mason-management:
       direct_boot_package: support.bymason.kiosk.checkin
@@ -12,6 +12,5 @@ os:
     android:
       config_minimumScreenOffTimeout: 2147483647
 apps:
-  - version_code: 10100
-    name: Check-in Kiosk
+  - name: Check-in Kiosk
     package_name: support.bymason.kiosk.checkin

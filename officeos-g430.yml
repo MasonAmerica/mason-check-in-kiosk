@@ -1,0 +1,16 @@
+os:
+  name: officeos-g430
+  version: 7
+  configurations:
+    mason-management:
+      direct_boot_package: support.bymason.kiosk.checkin
+      disable_status_bar: true
+      disable_screen_capture: true
+      disable_keyguard: true
+      disable_camera: true
+      default_runtime_permissions_grant_policy: autogrant
+    android:
+      config_minimumScreenOffTimeout: 2147483647
+apps:
+  - name: Check-in Kiosk
+    package_name: support.bymason.kiosk.checkin
