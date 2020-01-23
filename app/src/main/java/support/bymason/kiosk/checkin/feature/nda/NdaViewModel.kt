@@ -45,7 +45,9 @@ class NdaViewModel(
 
     fun createWebChromeClient() = object : WebChromeClient() {
         override fun onProgressChanged(view: WebView, newProgress: Int) {
-            _state.update { copy(isLoading = newProgress != 100) }
+            if (_state.value.isWebViewVisible) {
+                _state.update { copy(isLoading = newProgress != 100) }
+            }
         }
     }
 
@@ -75,7 +77,7 @@ class NdaViewModel(
     }
 
     private fun finishCheckIn() {
-        _state.update { copy(isLoading = true) }
+        _state.update { copy(isLoading = true, isWebViewVisible = false) }
         viewModelScope.launch {
             try {
                 repository.finish(sessionId)
@@ -83,7 +85,7 @@ class NdaViewModel(
                 logBreadcrumb("Failed to complete check-in", t)
                 return@launch
             } finally {
-                _state.update { copy(isLoading = false) }
+                _state.update { copy(isLoading = false, isWebViewVisible = true) }
             }
 
             _actions.offer(Action.Navigate(NdaFragmentDirections.next()))
@@ -91,7 +93,8 @@ class NdaViewModel(
     }
 
     data class State(
-            val isLoading: Boolean = false
+            val isLoading: Boolean = false,
+            val isWebViewVisible: Boolean = true
     )
 
     sealed class Action {

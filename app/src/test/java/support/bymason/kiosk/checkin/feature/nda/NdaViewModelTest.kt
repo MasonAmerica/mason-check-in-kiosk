@@ -97,6 +97,19 @@ class NdaViewModelTest {
         assertThat(vm.state.value?.isLoading).isTrue()
     }
 
+    @Test
+    fun `WebView is hidden while finalizing check in`() {
+        dispatcherRule.pauseDispatcher()
+        vm.createWebViewClient().shouldOverrideUrlLoading(
+                WebView(null),
+                createFakeRequest("https://mason-check-in-kiosk.firebaseapp.com" +
+                                          "/redirect/docusign/app?event=signing_complete")
+        )
+
+        assertThat(vm.state.value?.isLoading).isTrue()
+        assertThat(vm.state.value?.isWebViewVisible).isFalse()
+    }
+
     private fun createFakeRequest(url: String) = object : WebResourceRequest {
         override fun getUrl() = mock(Uri::class.java).apply {
             `when`(toString()).thenReturn(url)

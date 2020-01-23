@@ -1,5 +1,6 @@
 package support.bymason.kiosk.checkin.feature.hostfinder
 
+import androidx.core.view.isVisible
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation

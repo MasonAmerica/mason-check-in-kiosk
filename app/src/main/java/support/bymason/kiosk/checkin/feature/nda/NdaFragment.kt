@@ -86,5 +86,6 @@ class NdaFragment(
 
     private fun onViewStateChanged(state: NdaViewModel.State) {
         progress?.isVisible = state.isLoading
+        binding.root.isVisible = state.isWebViewVisible
     }
 }
