@@ -152,7 +152,7 @@ private suspend fun notifyHostViaSlack(auth: AuthContext, host: `Schema$User`, g
             .query(json(
                     "token" to creds.getValue("slack")["access_token"],
                     "channel" to slackUserId,
-                    "text" to "Your guest ($guestName) just arrived! \uD83D\uDC4B"
+                    "text" to "Your guest ($guestName) just arrived! :wave:"
             ))
             .await().body
     console.log("Slack message: ", slackMessage)
@@ -179,7 +179,7 @@ private suspend fun notifyHostViaSms(host: `Schema$User`, guestName: String) {
             .send(json(
                     "To" to if ("+" in hostPhone) hostPhone else "+1$hostPhone",
                     "From" to "+12064830420",
-                    "Body" to "Your guest ($guestName) just arrived! \uD83D\uDC4B"
+                    "Body" to "Your guest ($guestName) just arrived!"
             ))
             .await().body
     console.log("Twilio message: ", sms)
