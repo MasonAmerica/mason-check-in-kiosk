@@ -15,6 +15,7 @@ import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import superagent.superagent
 import support.bymason.kiosk.checkin.utils.createInstance
+import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
 import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
 import support.bymason.kiosk.checkin.utils.refreshDocusignCreds
@@ -40,6 +41,7 @@ fun generateNdaLink(data: Any?, context: CallableContext): Promise<Json>? {
 
 private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json {
     val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
+    val host = fetchGsuiteHost(auth.uid, session.asDynamic().hereToSee[0].gsuite)
     val guestFields = session["guestFields"] as Array<Json>
     val guestName = guestFields.mapNotNull { field ->
         if (field["type"] == 0) field["value"] as String else null
@@ -50,6 +52,8 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
     val guestCompany = guestFields.mapNotNull { field ->
         if (field["type"] == 2) field["value"] as String else null
     }.singleOrNull()
+    val isTestRequest = guestEmail.split("@").lastOrNull() ==
+            host.primaryEmail?.split("@")?.lastOrNull()
 
     val metadataRef = admin.firestore()
             .collection(auth.uid)
@@ -80,7 +84,8 @@ private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json 
                 guestCompany,
                 guestName,
                 guestEmail,
-                sessionDoc
+                sessionDoc,
+                isTestRequest
         )
         else -> throw HttpsError("failed-precondition", "No NDA providers configured.")
     }
@@ -183,7 +188,8 @@ private suspend fun generateEsignaturesLink(
         guestCompany: String?,
         guestName: String,
         guestEmail: String,
-        sessionDoc: DocumentSnapshot
+        sessionDoc: DocumentSnapshot,
+        isTestRequest: Boolean
 ): Json {
     val creds = getAndInitCreds(auth.uid, "esignatures")
     val esignaturesCreds = creds.getValue("esignatures")
@@ -206,7 +212,8 @@ private suspend fun generateEsignaturesLink(
             .send(json(
                     "template_id" to templateId,
                     "title" to "$companyName $userVisibleNdaType Nondisclosure Agreement",
-                    "signers" to arrayOf(signer)
+                    "signers" to arrayOf(signer),
+                    "test" to if (isTestRequest) "yes" else "no"
             ))
             .await().body
     val contractData = contract.asDynamic().data.contract

@@ -9,16 +9,14 @@ import firebase.functions.admin
 import firebase.functions.functions
 import firebase.https.CallableContext
 import firebase.https.HttpsError
-import google.google
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asPromise
 import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import superagent.superagent
+import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
 import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
-import support.bymason.kiosk.checkin.utils.installGoogleAuth
-import support.bymason.kiosk.checkin.utils.maybeRefreshGsuiteCreds
 import support.bymason.kiosk.checkin.utils.validateSession
 import kotlin.js.Json
 import kotlin.js.Promise
@@ -122,15 +120,8 @@ private suspend fun finalizeSession(
         hostId: String,
         guestName: String
 ): Json {
-    val creds = getAndInitCreds(auth.uid, "gsuite")
-    val state = installGoogleAuth(creds.getValue("gsuite"))
-    val directory = google.admin(json("version" to "directory_v1"))
-    val host = directory.users.get(json(
-            "viewType" to "domain_public",
-            "userKey" to hostId
-    )).await().data
-    maybeRefreshGsuiteCreds(auth.uid, state)
-    console.log("Host: ", host)
+    val host = fetchGsuiteHost(auth.uid, hostId)
+    console.log("Host: ", JSON.stringify(host))
 
     notifyHost(auth, host, guestName)
 
