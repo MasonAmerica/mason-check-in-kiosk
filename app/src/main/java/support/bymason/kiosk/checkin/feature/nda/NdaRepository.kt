@@ -14,6 +14,6 @@ class DefaultNdaRepository(
     override suspend fun sign(sessionId: String) = api.generateNdaLink(sessionId)
 
     override suspend fun finish(sessionId: String) {
-        api.updateSession("finalize", sessionId)
+        api.updateSessionForFinalize(sessionId)
     }
 }

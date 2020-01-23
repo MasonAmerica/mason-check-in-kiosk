@@ -1,6 +1,5 @@
 package support.bymason.kiosk.checkin.feature.hostfinder
 
-import androidx.core.view.isVisible
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -106,7 +105,7 @@ class HostFinderFragmentTest {
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
             runBlocking {
                 `when`(mockApi.findHosts(any())).thenReturn(listOf(host))
-                `when`(mockApi.updateSession(any(), any(), any())).thenReturn("foobar")
+                `when`(mockApi.updateSessionForHereToSee(any(), any())).thenReturn("foobar")
             }
             binding.search.setText("Person")
         }

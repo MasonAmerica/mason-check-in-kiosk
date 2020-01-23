@@ -179,7 +179,7 @@ class IdentityFragmentTest {
             `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id", GuestFieldType.NAME, "foo", false, null)))
-            `when`(mockApi.updateSession(any(), any(), any())).thenReturn("foobar")
+            `when`(mockApi.updateSessionForCreate(any())).thenReturn("foobar")
         }
 
         val mockNavController = mock(NavController::class.java)

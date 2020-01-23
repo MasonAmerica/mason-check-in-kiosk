@@ -1,30 +1,24 @@
 package support.bymason.kiosk.checkin.functions
 
 import firebase.functions.AuthContext
-import firebase.https.CallableContext
 import firebase.https.HttpsError
 import google.google
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asPromise
-import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
 import support.bymason.kiosk.checkin.utils.installGoogleAuth
 import support.bymason.kiosk.checkin.utils.maybeRefreshGsuiteCreds
 import kotlin.js.Json
-import kotlin.js.Promise
 import kotlin.js.json
 
-fun findHosts(data: Any?, context: CallableContext): Promise<Array<Json>> {
-    val auth = context.auth ?: throw HttpsError("unauthenticated")
-    val hostName = data as? String
+suspend fun findHosts(auth: AuthContext, data: Json): Array<Json> {
+    val hostName = data["query"] as? String
     console.log("Searching for host '$hostName' as user '${auth.uid}'")
 
     if (hostName == null) {
         throw HttpsError("invalid-argument")
     }
 
-    return GlobalScope.async { findHosts(auth, hostName) }.asPromise()
+    return findHosts(auth, hostName)
 }
 
 private suspend fun findHosts(auth: AuthContext, hostName: String): Array<Json> {

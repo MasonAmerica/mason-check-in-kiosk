@@ -58,6 +58,6 @@ class DefaultIdentityRepository(
                     .filter { it.value != null }
                     .map { mapOf("id" to it.field.id, "value" to it.value) }
         }
-        return api.updateSession("create", null, "guestFields" to processedFields)
+        return api.updateSessionForCreate(processedFields)
     }
 }

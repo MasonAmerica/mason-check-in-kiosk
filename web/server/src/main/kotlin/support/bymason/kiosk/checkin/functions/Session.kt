@@ -7,11 +7,7 @@ import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
 import firebase.functions.admin
 import firebase.functions.functions
-import firebase.https.CallableContext
 import firebase.https.HttpsError
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asPromise
-import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import superagent.superagent
 import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
@@ -19,38 +15,11 @@ import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
 import support.bymason.kiosk.checkin.utils.validateSession
 import kotlin.js.Json
-import kotlin.js.Promise
 import kotlin.js.json
 
-fun updateSession(data: Json, context: CallableContext): Promise<Json>? {
-    val auth = context.auth ?: throw HttpsError("unauthenticated")
-    val operation = data["operation"] as? String
-    val sessionId = data["id"] as? String
-    val hostId = data["hostId"] as? String
+suspend fun createSession(auth: AuthContext, data: Json): Json {
     val guestFields = data["guestFields"] as? Array<Json>
-    console.log(
-            "Processing '$operation' check-in operation for user '${auth.uid}' with args: ",
-            JSON.stringify(data)
-    )
-
-    if (operation == null) {
-        throw HttpsError("invalid-argument")
-    }
-
-    return GlobalScope.async {
-        when (operation.toUpperCase().replace("-", "_")) {
-            "CREATE" -> createSession(auth, guestFields)
-            "HERE_TO_SEE" -> hereToSee(auth, sessionId, hostId)
-            "FINALIZE" -> finalizeSession(auth, sessionId)
-            else -> throw HttpsError("invalid-argument")
-        }
-    }.asPromise()
-}
-
-private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>?): Json {
-    if (guestFields == null) {
-        throw HttpsError("invalid-argument")
-    }
+            ?: throw HttpsError("invalid-argument")
 
     return createSession(auth, guestFields)
 }
@@ -73,14 +42,11 @@ private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): 
     return json("id" to sessionDoc.id)
 }
 
-private suspend fun hereToSee(
-        auth: AuthContext,
-        sessionId: String?,
-        hostId: String?
-): Json {
-    if (sessionId == null || hostId == null) {
-        throw HttpsError("invalid-argument")
-    }
+suspend fun hereToSee(auth: AuthContext, data: Json): Json {
+    val sessionId = data["id"] as? String
+            ?: throw HttpsError("invalid-argument")
+    val hostId = data["hostId"] as? String
+            ?: throw HttpsError("invalid-argument")
 
     val sessionDoc = validateSession(auth.uid, sessionId)
 
@@ -100,10 +66,9 @@ private suspend fun hereToSee(
     return json("id" to sessionDoc.id)
 }
 
-private suspend fun finalizeSession(auth: AuthContext, sessionId: String?): Json {
-    if (sessionId == null) {
-        throw HttpsError("invalid-argument")
-    }
+suspend fun finalizeSession(auth: AuthContext, data: Json): Json {
+    val sessionId = data["id"] as? String
+            ?: throw HttpsError("invalid-argument")
 
     val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
     val hostId = session.asDynamic().hereToSee[0].gsuite

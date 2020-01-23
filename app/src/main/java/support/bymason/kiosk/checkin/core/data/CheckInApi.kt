@@ -14,11 +14,11 @@ interface CheckInApi {
 
     suspend fun getGuestFields(): List<GuestField>
 
-    suspend fun updateSession(
-            operation: String,
-            sessionId: String?,
-            vararg params: Pair<String, Any>
-    ): String
+    suspend fun updateSessionForCreate(guestFields: List<Map<String, String?>>): String
+
+    suspend fun updateSessionForHereToSee(sessionId: String, hostId: String): String
+
+    suspend fun updateSessionForFinalize(sessionId: String): String
 
     suspend fun findHosts(name: String): List<Host>
 
@@ -29,15 +29,19 @@ class DefaultCheckInApi(
         private val dispatchers: DispatcherProvider
 ) : CheckInApi {
     override suspend fun getCompanyMetadata(): Company = dispatchers.default {
-        val result = Firebase.functions.getHttpsCallable("getCompanyMetadata").call().await()
-        @Suppress("UNCHECKED_CAST") val data = result.data as Map<String, String>
-        Company(data.getValue("name"), data.getValue("logo"))
+        val data = mapOf("operation" to "get-company-metadata")
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
+        @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
+        Company(response.getValue("name"), response.getValue("logo"))
     }
 
     override suspend fun getGuestFields(): List<GuestField> = dispatchers.default {
-        val result = Firebase.functions.getHttpsCallable("getGuestFields").call().await()
-        @Suppress("UNCHECKED_CAST") val data = result.data as List<Map<String, Any>>
-        data.map {
+        val data = mapOf("operation" to "get-guest-fields")
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
+        @Suppress("UNCHECKED_CAST") val response = result.data as List<Map<String, Any>>
+        response.map {
             GuestField(
                     it.getValue("id") as String,
                     GuestFieldType.from(it.getValue("type") as Int),
@@ -48,28 +52,53 @@ class DefaultCheckInApi(
         }
     }
 
-    override suspend fun updateSession(
-            operation: String,
-            sessionId: String?,
-            vararg params: Pair<String, Any>
+    override suspend fun updateSessionForCreate(
+            guestFields: List<Map<String, String?>>
     ): String = dispatchers.default {
-        val data = mutableMapOf<String, Any>("operation" to operation)
-        sessionId?.let { data["id"] = it }
-        for ((key, value) in params) data[key] = value
+        val data = mapOf("operation" to "session-create", "guestFields" to guestFields)
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
 
-        val result = Firebase.functions.getHttpsCallable("updateSession").call(data).await()
+        @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
+        response.getValue("id")
+    }
+
+    override suspend fun updateSessionForHereToSee(
+            sessionId: String,
+            hostId: String
+    ): String = dispatchers.default {
+        val data = mapOf(
+                "operation" to "session-here-to-see",
+                "id" to sessionId,
+                "hostId" to hostId
+        )
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
+        @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
+        response.getValue("id")
+    }
+
+    override suspend fun updateSessionForFinalize(
+            sessionId: String
+    ): String = dispatchers.default {
+        val data = mapOf("operation" to "session-finalize", "id" to sessionId)
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
         @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
         response.getValue("id")
     }
 
     override suspend fun findHosts(name: String): List<Host> = dispatchers.default {
-        val result = Firebase.functions.getHttpsCallable("findHosts").call(name).await()
-        @Suppress("UNCHECKED_CAST") val data = result.data as List<Map<String, String>>
-        data.map { Host(it.getValue("id"), it.getValue("name"), it["photoUrl"]) }
+        val data = mapOf("operation" to "session-find-hosts", "query" to name)
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
+        @Suppress("UNCHECKED_CAST") val response = result.data as List<Map<String, String>>
+        response.map { Host(it.getValue("id"), it.getValue("name"), it["photoUrl"]) }
     }
 
     override suspend fun generateNdaLink(sessionId: String): String = dispatchers.default {
-        val result = Firebase.functions.getHttpsCallable("generateNdaLink").call(sessionId).await()
+        val data = mapOf("operation" to "session-nda-link", "id" to sessionId)
+        val result = Firebase.functions.getHttpsCallable("clientApi").call(data).await()
+
         @Suppress("UNCHECKED_CAST") val response = result.data as Map<String, String>
         response.getValue("url")
     }

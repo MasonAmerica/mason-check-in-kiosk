@@ -5,12 +5,8 @@ import firebase.firestore.FieldValues
 import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
 import firebase.functions.admin
-import firebase.https.CallableContext
 import firebase.https.HttpsError
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.asPromise
-import kotlinx.coroutines.async
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
 import superagent.superagent
@@ -24,22 +20,18 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Json
-import kotlin.js.Promise
 import kotlin.js.json
 
-fun generateNdaLink(data: Any?, context: CallableContext): Promise<Json>? {
-    val auth = context.auth ?: throw HttpsError("unauthenticated")
-    val sessionId = data as? String
-    console.log("Generating DocuSign NDA for user '${auth.uid}' with session '$sessionId'")
+suspend fun generateNdaLink(auth: AuthContext, data: Json): Json {
+    val sessionId = data["id"] as? String
+            ?: throw HttpsError("invalid-argument")
 
-    if (sessionId == null) {
-        throw HttpsError("invalid-argument")
-    }
-
-    return GlobalScope.async { generateNdaLink(auth, sessionId) }.asPromise()
+    return generateNdaLink(auth, sessionId)
 }
 
 private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json {
+    console.log("Generating DocuSign NDA for user '${auth.uid}' with session '$sessionId'")
+
     val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
     val host = fetchGsuiteHost(auth.uid, session.asDynamic().hereToSee[0].gsuite)
     val guestFields = session["guestFields"] as Array<Json>

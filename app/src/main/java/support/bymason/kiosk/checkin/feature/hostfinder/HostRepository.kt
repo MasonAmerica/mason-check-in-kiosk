@@ -37,6 +37,6 @@ class DefaultHostRepository(
             sessionId: String,
             host: Host
     ): String {
-        return api.updateSession("here-to-see", sessionId, "hostId" to host.id)
+        return api.updateSessionForHereToSee(sessionId, host.id)
     }
 }
