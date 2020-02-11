@@ -6,9 +6,10 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
@@ -29,6 +30,7 @@ import support.bymason.kiosk.checkin.core.model.Company
 import support.bymason.kiosk.checkin.core.model.GuestField
 import support.bymason.kiosk.checkin.core.model.GuestFieldType
 import support.bymason.kiosk.checkin.databinding.IdentityFragmentBinding
+import support.bymason.kiosk.checkin.feature.identity.holders.IdentityViewHolderBase
 import support.bymason.kiosk.checkin.helpers.TestCoroutineDispatcherRule
 
 @RunWith(AndroidJUnit4::class)
@@ -47,7 +49,8 @@ class IdentityFragmentTest {
     @Test
     fun `Config change succeeds`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(emptyList())
         }
 
@@ -58,7 +61,8 @@ class IdentityFragmentTest {
     @Test
     fun `Input fields don't have errors on launch`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -68,6 +72,7 @@ class IdentityFragmentTest {
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+            Thread.sleep(500) // Wait for ListAdapter diffing
             val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
             val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
@@ -79,7 +84,8 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button is disabled on launch`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
                     GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
@@ -94,52 +100,59 @@ class IdentityFragmentTest {
         }
     }
 
-    @Ignore("https://github.com/robolectric/robolectric/issues/5407")
     @Test
     fun `Moving to new field while current one is invalid shows error`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
-                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
+                    GuestField("id2", GuestFieldType.EMAIL, "foo", true, ".+")
             ))
         }
 
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+
+            Thread.sleep(500) // Wait for ListAdapter diffing
+            onView(withId(R.id.fields)).perform(
+                    actionOnItemAtPosition<IdentityViewHolderBase>(0, click()))
+            onView(withId(R.id.fields)).perform(
+                    actionOnItemAtPosition<IdentityViewHolderBase>(1, click()))
+
             val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
             val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
-
-            inputLayout2.requestFocus()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-
             assertThat(inputLayout1.error).isNotNull()
             assertThat(inputLayout2.error).isNull()
         }
     }
 
-    @Ignore("https://github.com/robolectric/robolectric/issues/5407")
     @Test
     fun `Going back to invalid field clears error`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
-                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
+                    GuestField("id2", GuestFieldType.EMAIL, "foo", true, ".+")
             ))
         }
 
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
+
+            Thread.sleep(500) // Wait for ListAdapter diffing
+            onView(withId(R.id.fields)).perform(
+                    actionOnItemAtPosition<IdentityViewHolderBase>(0, click()))
+            onView(withId(R.id.fields)).perform(
+                    actionOnItemAtPosition<IdentityViewHolderBase>(1, click()))
+            onView(withId(R.id.fields)).perform(
+                    actionOnItemAtPosition<IdentityViewHolderBase>(0, click()))
+
             val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
             val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
-
-            inputLayout2.requestFocus()
-            inputLayout1.requestFocus()
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
-
             assertThat(inputLayout1.error).isNull()
             assertThat(inputLayout2.error).isNotNull()
         }
@@ -148,22 +161,21 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button becomes enabled when all fields are valid`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
-                    GuestField("id2", GuestFieldType.NAME, "foo", true, ".+")
+                    GuestField("id2", GuestFieldType.EMAIL, "foo", true, ".+")
             ))
         }
 
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
-            val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
-            val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
 
-            inputLayout1.editText!!.setText("A")
-            inputLayout2.editText!!.setText("B")
-            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            Thread.sleep(500) // Wait for ListAdapter diffing
+            onView(withId(R.id.name)).perform(replaceText("A"))
+            onView(withId(R.id.email)).perform(replaceText("B"))
 
             assertThat(binding.next.isEnabled).isTrue()
         }
@@ -176,7 +188,8 @@ class IdentityFragmentTest {
     @Test
     fun `Continue button navigates to next destination`() {
         runBlocking {
-            `when`(mockApi.getCompanyMetadata()).thenReturn(Company("Mason", "url"))
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
             `when`(mockApi.getGuestFields()).thenReturn(listOf(
                     GuestField("id", GuestFieldType.NAME, "foo", false, null)))
             `when`(mockApi.updateSessionForCreate(any())).thenReturn("foobar")

@@ -98,7 +98,7 @@ dependencies {
     implementation(Config.Libs.Jetpack.core)
     implementation(Config.Libs.Jetpack.appCompat)
     implementation(Config.Libs.Jetpack.fragment)
-    implementation(Config.Libs.Jetpack.rvSelection)
+    implementation(Config.Libs.Jetpack.rv)
     implementation(Config.Libs.Jetpack.constraint)
     implementation(Config.Libs.Jetpack.material)
     implementation(Config.Libs.Jetpack.common)
@@ -119,12 +119,11 @@ dependencies {
     implementation(Config.Libs.Misc.glide)
     implementation(Config.Libs.Misc.guava)
 
-    implementation(Config.Libs.Misc.permissions)
-
     testImplementation(Config.Libs.Testing.junit)
     testImplementation(Config.Libs.Testing.truth)
     testImplementation(Config.Libs.Testing.espresso)
     testImplementation(Config.Libs.Testing.espressoWeb)
+    testImplementation(Config.Libs.Testing.espressoContrib)
     testImplementation(Config.Libs.Testing.core)
     testImplementation(Config.Libs.Testing.arch)
     debugImplementation(Config.Libs.Testing.fragment)

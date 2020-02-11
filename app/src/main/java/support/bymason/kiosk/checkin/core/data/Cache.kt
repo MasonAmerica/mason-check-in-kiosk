@@ -39,7 +39,7 @@ class FreshCache(
             input: Cache.Input<T>,
             block: suspend () -> T
     ): T = dispatchers.default {
-        val resultOp = GlobalScope.async { block() }
+        val resultOp = GlobalScope.async(dispatchers.default) { block() }
 
         val cacheKey = Hashing.sha256().newHasher()
                 .apply { for (key in input.keys) putString(key, Charsets.UTF_8) }

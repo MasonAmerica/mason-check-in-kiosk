@@ -38,6 +38,14 @@ allprojects {
             }
         }
     }
+
+    tasks.withType<Test> {
+        testLogging {
+            events("passed", "failed", "skipped")
+            showStandardStreams = true
+            setExceptionFormat("full")
+        }
+    }
 }
 
 tasks.wrapper {

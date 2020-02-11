@@ -7,6 +7,7 @@ import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -49,16 +50,18 @@ class HostFinderFragmentTest {
 
     @Test
     fun `Searching for host displays results`() {
+        runBlocking {
+            `when`(mockApi.findHosts(any())).thenReturn(listOf(
+                    Host("id", "Mr Robot", null)))
+        }
+
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
-            runBlocking {
-                `when`(mockApi.findHosts(any())).thenReturn(listOf(
-                        Host("id", "Mr Robot", null)))
-            }
 
             binding.search.setText("Person")
             InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            Thread.sleep(500) // Wait for ListAdapter diffing
 
             onView(withId(R.id.hosts)).check(matches(hasDescendant(withText("Mr Robot"))))
         }
@@ -97,21 +100,22 @@ class HostFinderFragmentTest {
 
     @Test
     fun `Selecting host result navigates to next destination`() {
-        val host = Host("id", "name", null)
+        runBlocking {
+            `when`(mockApi.findHosts(any())).thenReturn(listOf(Host("id", "name", null)))
+            `when`(mockApi.updateSessionForHereToSee(any(), any())).thenReturn("foobar")
+        }
+
         val mockNavController = mock(NavController::class.java)
         val scenario = launchFragment("foobar")
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
 
             val binding = HostFinderFragmentBinding.bind(fragment.requireView())
-            runBlocking {
-                `when`(mockApi.findHosts(any())).thenReturn(listOf(host))
-                `when`(mockApi.updateSessionForHereToSee(any(), any())).thenReturn("foobar")
-            }
             binding.search.setText("Person")
         }
 
-        onView(withId(R.id.name)).perform(click())
+        Thread.sleep(500) // Wait for ListAdapter diffing
+        onView(withId(R.id.hosts)).perform(actionOnItemAtPosition<HostViewHolder>(0, click()))
 
         verify(mockNavController).navigate(HostFinderFragmentDirections.next("foobar"))
     }

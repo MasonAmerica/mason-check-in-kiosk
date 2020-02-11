@@ -1,0 +1,115 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Cache Gradle
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-v2-gradle-
+      - name: Validate Gradle integrety
+        uses: gradle/wrapper-validation-action@v1
+      - name: Configure Gradle
+        run: ./gradlew help
+      - name: Build debug project
+        run: ./gradlew assembleDebug -S
+        if: github.ref != 'refs/heads/master'
+      - name: Build release project
+        run: ./gradlew assembleRelease -Prelbuild -S
+        if: github.ref == 'refs/heads/master'
+      - name: Upload outputs
+        uses: actions/upload-artifact@v1
+        with:
+          name: outputs
+          path: app/build/outputs/
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Cache Gradle
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-v2-gradle-
+      - name: Run tests
+        # TODO add back "check" task. Blocked by https://issuetracker.google.com/issues/148284064
+        run: ./gradlew test -S
+
+  deploy_mason:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Download outputs
+        uses: actions/download-artifact@v1
+        with:
+          name: outputs
+      - name: Prep outputs
+        run: |
+          mkdir -p app/build
+          mv outputs app/build
+      - name: Prep CLI
+        run: |
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.4/mason-linux
+          chmod +x mason
+          ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
+        env:
+          MASON_USERNAME: ${{ secrets.MASON_USERNAME }}
+          MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
+      - name: Build and deploy Mason project
+        run: |
+          ./mason register -y project
+          ./mason deploy -y --push config officeos-g450 latest check-in-kiosk-g450-dev
+          ./mason deploy -y --push config officeos-g430 latest check-in-kiosk-g430-dev
+
+  deploy_web:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Cache Gradle
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-v2-gradle-
+      - name: Deploy website + backend
+        run: ./gradlew deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
