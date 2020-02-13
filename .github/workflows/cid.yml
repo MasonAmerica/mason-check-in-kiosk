@@ -10,8 +10,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Fetch tags and history
         run: |
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          git fetch --prune --unshallow
+          git fetch --depth=1 --progress origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow --progress
       - name: Install JDK
         uses: actions/setup-java@v1
         with:
@@ -74,7 +74,7 @@ jobs:
           mv outputs app/build
       - name: Prep CLI
         run: |
-          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.4/mason-linux
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
           chmod +x mason
           ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
         env:
@@ -82,9 +82,12 @@ jobs:
           MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
       - name: Build and deploy Mason project
         run: |
-          ./mason register -y project
-          ./mason deploy -y --push config officeos-g450 latest check-in-kiosk-g450-dev
-          ./mason deploy -y --push config officeos-g430 latest check-in-kiosk-g430-dev
+          ./mason register project
+          ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450-dev
+          ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430-dev
+        env:
+          CI: true
+          MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
 
   deploy_web:
     needs: [build, test]
