@@ -36,7 +36,7 @@ object Config {
         const val android = "com.android.tools.build:gradle:4.0.0-alpha09"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
-        const val mason = "com.bymason.build:mason-apps:1.0.4"
+        const val mason = "com.bymason.build:mason-apps:1.0.5"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
         const val google = "com.google.gms:google-services:4.3.3"
         const val fabric = "io.fabric.tools:gradle:1.31.2"

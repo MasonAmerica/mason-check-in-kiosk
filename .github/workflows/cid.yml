@@ -23,14 +23,14 @@ jobs:
             ${{ runner.os }}-v2-gradle-
       - name: Validate Gradle integrety
         uses: gradle/wrapper-validation-action@v1
-      - name: Configure Gradle
-        run: ./gradlew help
       - name: Build debug project
         run: ./gradlew assembleDebug -S
         if: github.ref != 'refs/heads/master'
       - name: Build release project
-        run: ./gradlew assembleRelease -Prelbuild -S
+        run: ./gradlew assembleRelease -S
         if: github.ref == 'refs/heads/master'
+        env:
+          CI: true
       - name: Upload outputs
         uses: actions/upload-artifact@v1
         with:
