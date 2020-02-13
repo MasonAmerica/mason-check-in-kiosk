@@ -8,13 +8,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Fetch tags and history
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git fetch --prune --unshallow
       - name: Install JDK
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Cache Gradle
+      - name: Gradle Cache
         uses: actions/cache@v1
         with:
           path: ~/.gradle
@@ -29,8 +31,6 @@ jobs:
       - name: Build release project
         run: ./gradlew assembleRelease -S
         if: github.ref == 'refs/heads/master'
-        env:
-          CI: true
       - name: Upload outputs
         uses: actions/upload-artifact@v1
         with:
@@ -38,7 +38,6 @@ jobs:
           path: app/build/outputs/
 
   test:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
