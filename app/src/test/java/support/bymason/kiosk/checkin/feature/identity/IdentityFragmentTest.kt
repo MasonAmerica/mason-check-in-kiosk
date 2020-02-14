@@ -120,6 +120,7 @@ class IdentityFragmentTest {
                     actionOnItemAtPosition<IdentityViewHolderBase>(0, click()))
             onView(withId(R.id.fields)).perform(
                     actionOnItemAtPosition<IdentityViewHolderBase>(1, click()))
+            Thread.sleep(500) // Wait for ListAdapter diffing
 
             val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
             val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
@@ -150,6 +151,7 @@ class IdentityFragmentTest {
                     actionOnItemAtPosition<IdentityViewHolderBase>(1, click()))
             onView(withId(R.id.fields)).perform(
                     actionOnItemAtPosition<IdentityViewHolderBase>(0, click()))
+            Thread.sleep(500) // Wait for ListAdapter diffing
 
             val inputLayout1 = binding.fields.layoutManager!!.getChildAt(0) as TextInputLayout
             val inputLayout2 = binding.fields.layoutManager!!.getChildAt(1) as TextInputLayout
