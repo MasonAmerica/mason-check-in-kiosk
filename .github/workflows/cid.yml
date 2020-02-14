@@ -23,7 +23,7 @@ jobs:
           key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
           restore-keys: |
             ${{ runner.os }}-v2-gradle-
-      - name: Validate Gradle integrety
+      - name: Validate Gradle integrity
         uses: gradle/wrapper-validation-action@v1
       - name: Build debug project
         run: ./gradlew assembleDebug -S
@@ -61,9 +61,14 @@ jobs:
     needs: [build, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    env:
+      CI: true
+      MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Fetch tags
+        run: git fetch --depth=1 --progress origin +refs/tags/*:refs/tags/*
       - name: Download outputs
         uses: actions/download-artifact@v1
         with:
@@ -80,19 +85,26 @@ jobs:
         env:
           MASON_USERNAME: ${{ secrets.MASON_USERNAME }}
           MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
-      - name: Build and deploy Mason project
+      - name: Register Mason project
+        run: ./mason register project
+      - name: Deploy to development environment
         run: |
-          ./mason register project
           ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450-dev
           ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430-dev
-        env:
-          CI: true
-          MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
+      - name: Deploy to production environment
+        run: |
+          if [ ! -z $(git tag -l --points-at HEAD) ]
+          then
+            ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450
+            ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430
+          fi
 
   deploy_web:
     needs: [build, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    env:
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -113,5 +125,3 @@ jobs:
             ${{ runner.os }}-v2-gradle-
       - name: Deploy website + backend
         run: ./gradlew deploy
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
