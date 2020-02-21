@@ -5,6 +5,11 @@
     <string name="kiosk_checkin_sign_in_title">Sign in</string>
     <string name="kiosk_checkin_sign_in_email_hint">Email</string>
     <string name="kiosk_checkin_sign_in_password_hint">Password</string>
+    <string name="kiosk_checkin_sign_in_email_invalid_error">Invalid email address</string>
+    <string name="kiosk_checkin_sign_in_email_unknown_error">
+        Account not found. Create an account in the Console.
+    </string>
+    <string name="kiosk_checkin_sign_in_password_error">Oops, wrong password</string>
     <string name="kiosk_checkin_sign_in_submit_button_title">Sign in</string>
 
     <!-- Check-in -->

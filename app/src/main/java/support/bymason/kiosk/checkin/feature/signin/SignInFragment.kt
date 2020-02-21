@@ -57,5 +57,15 @@ class SignInFragment(
     private fun onViewStateChanged(state: SignInFragmentViewModel.State) {
         progress?.isVisible = state.isLoading
         binding.submit.isEnabled = state.isSubmitButtonEnabled
+
+        binding.emailLayout.error = when {
+            state.isEmailInvalid -> getString(R.string.kiosk_checkin_sign_in_email_invalid_error)
+            state.isAccountUnknown -> getString(R.string.kiosk_checkin_sign_in_email_unknown_error)
+            else -> null
+        }
+        binding.passwordLayout.error = when {
+            state.isPasswordInvalid -> getString(R.string.kiosk_checkin_sign_in_password_error)
+            else -> null
+        }
     }
 }

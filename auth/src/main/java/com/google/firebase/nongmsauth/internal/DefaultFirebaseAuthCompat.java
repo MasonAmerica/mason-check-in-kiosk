@@ -2,26 +2,31 @@ package com.google.firebase.nongmsauth.internal;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.auth0.android.jwt.Claim;
 import com.auth0.android.jwt.JWT;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.identitytoolkit.IdentityToolkit;
 import com.google.api.services.identitytoolkit.IdentityToolkitRequestInitializer;
 import com.google.api.services.identitytoolkit.model.IdentitytoolkitRelyingpartyVerifyPasswordRequest;
+import com.google.api.services.identitytoolkit.model.VerifyPasswordResponse;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.internal.IdTokenListener;
 import com.google.firebase.internal.InternalTokenResult;
 import com.google.firebase.nongmsauth.FirebaseAuthCompat;
+import com.google.firebase.nongmsauth.errors.FirebaseAuthInvalidEmailException;
+import com.google.firebase.nongmsauth.errors.FirebaseAuthInvalidPasswordException;
+import com.google.firebase.nongmsauth.errors.FirebaseAuthUnknownAccountException;
 import com.google.tokenservice.TokenService;
 import com.google.tokenservice.TokenServiceRequestInitializer;
 import com.google.tokenservice.model.ExchangeTokenRequest;
 import com.google.tokenservice.model.ExchangeTokenResponse;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,12 +107,43 @@ public final class DefaultFirebaseAuthCompat implements FirebaseAuthCompat {
             request.setPassword(password);
             request.setReturnSecureToken(true);
 
+            return handlePasswordVerification(request);
+        }).continueWithTask((emailTask) ->
+                refreshToken(emailTask.getResult().getRefreshToken()));
+    }
+
+    private VerifyPasswordResponse handlePasswordVerification(
+            IdentitytoolkitRelyingpartyVerifyPasswordRequest request)
+            throws IOException,
+            FirebaseAuthInvalidEmailException,
+            FirebaseAuthUnknownAccountException,
+            FirebaseAuthInvalidPasswordException {
+        try {
             return identityService.relyingparty()
                     .verifyPassword(request)
                     .setKey(app.getOptions().getApiKey())
                     .execute();
-        }).continueWithTask((emailTask) ->
-                refreshToken(emailTask.getResult().getRefreshToken()));
+        } catch (GoogleJsonResponseException e) {
+            GoogleJsonError details = e.getDetails();
+            if (details == null) {
+                throw e;
+            }
+            String message = details.getMessage();
+            if (message == null) {
+                throw e;
+            }
+
+            switch (message) {
+                case "INVALID_EMAIL":
+                    throw new FirebaseAuthInvalidEmailException();
+                case "EMAIL_NOT_FOUND":
+                    throw new FirebaseAuthUnknownAccountException();
+                case "INVALID_PASSWORD":
+                    throw new FirebaseAuthInvalidPasswordException();
+                default:
+                    throw e;
+            }
+        }
     }
 
     private Task<GetTokenResult> maybeRefreshToken(boolean forceRefresh) {

@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.google.firebase.nongmsauth.FirebaseAuthCompat
+import com.google.firebase.nongmsauth.errors.FirebaseAuthInvalidEmailException
+import com.google.firebase.nongmsauth.errors.FirebaseAuthInvalidPasswordException
+import com.google.firebase.nongmsauth.errors.FirebaseAuthUnknownAccountException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -39,10 +42,26 @@ class SignInFragmentViewModel(
         if (_state.value.isLoading) return // Prevent repeated clicks
         if (!_state.value.isSubmitButtonEnabled) return
 
-        _state.update { copy(isLoading = true) }
+        _state.update {
+            copy(
+                    isLoading = true,
+                    isEmailInvalid = false,
+                    isAccountUnknown = false,
+                    isPasswordInvalid = false
+            )
+        }
         viewModelScope.launch {
             try {
                 auth.signInWithEmailAndPassword(email, password).await()
+            } catch (e: FirebaseAuthInvalidEmailException) {
+                _state.update { copy(isEmailInvalid = true) }
+                return@launch
+            } catch (e: FirebaseAuthUnknownAccountException) {
+                _state.update { copy(isAccountUnknown = true) }
+                return@launch
+            } catch (e: FirebaseAuthInvalidPasswordException) {
+                _state.update { copy(isPasswordInvalid = true) }
+                return@launch
             } catch (t: Throwable) {
                 logBreadcrumb("Failed to log in", t)
                 return@launch
@@ -61,7 +80,10 @@ class SignInFragmentViewModel(
 
     data class State(
             val isLoading: Boolean = false,
-            val isSubmitButtonEnabled: Boolean = false
+            val isSubmitButtonEnabled: Boolean = false,
+            val isEmailInvalid: Boolean = false,
+            val isAccountUnknown: Boolean = false,
+            val isPasswordInvalid: Boolean = false
     )
 
     sealed class Action {
