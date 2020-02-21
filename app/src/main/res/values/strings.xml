@@ -32,5 +32,5 @@
     <string name="kiosk_checkin_report_title">You\'re all set</string>
     <string name="kiosk_checkin_report_info_title">Check-in complete</string>
     <string name="kiosk_checkin_report_info_body">We\'ll let your host know you\'re here.</string>
-    <string name="kiosk_checkin_report_continue_button_title">Start new check-in</string>
+    <string name="kiosk_checkin_report_continue_button_title">Done</string>
 </resources>
