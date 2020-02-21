@@ -2,6 +2,7 @@ package support.bymason.kiosk.checkin
 
 import firebase.functions.admin
 import firebase.functions.functions
+import support.bymason.kiosk.checkin.functions.cleanupCompletedSessions
 import support.bymason.kiosk.checkin.functions.cleanupIncompleteSessions
 import support.bymason.kiosk.checkin.functions.handleDocusignAuth
 import support.bymason.kiosk.checkin.functions.handleGSuiteAuth
@@ -25,7 +26,10 @@ fun main() {
     exports.clientApi = functions.runWith(json("memory" to "2GB")).https
             .onCall<Json> { data, context -> processClientRequest(data, context) }
 
-    exports.cleanupIncompleteSessions = functions.runWith(json("timeoutSeconds" to 300))
-            .pubsub.schedule("0 3 * * *")
-            .onRun { cleanupIncompleteSessions() }
+    exports.cleanupIncompleteSessions = functions.runWith(json("timeoutSeconds" to 540))
+            .pubsub.topic("daily-tick")
+            .onPublish { _, _ -> cleanupIncompleteSessions() }
+    exports.cleanupCompletedSessions = functions.runWith(json("timeoutSeconds" to 540))
+            .pubsub.topic("daily-tick")
+            .onPublish { _, _ -> cleanupCompletedSessions() }
 }
