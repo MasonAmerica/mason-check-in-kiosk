@@ -40,6 +40,8 @@ allprojects {
     }
 
     tasks.withType<Test> {
+        maxParallelForks = Runtime.getRuntime().availableProcessors()
+
         testLogging {
             events("passed", "failed", "skipped")
             showStandardStreams = true

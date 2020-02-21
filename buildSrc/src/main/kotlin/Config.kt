@@ -23,7 +23,7 @@ fun RepositoryHandler.deps() {
 
 object Config {
     private const val kotlinVersion = "1.3.61"
-    private const val navVersion = "2.2.0"
+    private const val navVersion = "2.3.0-alpha02"
     private const val coroutinesVersion = "1.3.3"
 
     object SdkVersions {
@@ -63,13 +63,13 @@ object Config {
         object Jetpack {
             private const val lifecycleVersion = "2.2.0"
 
-            const val core = "androidx.core:core-ktx:1.2.0-rc01"
-            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha01"
-            const val fragment = "androidx.fragment:fragment-ktx:1.2.0"
+            const val core = "androidx.core:core-ktx:1.3.0-alpha01"
+            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha02"
+            const val fragment = "androidx.fragment:fragment-ktx:1.2.2"
             const val rv = "androidx.recyclerview:recyclerview:1.2.0-alpha01"
             const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
 
-            const val material = "com.google.android.material:material:1.2.0-alpha04"
+            const val material = "com.google.android.material:material:1.2.0-alpha05"
 
             const val common = "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
             const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
@@ -79,12 +79,12 @@ object Config {
             const val navFragments = "androidx.navigation:navigation-fragment-ktx:$navVersion"
             const val navUi = "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-            const val webkit = "androidx.webkit:webkit:1.2.0-alpha01"
+            const val webkit = "androidx.webkit:webkit:1.2.0-rc01"
         }
 
         object Firebase {
             const val analytics = "com.google.firebase:firebase-analytics:17.2.2"
-            const val functions = "com.google.firebase:firebase-functions-ktx:19.0.1"
+            const val functions = "com.google.firebase:firebase-functions-ktx:19.0.2"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
 
             const val identityToolkit =
@@ -96,21 +96,21 @@ object Config {
         object Misc {
             private const val retrofitVersion = "2.7.1"
 
-            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.1"
+            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.2"
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
             const val glide = "com.github.bumptech.glide:glide:4.11.0"
             const val guava = "com.google.guava:guava:28.2-android"
         }
 
         object Testing {
-            const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha03"
-            const val truth = "androidx.test.ext:truth:1.3.0-alpha03"
-            const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha03"
-            const val espressoWeb = "androidx.test.espresso:espresso-web:3.3.0-alpha03"
-            const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.3.0-alpha03"
-            const val core = "androidx.test:core-ktx:1.3.0-alpha03"
+            const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha04"
+            const val truth = "androidx.test.ext:truth:1.3.0-alpha04"
+            const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha04"
+            const val espressoWeb = "androidx.test.espresso:espresso-web:3.3.0-alpha04"
+            const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.3.0-alpha04"
+            const val core = "androidx.test:core-ktx:1.3.0-alpha04"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
-            const val fragment = "androidx.fragment:fragment-testing:1.2.0"
+            const val fragment = "androidx.fragment:fragment-testing:1.2.2"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
             const val mockito = "org.mockito:mockito-core:3.2.4"
             const val coroutines =

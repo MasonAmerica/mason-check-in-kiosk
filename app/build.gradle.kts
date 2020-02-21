@@ -85,6 +85,10 @@ android {
     }
 }
 
+androidExtensions {
+    features = setOf("parcelize")
+}
+
 masonApps {
     appName = "mason-check-in-kiosk"
 }

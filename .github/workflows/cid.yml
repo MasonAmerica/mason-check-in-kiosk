@@ -1,6 +1,9 @@
 name: CI/CD
 
 on: [push, pull_request]
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dkotlin.incremental=false -Dkotlin.compiler.execution.strategy=in-process
+  CI: true
 
 jobs:
   build:
@@ -54,29 +57,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-v2-gradle-
       - name: Run tests
-        # TODO add back "check" task. Blocked by https://issuetracker.google.com/issues/148284064
-        run: ./gradlew test -S
+        run: ./gradlew check test lint -S
 
   deploy_mason:
     needs: [build, test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     env:
-      CI: true
       MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Fetch tags
         run: git fetch --depth=1 --progress origin +refs/tags/*:refs/tags/*
       - name: Download outputs
         uses: actions/download-artifact@v1
         with:
           name: outputs
-      - name: Prep outputs
-        run: |
-          mkdir -p app/build
-          mv outputs app/build
+          path: app/build/outputs
       - name: Prep CLI
         run: |
           curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
@@ -107,7 +105,7 @@ jobs:
       FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Install JDK
         uses: actions/setup-java@v1
         with:
