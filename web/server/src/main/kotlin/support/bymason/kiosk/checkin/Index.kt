@@ -26,10 +26,11 @@ fun main() {
     exports.clientApi = functions.runWith(json("memory" to "2GB")).https
             .onCall<Json> { data, context -> processClientRequest(data, context) }
 
-    exports.cleanupIncompleteSessions = functions.runWith(json("timeoutSeconds" to 540))
+    val cleanupRuntime = json("memory" to "1GB", "timeoutSeconds" to 540)
+    exports.cleanupIncompleteSessions = functions.runWith(cleanupRuntime)
             .pubsub.topic("daily-tick")
             .onPublish { _, _ -> cleanupIncompleteSessions() }
-    exports.cleanupCompletedSessions = functions.runWith(json("timeoutSeconds" to 540))
+    exports.cleanupCompletedSessions = functions.runWith(cleanupRuntime)
             .pubsub.topic("daily-tick")
             .onPublish { _, _ -> cleanupCompletedSessions() }
 }

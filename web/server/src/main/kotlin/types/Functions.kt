@@ -19,8 +19,8 @@ import kotlin.js.Date
 import kotlin.js.Json
 import kotlin.js.Promise
 
-val admin = js("require('firebase-admin')").unsafeCast<Admin>()
-val functions = js("require('firebase-functions')").unsafeCast<Functions>()
+val admin by lazy { js("require('firebase-admin')").unsafeCast<Admin>() }
+val functions by lazy { js("require('firebase-functions')").unsafeCast<Functions>() }
 val moment: dynamic by lazy { js("require('moment')") }
 val epoch by lazy { Timestamps.fromDate(Date(0)) }
 

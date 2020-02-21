@@ -108,7 +108,14 @@ class IdentityViewModel(
                         hasInteracted = true
                 )
             }
-            copy(isContinueButtonEnabled = newStates.none { it.hasError }, fieldStates = newStates)
+
+            val isFormReady = newStates.none { it.hasError }
+            copy(isContinueButtonEnabled = isFormReady, fieldStates = newStates)
+        }
+
+        if (_state.value.isContinueButtonEnabled) {
+            // Warm up the Cloud Function
+            repository.registerFields(_state.value.fieldStates)
         }
     }
 
