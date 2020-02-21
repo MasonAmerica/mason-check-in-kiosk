@@ -1,0 +1,6 @@
+<resources>
+
+    <attr name="appBarLayoutTheme" format="reference" />
+    <attr name="toolbarPopupTheme" format="reference" />
+
+</resources>
