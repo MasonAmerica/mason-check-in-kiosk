@@ -5,6 +5,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
@@ -85,6 +87,15 @@ class HostFinderFragment(
     private fun onViewStateChanged(state: HostFinderViewModel.State, adapter: HostAdapter) {
         progress?.isVisible = state.isLoading
         binding.noHostsHint.isVisible = state.isSearchHintVisible
+        updateEnabledStatus(binding.root, !state.isSelectingHost)
+
         adapter.submitList(state.hosts)
+    }
+
+    private fun updateEnabledStatus(group: ViewGroup, enabled: Boolean) {
+        for (child in group.children) {
+            if (child is ViewGroup) updateEnabledStatus(child, enabled)
+            child.isEnabled = enabled
+        }
     }
 }

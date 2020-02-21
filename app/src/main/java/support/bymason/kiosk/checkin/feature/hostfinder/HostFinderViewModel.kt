@@ -59,9 +59,9 @@ class HostFinderViewModel(
     }
 
     fun onFound(host: Host) {
-        if (_state.value.isLoading) return // Prevent repeated clicks
+        if (_state.value.isSelectingHost) return // Prevent repeated clicks
 
-        _state.update { copy(isLoading = true) }
+        _state.update { copy(isLoading = true, isSelectingHost = true) }
         viewModelScope.launch {
             val sessionId = try {
                 repository.registerHost(sessionId, host)
@@ -69,7 +69,7 @@ class HostFinderViewModel(
                 logBreadcrumb("Failed to register host", t)
                 return@launch
             } finally {
-                _state.update { copy(isLoading = false) }
+                _state.update { copy(isLoading = false, isSelectingHost = false) }
             }
 
             _actions.offer(Action.Navigate(HostFinderFragmentDirections.next(sessionId)))
@@ -78,6 +78,7 @@ class HostFinderViewModel(
 
     data class State(
             val isLoading: Boolean = false,
+            val isSelectingHost: Boolean = false,
             val isSearchHintVisible: Boolean = true,
             val hosts: List<Host> = emptyList()
     )
