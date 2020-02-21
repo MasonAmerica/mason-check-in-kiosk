@@ -7,7 +7,6 @@ buildscript {
         classpath(Config.Plugins.android)
         classpath(Config.Plugins.kotlin)
         classpath(Config.Plugins.kotlinSerialization)
-        classpath(Config.Plugins.mason)
         classpath(Config.Plugins.navArgs)
         classpath(Config.Plugins.google)
         classpath(Config.Plugins.fabric)
@@ -17,12 +16,13 @@ buildscript {
 plugins {
     Config.Plugins.run { versionChecker }
     `lifecycle-base`
-    id("com.bymason.build.kiosk")
 }
 
 buildScan {
     termsOfServiceUrl = "https://gradle.com/terms-of-service"
     termsOfServiceAgree = "yes"
+
+    publishAlways()
 }
 
 allprojects {

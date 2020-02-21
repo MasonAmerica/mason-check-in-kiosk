@@ -4,7 +4,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("mason-apps")
+    id("com.supercilex.gradle.versions") version "0.4.0"
     id("io.fabric")
 
     id("org.jetbrains.kotlin.android")
@@ -21,6 +21,7 @@ android {
     defaultConfig {
         minSdkVersion(Config.SdkVersions.min)
         targetSdkVersion(Config.SdkVersions.target)
+        base.archivesBaseName = "mason-check-in-kiosk"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -87,10 +88,6 @@ android {
 
 androidExtensions {
     features = setOf("parcelize")
-}
-
-masonApps {
-    appName = "mason-check-in-kiosk"
 }
 
 dependencies {
