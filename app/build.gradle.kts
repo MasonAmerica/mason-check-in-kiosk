@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.retry
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
@@ -5,6 +6,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("com.supercilex.gradle.versions") version "0.4.0"
+    id("org.gradle.test-retry") version "1.1.2"
     id("io.fabric")
 
     id("org.jetbrains.kotlin.android")
@@ -137,6 +139,13 @@ tasks.matching {
     it.name.contains("ReleaseUnitTest")
 }.configureEach {
     enabled = false
+}
+
+tasks.withType<Test>().configureEach {
+    retry {
+        maxRetries.set(3)
+        maxFailures.set(20)
+    }
 }
 
 tasks.withType<KotlinCompile>().matching {
