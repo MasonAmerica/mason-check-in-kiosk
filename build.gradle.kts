@@ -16,6 +16,7 @@ buildscript {
 plugins {
     Config.Plugins.run { versionChecker }
     `lifecycle-base`
+    id("com.bymason.build.kiosk")
 }
 
 buildScan {
