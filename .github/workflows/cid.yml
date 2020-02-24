@@ -33,7 +33,7 @@ jobs:
         if: github.ref != 'refs/heads/master'
       - name: Build release project
         run: ./gradlew assembleRelease -S
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
       - name: Upload outputs
         uses: actions/upload-artifact@v1
         with:
@@ -58,44 +58,6 @@ jobs:
             ${{ runner.os }}-v2-gradle-
       - name: Run tests
         run: ./gradlew check test lint -S
-
-  deploy_mason:
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    env:
-      MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Fetch tags
-        run: git fetch --depth=1 --progress origin +refs/tags/*:refs/tags/*
-      - name: Download outputs
-        uses: actions/download-artifact@v1
-        with:
-          name: outputs
-          path: app/build/outputs
-      - name: Prep CLI
-        run: |
-          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
-          chmod +x mason
-          ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
-        env:
-          MASON_USERNAME: ${{ secrets.MASON_USERNAME }}
-          MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
-      - name: Register Mason project
-        run: ./mason register project
-      - name: Deploy to development environment
-        run: |
-          ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450-dev
-          ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430-dev
-      - name: Deploy to production environment
-        run: |
-          if [ ! -z $(git tag -l --points-at HEAD) ]
-          then
-            ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450
-            ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430
-          fi
 
   deploy_web:
     needs: [build, test]
@@ -123,3 +85,61 @@ jobs:
             ${{ runner.os }}-v2-gradle-
       - name: Deploy website + backend
         run: ./gradlew deploy
+
+  deploy_mason_dev:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    env:
+      MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download outputs
+        uses: actions/download-artifact@v1
+        with:
+          name: outputs
+          path: mason-os/dev/apps
+      - name: Prep CLI
+        run: |
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
+          chmod +x mason
+          ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
+        env:
+          MASON_USERNAME: ${{ secrets.MASON_USERNAME }}
+          MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
+      - name: Register Mason project
+        run: ./mason register project mason-os/dev
+      - name: Deploy Mason
+        run: |
+          ./mason deploy --push config officeos-g450-dev latest check-in-kiosk-g450-dev
+          ./mason deploy --push config officeos-g430-dev latest check-in-kiosk-g430-dev
+
+  deploy_mason_prod:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    env:
+      MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download outputs
+        uses: actions/download-artifact@v1
+        with:
+          name: outputs
+          path: mason-os/prod/apps
+      - name: Prep CLI
+        run: |
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
+          chmod +x mason
+          ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
+        env:
+          MASON_USERNAME: ${{ secrets.MASON_USERNAME }}
+          MASON_PASSWORD: ${{ secrets.MASON_PASSWORD }}
+      - name: Register Mason project
+        run: ./mason register project mason-os/prod
+      - name: Deploy Mason
+        run: |
+          ./mason deploy --push config officeos-g450 latest check-in-kiosk-g450
+          ./mason deploy --push config officeos-g430 latest check-in-kiosk-g430

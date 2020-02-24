@@ -1,0 +1,7 @@
+{
+    "configs": [
+        "officeos-g430.yml",
+        "officeos-g450.yml"
+    ],
+    "apps": "apps/apk/release"
+}

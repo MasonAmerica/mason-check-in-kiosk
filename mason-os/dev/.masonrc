@@ -3,5 +3,5 @@
         "officeos-g430.yml",
         "officeos-g450.yml"
     ],
-    "apps": "app/build/outputs/apk/release"
+    "apps": "apps/apk/release"
 }

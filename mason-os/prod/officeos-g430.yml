@@ -11,6 +11,7 @@ os:
       default_runtime_permissions_grant_policy: autogrant
     mason-fota:
       config_update_prompt_prior_to_install: false
+      config_update_install_time: 03:00
     android:
       config_minimumScreenOffTimeout: 2147483647
       config_cameraDoubleTapPowerGestureEnabled: false

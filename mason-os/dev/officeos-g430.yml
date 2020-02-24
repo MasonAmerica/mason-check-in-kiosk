@@ -1,0 +1,11 @@
+os:
+  name: officeos-g430-dev
+  version: latest
+  configurations:
+    mason-fota:
+      config_update_prompt_prior_to_install: false
+    android:
+      config_minimumScreenOffTimeout: 2147483647
+apps:
+  - name: Check-in Kiosk
+    package_name: support.bymason.kiosk.checkin
