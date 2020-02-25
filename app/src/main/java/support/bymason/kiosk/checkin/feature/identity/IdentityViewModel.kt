@@ -114,8 +114,12 @@ class IdentityViewModel(
         }
 
         if (_state.value.isContinueButtonEnabled) {
-            // Warm up the Cloud Function
-            repository.registerFields(_state.value.fieldStates)
+            try {
+                // Warm up the Cloud Function
+                repository.registerFields(_state.value.fieldStates)
+            } catch (t: Throwable) {
+                logBreadcrumb("Failed to register fields", t)
+            }
         }
     }
 
