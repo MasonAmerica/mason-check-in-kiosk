@@ -12,8 +12,8 @@ import kotlinx.coroutines.await
 import superagent.superagent
 import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
 import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
+import support.bymason.kiosk.checkin.utils.fetchValidatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
-import support.bymason.kiosk.checkin.utils.validateSession
 import kotlin.js.Json
 import kotlin.js.json
 
@@ -48,7 +48,7 @@ suspend fun hereToSee(auth: AuthContext, data: Json): Json {
     val hostId = data["hostId"] as? String
             ?: throw HttpsError("invalid-argument")
 
-    val sessionDoc = validateSession(auth.uid, sessionId)
+    val sessionDoc = fetchValidatedSession(auth.uid, sessionId)
 
     return hereToSee(sessionDoc, hostId)
 }
@@ -112,8 +112,11 @@ private suspend fun notifyHost(auth: AuthContext, host: `Schema$User`, guestName
         try {
             when (notifyType) {
                 1 -> notifyHostViaEmail()
-                2 -> notifyHostViaSlack(auth, host, guestName)
+                2 -> notifyHostViaSlack(auth, host, guestName, true)
                 3 -> notifyHostViaSms(host, guestName)
+                4 -> notifyHostViaSlack(auth, host, guestName, false)
+                else -> throw HttpsError(
+                        "failed-precondition", "Unknown notification type: $notifyType")
             }
             break
         } catch (t: Throwable) {
@@ -129,10 +132,15 @@ private suspend fun notifyHost(auth: AuthContext, host: `Schema$User`, guestName
 }
 
 private fun notifyHostViaEmail() {
-    error("Email notifications are not yet available")
+    throw HttpsError("unimplemented", "Email notifications are not yet available")
 }
 
-private suspend fun notifyHostViaSlack(auth: AuthContext, host: `Schema$User`, guestName: String) {
+private suspend fun notifyHostViaSlack(
+        auth: AuthContext,
+        host: `Schema$User`,
+        guestName: String,
+        requirePresence: Boolean
+) {
     val creds = getAndInitCreds(auth.uid, "slack")
     val hostEmail = host.primaryEmail
     val slackUser = superagent.get("https://slack.com/api/users.lookupByEmail")
@@ -146,8 +154,24 @@ private suspend fun notifyHostViaSlack(auth: AuthContext, host: `Schema$User`, g
     if (!slackUser["ok"].unsafeCast<Boolean>()) {
         throw HttpsError("failed-precondition", slackUser["error"].unsafeCast<String>())
     }
-
     val slackUserId = slackUser.asDynamic().user.id
+
+    if (requirePresence) {
+        val userPresence = superagent.get("https://slack.com/api/users.getPresence")
+                .query(json(
+                        "token" to creds.getValue("slack")["access_token"],
+                        "user" to slackUserId
+                ))
+                .await().body
+
+        if (!userPresence["ok"].unsafeCast<Boolean>()) {
+            throw HttpsError("failed-precondition", slackUser["error"].unsafeCast<String>())
+        }
+        if (userPresence["presence"] != "active") {
+            throw HttpsError("failed-precondition", "Slack user is not present.")
+        }
+    }
+
     val slackMessage = superagent.post("https://slack.com/api/chat.postMessage")
             .query(json(
                     "token" to creds.getValue("slack")["access_token"],

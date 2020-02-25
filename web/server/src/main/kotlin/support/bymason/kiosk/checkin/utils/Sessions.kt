@@ -12,7 +12,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlin.js.Json
 import kotlin.js.json
 
-suspend fun validateSession(uid: String, sessionId: String): DocumentSnapshot {
+suspend fun fetchValidatedSession(uid: String, sessionId: String): DocumentSnapshot {
     val sessionDoc = admin.firestore().collection(uid)
             .doc("sessions")
             .collection("guest-visits")
@@ -31,7 +31,7 @@ suspend fun fetchPopulatedSession(
         uid: String,
         sessionId: String
 ): Pair<DocumentSnapshot, Json> = coroutineScope {
-    val sessionDoc = validateSession(uid, sessionId)
+    val sessionDoc = fetchValidatedSession(uid, sessionId)
     val session = sessionDoc.data()
 
     (session["guestFields"] as Array<Json>).map { completedField ->
