@@ -2,6 +2,8 @@ os:
   name: officeos-g430-dev
   version: latest
   configurations:
+    mason-management:
+      disable_keyguard: true
     mason-fota:
       config_update_prompt_prior_to_install: false
     android:
