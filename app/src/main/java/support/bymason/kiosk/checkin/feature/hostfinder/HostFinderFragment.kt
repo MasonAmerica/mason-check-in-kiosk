@@ -21,6 +21,7 @@ import support.bymason.kiosk.checkin.core.ui.FragmentBase
 import support.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import support.bymason.kiosk.checkin.core.ui.hideKeyboard
 import support.bymason.kiosk.checkin.core.ui.onDestroy
+import support.bymason.kiosk.checkin.core.ui.showKeyboard
 import support.bymason.kiosk.checkin.databinding.HostFinderFragmentBinding
 
 class HostFinderFragment(
@@ -52,6 +53,9 @@ class HostFinderFragment(
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.search.requestFocus()
+        binding.search.showKeyboard()
+
         binding.search.doAfterTextChanged {
             vm.onSearch(it?.toString())
         }
