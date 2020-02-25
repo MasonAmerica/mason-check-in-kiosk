@@ -5,7 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="progressBarStyle">@style/Widget.AppCompat.ProgressBar</item>
-        <item name="appBarLayoutTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="appBarLayoutTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
         <item name="toolbarPopupTheme">@style/ThemeOverlay.AppCompat.DayNight</item>
         <item name="textInputStyle">
             @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
@@ -16,6 +16,7 @@
     <style name="MasonKiosk.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
     </style>
 
     <style name="MasonKiosk.Launcher">

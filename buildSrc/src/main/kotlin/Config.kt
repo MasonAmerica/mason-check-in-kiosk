@@ -33,7 +33,7 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-alpha09"
+        const val android = "com.android.tools.build:gradle:4.0.0-beta01"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
