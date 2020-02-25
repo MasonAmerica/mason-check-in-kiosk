@@ -5,11 +5,7 @@ import firebase.firestore.DocumentSnapshot
 import firebase.functions.admin
 import firebase.https.HttpsError
 import google.google
-import kotlinx.coroutines.async
 import kotlinx.coroutines.await
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlin.js.Json
 import kotlin.js.json
 
 suspend fun fetchValidatedSession(uid: String, sessionId: String): DocumentSnapshot {
@@ -25,30 +21,6 @@ suspend fun fetchValidatedSession(uid: String, sessionId: String): DocumentSnaps
     }
 
     return sessionDoc
-}
-
-suspend fun fetchPopulatedSession(
-        uid: String,
-        sessionId: String
-): Pair<DocumentSnapshot, Json> = coroutineScope {
-    val sessionDoc = fetchValidatedSession(uid, sessionId)
-    val session = sessionDoc.data()
-
-    (session["guestFields"] as Array<Json>).map { completedField ->
-        async {
-            val field = admin.firestore().collection(uid)
-                    .doc("config")
-                    .collection("guest-fields")
-                    .doc(completedField["id"] as String)
-                    .get()
-                    .await()
-                    .data()
-
-            completedField["type"] = field["type"]
-        }
-    }.awaitAll()
-
-    sessionDoc to session
 }
 
 suspend fun fetchGsuiteHost(uid: String, hostId: String): `Schema$User` {

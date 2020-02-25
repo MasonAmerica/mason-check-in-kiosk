@@ -1,19 +1,15 @@
 package support.bymason.kiosk.checkin.functions
 
-import admin_directory_v1.`Schema$User`
 import firebase.firestore.DocumentSnapshot
 import firebase.firestore.FieldValues
 import firebase.firestore.SetOptions
 import firebase.functions.AuthContext
 import firebase.functions.admin
-import firebase.functions.functions
 import firebase.https.HttpsError
 import kotlinx.coroutines.await
-import superagent.superagent
-import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
-import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import support.bymason.kiosk.checkin.utils.fetchValidatedSession
-import support.bymason.kiosk.checkin.utils.getAndInitCreds
 import kotlin.js.Json
 import kotlin.js.json
 
@@ -25,6 +21,36 @@ suspend fun createSession(auth: AuthContext, data: Json): Json {
 }
 
 private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): Json {
+    val fieldMap = guestFields.associate {
+        it["id"] as String to it["value"]
+    }
+    val expectedFields = admin.firestore().collection(auth.uid)
+            .doc("config")
+            .collection("guest-fields")
+            .get()
+            .await()
+
+    val validatedFields = expectedFields.docs.map {
+        val field = it.data()
+        val value = fieldMap[it.id]
+        val hasError = when {
+            field["regex"] == null -> false
+            value == null -> field["required"] as Boolean
+            else -> !Regex(field["regex"] as String).matches(value as String)
+        }
+
+        if (hasError) {
+            throw HttpsError("invalid-argument", "Field ${field["name"]} is invalid.")
+        }
+
+        json(
+                "id" to it.id,
+                "type" to field["type"],
+                "name" to field["name"],
+                "value" to fieldMap[it.id]
+        )
+    }
+
     val sessionDoc = admin.firestore().collection(auth.uid)
             .doc("sessions")
             .collection("guest-visits")
@@ -33,9 +59,7 @@ private suspend fun createSession(auth: AuthContext, guestFields: Array<Json>): 
     sessionDoc.set(json(
             "state" to 0,
             "timestamp" to FieldValues.serverTimestamp(),
-            "guestFields" to guestFields.map {
-                json("id" to it["id"], "value" to it["value"])
-            }.toTypedArray()
+            "guestFields" to validatedFields.toTypedArray()
     )).await()
 
     console.log("Created session '${sessionDoc.id}'")
@@ -70,8 +94,9 @@ suspend fun finalizeSession(auth: AuthContext, data: Json): Json {
     val sessionId = data["id"] as? String
             ?: throw HttpsError("invalid-argument")
 
-    val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
-    val hostId = session.asDynamic().hereToSee[0].gsuite
+    val sessionDoc = fetchValidatedSession(auth.uid, sessionId)
+    val session = sessionDoc.data()
+    val hostId = session.asDynamic().hereToSee[0]
     val guestName = (session["guestFields"] as Array<Json>).mapNotNull { field ->
         if (field["type"] == 0) field["value"] as String else null
     }.single()
@@ -82,133 +107,25 @@ suspend fun finalizeSession(auth: AuthContext, data: Json): Json {
 private suspend fun finalizeSession(
         auth: AuthContext,
         sessionDoc: DocumentSnapshot,
-        hostId: String,
+        host: Json,
         guestName: String
 ): Json {
-    val host = fetchGsuiteHost(auth.uid, hostId)
-    console.log("Host: ", JSON.stringify(host))
+    coroutineScope {
+        launch {
+            sessionDoc.ref.set(json(
+                    "state" to -1,
+                    "timestamp" to FieldValues.serverTimestamp()
+            ), SetOptions.merge).await()
+        }
 
-    notifyHost(auth, host, guestName)
-
-    sessionDoc.ref.set(json(
-            "state" to -1,
-            "timestamp" to FieldValues.serverTimestamp()
-    ), SetOptions.merge).await()
+        launch {
+            admin.firestore()
+                    .collection("notifications")
+                    .doc()
+                    .set(json("uid" to auth.uid, "host" to host, "guestName" to guestName))
+                    .await()
+        }
+    }
 
     return json("id" to sessionDoc.id)
-}
-
-private suspend fun notifyHost(auth: AuthContext, host: `Schema$User`, guestName: String) {
-    val notificationsSnap = admin.firestore()
-            .collection(auth.uid)
-            .doc("config")
-            .collection("metadata")
-            .doc("notifications")
-            .get()
-            .await()
-
-    val notifyOrder = notificationsSnap.data()["guestArrival"].unsafeCast<Array<Int>>()
-    for (notifyType in notifyOrder) {
-        try {
-            when (notifyType) {
-                1 -> notifyHostViaEmail()
-                2 -> notifyHostViaSlack(auth, host, guestName, true)
-                3 -> notifyHostViaSms(host, guestName)
-                4 -> notifyHostViaSlack(auth, host, guestName, false)
-                else -> throw HttpsError(
-                        "failed-precondition", "Unknown notification type: $notifyType")
-            }
-            break
-        } catch (t: Throwable) {
-            console.log(t)
-
-            if (t.asDynamic().code == "failed-precondition") {
-                continue
-            } else {
-                throw t
-            }
-        }
-    }
-}
-
-private fun notifyHostViaEmail() {
-    throw HttpsError("unimplemented", "Email notifications are not yet available")
-}
-
-private suspend fun notifyHostViaSlack(
-        auth: AuthContext,
-        host: `Schema$User`,
-        guestName: String,
-        requirePresence: Boolean
-) {
-    val creds = getAndInitCreds(auth.uid, "slack")
-    val hostEmail = host.primaryEmail
-    val slackUser = superagent.get("https://slack.com/api/users.lookupByEmail")
-            .query(json(
-                    "token" to creds.getValue("slack")["access_token"],
-                    "email" to hostEmail
-            ))
-            .await().body
-    console.log("Slack user: ", slackUser)
-
-    if (!slackUser["ok"].unsafeCast<Boolean>()) {
-        throw HttpsError("failed-precondition", slackUser["error"].unsafeCast<String>())
-    }
-    val slackUserId = slackUser.asDynamic().user.id
-
-    if (requirePresence) {
-        val userPresence = superagent.get("https://slack.com/api/users.getPresence")
-                .query(json(
-                        "token" to creds.getValue("slack")["access_token"],
-                        "user" to slackUserId
-                ))
-                .await().body
-
-        if (!userPresence["ok"].unsafeCast<Boolean>()) {
-            throw HttpsError("failed-precondition", slackUser["error"].unsafeCast<String>())
-        }
-        if (userPresence["presence"] != "active") {
-            throw HttpsError("failed-precondition", "Slack user is not present.")
-        }
-    }
-
-    val slackMessage = superagent.post("https://slack.com/api/chat.postMessage")
-            .query(json(
-                    "token" to creds.getValue("slack")["access_token"],
-                    "channel" to slackUserId,
-                    "text" to "Your guest ($guestName) just arrived! :wave:"
-            ))
-            .await().body
-    console.log("Slack message: ", slackMessage)
-
-    if (!slackMessage["ok"].unsafeCast<Boolean>()) {
-        throw HttpsError("unknown", slackMessage["error"].unsafeCast<String>())
-    }
-}
-
-private suspend fun notifyHostViaSms(host: `Schema$User`, guestName: String) {
-    val hostPhone = host.phones.unsafeCast<Array<Json>?>()
-            ?.sortedByDescending { if (it["primary"] == true) 1 else 0 }
-            ?.map { it["value"] as String }
-            ?.firstOrNull()
-    if (hostPhone.isNullOrEmpty()) {
-        throw HttpsError("failed-precondition", "Host has no phone numbers.")
-    }
-
-    val accountSid = functions.config().twilio.sid
-    val userHash = functions.config().twilio.user_hash
-    val sms = superagent.post("https://api.twilio.com/2010-04-01/Accounts/$accountSid/Messages.json")
-            .set(json("Authorization" to "Basic $userHash"))
-            .type("form")
-            .send(json(
-                    "To" to if ("+" in hostPhone) hostPhone else "+1$hostPhone",
-                    "From" to "+12064830420",
-                    "Body" to "Your guest ($guestName) just arrived!"
-            ))
-            .await().body
-    console.log("Twilio message: ", sms)
-
-    if (sms["error_code"] != null) {
-        throw HttpsError("unknown", sms["error_message"].unsafeCast<String>())
-    }
 }

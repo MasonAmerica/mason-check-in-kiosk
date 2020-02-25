@@ -33,7 +33,7 @@ fun handleSlackAuth(req: Request<Any?>, res: Response<Any?>): Promise<*>? {
 private fun checkForError(req: Request<Any?>, res: Response<Any?>): Boolean {
     val error = req.query["error"]
     if (error != null) {
-        console.log(error)
+        console.warn(error)
         res.status(400).send(error)
         return false
     }
@@ -46,7 +46,7 @@ private suspend fun fetchGSuiteAccessToken(req: Request<Any?>, res: Response<Any
         client.getToken(req.query["code"].unsafeCast<String>()).await().tokens
     } catch (e: Throwable) {
         val error = e.asDynamic().response?.data ?: e.toString()
-        console.log(error)
+        console.warn(error)
         res.status(401).send(error)
         return
     }
@@ -71,7 +71,7 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
                 )).await()
     } catch (e: Throwable) {
         val error = e.asDynamic().response?.text ?: e.toString()
-        console.log(error)
+        console.warn(error)
         res.status(401).send(error)
         return
     }
@@ -82,7 +82,7 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
                 .await()
     } catch (e: Throwable) {
         val error = e.asDynamic().response?.text ?: e.toString()
-        console.log(error)
+        console.warn(error)
         res.status(401).send(error)
         return
     }
@@ -115,7 +115,7 @@ private suspend fun fetchSlackAccessToken(req: Request<Any?>, res: Response<Any?
                 .await()
         res.redirect("/")
     } else {
-        console.log(result.body)
+        console.warn(result.body)
         res.status(401).send(result.body)
     }
 }

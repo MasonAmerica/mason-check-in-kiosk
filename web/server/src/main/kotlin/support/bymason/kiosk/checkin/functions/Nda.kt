@@ -7,12 +7,14 @@ import firebase.functions.AuthContext
 import firebase.functions.admin
 import firebase.https.HttpsError
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.await
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import superagent.superagent
 import support.bymason.kiosk.checkin.utils.createInstance
 import support.bymason.kiosk.checkin.utils.fetchGsuiteHost
-import support.bymason.kiosk.checkin.utils.fetchPopulatedSession
+import support.bymason.kiosk.checkin.utils.fetchValidatedSession
 import support.bymason.kiosk.checkin.utils.getAndInitCreds
 import support.bymason.kiosk.checkin.utils.refreshDocusignCreds
 import kotlin.coroutines.coroutineContext
@@ -30,67 +32,22 @@ suspend fun generateNdaLink(auth: AuthContext, data: Json): Json {
 }
 
 private suspend fun generateNdaLink(auth: AuthContext, sessionId: String): Json {
-    console.log("Generating DocuSign NDA for user '${auth.uid}' with session '$sessionId'")
+    console.log("Generating NDA for user '${auth.uid}' with session '$sessionId'")
 
-    val (sessionDoc, session) = fetchPopulatedSession(auth.uid, sessionId)
-    val host = fetchGsuiteHost(auth.uid, session.asDynamic().hereToSee[0].gsuite)
-    val guestFields = session["guestFields"] as Array<Json>
-    val guestName = guestFields.mapNotNull { field ->
-        if (field["type"] == 0) field["value"] as String else null
-    }.single()
-    val guestEmail = guestFields.mapNotNull { field ->
-        if (field["type"] == 1) field["value"] as String else null
-    }.single()
-    val guestCompany = guestFields.mapNotNull { field ->
-        if (field["type"] == 2) field["value"] as String else null
-    }.singleOrNull()
-    val isTestRequest = guestEmail.split("@").lastOrNull() ==
-            host.primaryEmail?.split("@")?.lastOrNull()
+    val sessionDoc = fetchValidatedSession(auth.uid, sessionId)
+    val signingData = fetchSigningDataAsync(auth, sessionDoc)
 
-    val metadataRef = admin.firestore()
-            .collection(auth.uid)
-            .doc("config")
-            .collection("metadata")
-    val companyName = metadataRef.doc("company").get().await().data()["name"]
-    val ndaType = if (guestCompany == null) "individual-nda" else "corporate-nda"
-    val documentsRef = metadataRef.doc("documents").get().await()
-    val ndaProvider = documentsRef.data()["nda"] as String?
-            ?: throw HttpsError("not-found", "No NDA found.")
-
-    return when (ndaProvider) {
-        "docusign" -> generateDocusignLink(
-                auth,
-                ndaType,
-                companyName,
-                documentsRef.data().asDynamic().docusign[ndaType],
-                guestCompany,
-                guestName,
-                guestEmail,
-                sessionDoc
-        )
-        "esignatures" -> generateEsignaturesLink(
-                auth,
-                ndaType,
-                companyName,
-                documentsRef.data().asDynamic().esignatures[ndaType],
-                guestCompany,
-                guestName,
-                guestEmail,
-                sessionDoc,
-                isTestRequest
-        )
-        else -> throw HttpsError("failed-precondition", "No NDA providers configured.")
+    return when (signingData.ndaProvider) {
+        "docusign" -> generateDocusignLink(auth, signingData, sessionDoc)
+        "esignatures" -> generateEsignaturesLink(auth, signingData, sessionDoc)
+        else -> throw HttpsError(
+                "failed-precondition", "Unknown NDA provider : ${signingData.ndaProvider}")
     }
 }
 
 private suspend fun generateDocusignLink(
         auth: AuthContext,
-        ndaType: String,
-        companyName: Any?,
-        templateId: String,
-        guestCompany: String?,
-        guestName: String,
-        guestEmail: String,
+        signingData: SigningData,
         sessionDoc: DocumentSnapshot
 ): Json {
     val creds = getAndInitCreds(auth.uid, "docusign")
@@ -104,19 +61,26 @@ private suspend fun generateDocusignLink(
 
     val envelope: dynamic = createInstance(docusign.EnvelopeDefinition)
     envelope.status = "sent"
-    val userVisibleNdaType = if (ndaType == "individual-nda") "Individual" else "Corporate"
-    envelope.emailSubject = "$companyName $userVisibleNdaType Nondisclosure Agreement"
-    envelope.templateId = templateId
+    val userVisibleNdaType = if (signingData.ndaType == "individual-nda") {
+        "Individual"
+    } else {
+        "Corporate"
+    }
+    envelope.emailSubject = "${signingData.companyName} $userVisibleNdaType Nondisclosure Agreement"
+    envelope.templateId = signingData.templateId
 
     val tabs = docusign.Tabs.constructFromObject(json())
-    if (guestCompany != null) {
-        tabs.textTabs = arrayOf(json("tabLabel" to "SignerCompany", "value" to guestCompany))
+    if (signingData.guestCompany != null) {
+        tabs.textTabs = arrayOf(json(
+                "tabLabel" to "SignerCompany",
+                "value" to signingData.guestCompany
+        ))
     }
 
     val role = docusign.TemplateRole.constructFromObject(json(
             "roleName" to "Signer",
-            "name" to guestName,
-            "email" to guestEmail,
+            "name" to signingData.guestName,
+            "email" to signingData.guestEmail,
             "tabs" to tabs,
             "clientUserId" to auth.uid
     ))
@@ -148,8 +112,8 @@ private suspend fun generateDocusignLink(
                 "clientUserId" to auth.uid,
                 "recipientId" to "1",
                 "returnUrl" to "https://mason-check-in-kiosk.firebaseapp.com/redirect/docusign/app",
-                "userName" to guestName,
-                "email" to guestEmail
+                "userName" to signingData.guestName,
+                "email" to signingData.guestEmail
         ))
         envelopeApi.createRecipientView(
                 accountId,
@@ -159,7 +123,11 @@ private suspend fun generateDocusignLink(
         )
     }
 
-    console.log("Generated NDA for $guestName ($guestEmail) to sign: ", JSON.stringify(viewResult))
+    console.log(
+            "Generated DocuSign NDA for ${signingData.guestName} " +
+                    "(${signingData.guestEmail}) to sign: ",
+            JSON.stringify(viewResult)
+    )
 
     sessionDoc.ref.set(json(
             "state" to 2,
@@ -174,45 +142,47 @@ private suspend fun generateDocusignLink(
 
 private suspend fun generateEsignaturesLink(
         auth: AuthContext,
-        ndaType: String,
-        companyName: Any?,
-        templateId: String,
-        guestCompany: String?,
-        guestName: String,
-        guestEmail: String,
-        sessionDoc: DocumentSnapshot,
-        isTestRequest: Boolean
+        signingData: SigningData,
+        sessionDoc: DocumentSnapshot
 ): Json {
     val creds = getAndInitCreds(auth.uid, "esignatures")
     val esignaturesCreds = creds.getValue("esignatures")
     val esignaturesSecret = esignaturesCreds["secret"]
 
-    val userVisibleNdaType = if (ndaType == "individual-nda") "Individual" else "Corporate"
+    val userVisibleNdaType = if (signingData.ndaType == "individual-nda") {
+        "Individual"
+    } else {
+        "Corporate"
+    }
     val signer = json(
-            "name" to guestName,
-            "email" to guestEmail,
+            "name" to signingData.guestName,
+            "email" to signingData.guestEmail,
             "redirect_url" to "https://mason-check-in-kiosk.firebaseapp.com/redirect/docusign/app" +
                     "?event=signing_complete",
             "embedded_sign_page" to "yes",
             "skip_signature_request_email" to "yes"
     )
-    if (guestCompany != null) {
-        signer["company_name"] = guestCompany
+    if (signingData.guestCompany != null) {
+        signer["company_name"] = signingData.guestCompany
     }
 
     val contract = superagent.post("https://$esignaturesSecret:@esignatures.io/api/contracts")
             .send(json(
-                    "template_id" to templateId,
-                    "title" to "$companyName $userVisibleNdaType Nondisclosure Agreement",
+                    "template_id" to signingData.templateId,
+                    "title" to "${signingData.companyName} $userVisibleNdaType " +
+                            "Nondisclosure Agreement",
                     "signers" to arrayOf(signer),
-                    "test" to if (isTestRequest) "yes" else "no"
+                    "test" to if (signingData.isTestRequest) "yes" else "no"
             ))
             .await().body
     val contractData = contract.asDynamic().data.contract
     val url = contractData.signers[0].embedded_url
 
-    console.log("Generated NDA for $guestName ($guestEmail) to sign: ",
-                JSON.stringify(contractData))
+    console.log(
+            "Generated eSignatures NDA for ${signingData.guestName} " +
+                    "(${signingData.guestEmail}) to sign: ",
+            JSON.stringify(contractData)
+    )
 
     sessionDoc.ref.set(json(
             "state" to 2,
@@ -223,6 +193,60 @@ private suspend fun generateEsignaturesLink(
     ), SetOptions.merge).await()
 
     return json("url" to url)
+}
+
+private suspend fun fetchSigningDataAsync(
+        auth: AuthContext,
+        sessionDoc: DocumentSnapshot
+) = coroutineScope {
+    val session = sessionDoc.data()
+
+    val guestFields = session["guestFields"] as Array<Json>
+    val guestName = guestFields.mapNotNull { field ->
+        if (field["type"] == 0) field["value"] as String else null
+    }.single()
+    val guestEmail = guestFields.mapNotNull { field ->
+        if (field["type"] == 1) field["value"] as String else null
+    }.single()
+    val guestCompany = guestFields.mapNotNull { field ->
+        if (field["type"] == 2) field["value"] as String? else null
+    }.singleOrNull()
+
+    val metadataRef = admin.firestore()
+            .collection(auth.uid)
+            .doc("config")
+            .collection("metadata")
+
+    val companyName = async {
+        metadataRef.doc("company").get().await().data()["name"] as String?
+    }
+    val documentsData = async {
+        metadataRef.doc("documents").get().await().data()
+    }
+    val isTestRequest = async {
+        val host = fetchGsuiteHost(auth.uid, session.asDynamic().hereToSee[0].gsuite)
+        guestEmail.split("@").lastOrNull() ==
+                host.primaryEmail?.split("@")?.lastOrNull()
+    }
+
+    val ndaType = if (guestCompany == null) "individual-nda" else "corporate-nda"
+    val ndaProvider = documentsData.await()["nda"] as String?
+            ?: throw HttpsError("not-found", "No NDA found.")
+    val templates = documentsData.await()[ndaProvider] as? Json
+            ?: throw HttpsError("not-found", "No NDA found for provider: $ndaProvider")
+    val templateId = templates[ndaType] as? String
+            ?: throw HttpsError("not-found", "No NDA found for type: $ndaType")
+
+    SigningData(
+            templateId,
+            ndaProvider,
+            ndaType,
+            companyName.await(),
+            guestName,
+            guestEmail,
+            guestCompany,
+            isTestRequest.await()
+    )
 }
 
 private suspend fun <T> makeDocusignRequest(
@@ -261,3 +285,14 @@ private suspend fun <T> makeDocusignRequest(
         block(handler)
     }
 }
+
+data class SigningData(
+        val templateId: String,
+        val ndaProvider: String,
+        val ndaType: String,
+        val companyName: String?,
+        val guestName: String,
+        val guestEmail: String,
+        val guestCompany: String?,
+        val isTestRequest: Boolean
+)

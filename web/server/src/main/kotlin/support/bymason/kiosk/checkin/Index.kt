@@ -8,6 +8,7 @@ import support.bymason.kiosk.checkin.functions.handleDocusignAuth
 import support.bymason.kiosk.checkin.functions.handleGSuiteAuth
 import support.bymason.kiosk.checkin.functions.handleSlackAuth
 import support.bymason.kiosk.checkin.functions.processClientRequest
+import support.bymason.kiosk.checkin.functions.sendNotifications
 import kotlin.js.Json
 import kotlin.js.json
 
@@ -25,6 +26,9 @@ fun main() {
 
     exports.clientApi = functions.runWith(json("memory" to "2GB")).https
             .onCall<Json> { data, context -> processClientRequest(data, context) }
+
+    exports.sendNotifications = functions.firestore.document("notifications/{id}")
+            .onCreate { snapshot, _ -> sendNotifications(snapshot) }
 
     val cleanupRuntime = json("memory" to "1GB", "timeoutSeconds" to 540)
     exports.cleanupIncompleteSessions = functions.runWith(cleanupRuntime)
