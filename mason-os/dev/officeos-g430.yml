@@ -6,6 +6,11 @@ os:
       disable_keyguard: true
     mason-fota:
       config_update_prompt_prior_to_install: false
+      config_show_download_progress_as_notification: true
+      config_update_install_battery_threshold: 5
+    mason-app-updater:
+      config_show_download_progress_as_notification: true
+      config_update_install_battery_threshold: 5
     android:
       config_minimumScreenOffTimeout: 2147483647
 apps:
