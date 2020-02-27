@@ -10,6 +10,7 @@ buildscript {
         classpath(Config.Plugins.navArgs)
         classpath(Config.Plugins.google)
         classpath(Config.Plugins.fabric)
+        classpath(Config.Plugins.shot)
     }
 }
 

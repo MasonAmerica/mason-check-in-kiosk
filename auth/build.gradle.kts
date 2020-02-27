@@ -18,6 +18,10 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+    }
+
     lintOptions {
         baseline(file("lint-baseline.xml"))
     }

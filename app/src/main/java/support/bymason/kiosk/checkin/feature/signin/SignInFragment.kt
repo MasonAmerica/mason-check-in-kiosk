@@ -13,6 +13,8 @@ import support.bymason.kiosk.checkin.R
 import support.bymason.kiosk.checkin.core.ui.FragmentBase
 import support.bymason.kiosk.checkin.core.ui.LifecycleAwareLazy
 import support.bymason.kiosk.checkin.core.ui.doOnImeDone
+import support.bymason.kiosk.checkin.core.ui.hideKeyboard
+import support.bymason.kiosk.checkin.core.ui.onDestroy
 import support.bymason.kiosk.checkin.databinding.SignInFragmentBinding
 
 class SignInFragment(
@@ -21,7 +23,14 @@ class SignInFragment(
     private val vm by viewModels<SignInFragmentViewModel> {
         SignInFragmentViewModel.Factory(auth)
     }
-    private val binding by LifecycleAwareLazy { SignInFragmentBinding.bind(requireView()) }
+    private val binding by LifecycleAwareLazy {
+        SignInFragmentBinding.bind(requireView())
+    } onDestroy {
+        email.clearFocus()
+        email.hideKeyboard()
+        password.clearFocus()
+        password.hideKeyboard()
+    }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -39,9 +39,10 @@ object Config {
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
         const val google = "com.google.gms:google-services:4.3.3"
         const val fabric = "io.fabric.tools:gradle:1.31.2"
+        const val shot = "com.karumi:shot:3.1.0"
 
         val PluginDependenciesSpec.versionChecker
-            get() = id("com.github.ben-manes.versions") version "0.27.0"
+            get() = id("com.github.ben-manes.versions") version "0.28.0"
     }
 
     object Libs {
@@ -103,17 +104,21 @@ object Config {
 
         object Testing {
             const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha04"
-            const val truth = "androidx.test.ext:truth:1.3.0-alpha04"
-            const val espresso = "androidx.test.espresso:espresso-core:3.3.0-alpha04"
-            const val espressoWeb = "androidx.test.espresso:espresso-web:3.3.0-alpha04"
-            const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.3.0-alpha04"
-            const val core = "androidx.test:core-ktx:1.3.0-alpha04"
+            const val truth = "androidx.test.ext:truth:1.2.0"
+            const val espresso = "androidx.test.espresso:espresso-core:3.2.0"
+            const val espressoWeb = "androidx.test.espresso:espresso-web:3.2.0"
+            const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.2.0"
+            const val core = "androidx.test:core-ktx:1.2.0"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
             const val fragment = "androidx.fragment:fragment-testing:1.2.2"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
             const val mockito = "org.mockito:mockito-core:3.2.4"
+            const val mockitoAndroid = "org.mockito:mockito-android:3.2.4"
             const val coroutines =
                     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+
+            const val runner = "androidx.test:runner:1.2.0"
+            const val uiautomator = "androidx.test.uiautomator:uiautomator:2.2.0"
         }
     }
 }

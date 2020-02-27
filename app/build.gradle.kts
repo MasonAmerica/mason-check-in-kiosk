@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.retry
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
@@ -6,8 +5,9 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("com.supercilex.gradle.versions") version "0.4.0"
-    id("org.gradle.test-retry") version "1.1.2"
+    id("org.gradle.test-retry") version "1.1.3"
     id("io.fabric")
+    id("shot")
 
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.android.extensions")
@@ -26,6 +26,7 @@ android {
         base.archivesBaseName = "mason-check-in-kiosk"
 
         vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner = "support.bymason.kiosk.checkin.helpers.ScreenshotTestRunner"
     }
 
     signingConfigs {
@@ -72,6 +73,7 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        animationsDisabled = true
     }
 
     packagingOptions {
@@ -133,6 +135,19 @@ dependencies {
     testImplementation(Config.Libs.Testing.robolectric)
     testImplementation(Config.Libs.Testing.mockito)
     testImplementation(Config.Libs.Testing.coroutines)
+
+    androidTestImplementation(Config.Libs.Testing.runner)
+    androidTestImplementation(Config.Libs.Testing.uiautomator)
+    androidTestImplementation(Config.Libs.Testing.junit)
+    androidTestImplementation(Config.Libs.Testing.mockitoAndroid)
+    androidTestImplementation(Config.Libs.Testing.espresso)
+    androidTestImplementation(Config.Libs.Testing.core)
+    androidTestImplementation(Config.Libs.Testing.arch)
+    androidTestImplementation(Config.Libs.Testing.coroutines)
+}
+
+shot {
+    appId = "support.bymason.kiosk.checkin.debug"
 }
 
 tasks.matching {
@@ -149,7 +164,7 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.withType<KotlinCompile>().matching {
-    it.name.contains("UnitTest")
+    it.name.contains("UnitTest") || it.name.contains("AndroidTest")
 }.configureEach {
     kotlinOptions {
         freeCompilerArgs += "-Xno-call-assertions"
