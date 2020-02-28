@@ -23,8 +23,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.gradle
-          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          key: ${{ runner.os }}-v2-gradle-build-${{ hashFiles('**/*') }}
           restore-keys: |
+            ${{ runner.os }}-v2-gradle-build-
             ${{ runner.os }}-v2-gradle-
       - name: Validate Gradle integrity
         uses: gradle/wrapper-validation-action@v1
@@ -53,8 +54,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.gradle
-          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          key: ${{ runner.os }}-v2-gradle-test-${{ hashFiles('**/*') }}
           restore-keys: |
+            ${{ runner.os }}-v2-gradle-test-
             ${{ runner.os }}-v2-gradle-
       - name: Run tests
         run: ./gradlew check test lint -S
@@ -80,8 +82,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.gradle
-          key: ${{ runner.os }}-v2-gradle-${{ hashFiles('**/*') }}
+          key: ${{ runner.os }}-v2-gradle-deploy-${{ hashFiles('**/*') }}
           restore-keys: |
+            ${{ runner.os }}-v2-gradle-deploy-
             ${{ runner.os }}-v2-gradle-
       - name: Deploy website + backend
         run: ./gradlew deploy
