@@ -16,11 +16,14 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 crashlytics.alwaysUpdateBuildId = isReleaseBuild
+val forcedVersionCode = findProperty("forcedVersionCode")?.toString()?.toInt()
 
 android {
     compileSdkVersion(Config.SdkVersions.compile)
 
     defaultConfig {
+        forcedVersionCode?.let { versionCode = forcedVersionCode }
+
         minSdkVersion(Config.SdkVersions.min)
         targetSdkVersion(Config.SdkVersions.target)
         base.archivesBaseName = "mason-check-in-kiosk"
@@ -94,6 +97,14 @@ androidExtensions {
     features = setOf("parcelize")
 }
 
+versionMaster {
+    configureVersionCode.set(forcedVersionCode == null)
+}
+
+shot {
+    appId = "support.bymason.kiosk.checkin.debug"
+}
+
 dependencies {
     implementation(Config.Libs.Kotlin.jvm)
     implementation(Config.Libs.Kotlin.coroutinesAndroid)
@@ -144,10 +155,6 @@ dependencies {
     androidTestImplementation(Config.Libs.Testing.core)
     androidTestImplementation(Config.Libs.Testing.arch)
     androidTestImplementation(Config.Libs.Testing.coroutines)
-}
-
-shot {
-    appId = "support.bymason.kiosk.checkin.debug"
 }
 
 tasks.matching {
