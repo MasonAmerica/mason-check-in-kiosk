@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Cache Gradle
+      - name: Gradle Cache
         uses: actions/cache@v1
         with:
           path: ~/.gradle
@@ -60,6 +60,62 @@ jobs:
             ${{ runner.os }}-v2-gradle-
       - name: Run tests
         run: ./gradlew check test lint -S
+      - name: Upload reports
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: test-reports
+          path: app/build/reports/
+
+  test_ui:
+    runs-on: ubuntu-latest
+    env:
+      MASON_API_KEY: ${{ secrets.MASON_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Install adb
+        run: |
+          wget --output-document sdk-tools-linux.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+          unzip sdk-tools-linux.zip
+          echo 'y' | ./tools/bin/sdkmanager --install 'platform-tools'
+      - name: Gradle Cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-v2-gradle-test-ui-${{ hashFiles('**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-v2-gradle-test-ui-
+            ${{ runner.os }}-v2-gradle-test-
+            ${{ runner.os }}-v2-gradle-
+      - name: Prep CLI
+        run: |
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.6/mason-linux
+          chmod +x mason
+          cp mason-os/adbkey ~/.android
+          cp mason-os/adbkey.pub ~/.android
+      - name: Run screenshot tests
+        run: |
+          $ANDROID_HOME/platform-tools/adb kill-server
+          $ANDROID_HOME/platform-tools/adb devices
+          ./mason xray a50b1ad7-8f24-4bba-a39b-86e1fec5ee62 adbproxy &
+          sleep 15
+          $ANDROID_HOME/platform-tools/adb connect localhost:5555
+          $ANDROID_HOME/platform-tools/adb devices
+
+          ./gradlew executeScreenshotTests -S
+
+          kill $!
+      - name: Upload reports
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: ui-test-reports
+          path: app/build/reports/
 
   deploy_web:
     needs: [build, test]
@@ -78,7 +134,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-      - name: Cache Gradle
+      - name: Gradle Cache
         uses: actions/cache@v1
         with:
           path: ~/.gradle
@@ -105,7 +161,7 @@ jobs:
           path: mason-os/dev/apps
       - name: Prep CLI
         run: |
-          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.6/mason-linux
           chmod +x mason
           ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
         env:
@@ -134,7 +190,7 @@ jobs:
           path: mason-os/prod/apps
       - name: Prep CLI
         run: |
-          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.5/mason-linux
+          curl -Lo mason https://github.com/MasonAmerica/mason-cli/releases/download/1.6/mason-linux
           chmod +x mason
           ./mason login -u $MASON_USERNAME -p $MASON_PASSWORD
         env:
