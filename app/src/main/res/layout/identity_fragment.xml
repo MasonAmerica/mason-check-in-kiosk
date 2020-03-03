@@ -58,6 +58,6 @@
         android:enabled="false"
         android:text="@string/kiosk_checkin_identity_continue_button_title"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/fields" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,7 @@
         <item name="textInputStyle">
             @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
         </item>
-        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
+        <item name="materialButtonStyle">@style/Mason.Widget.Button</item>
     </style>
 
     <style name="MasonKiosk.NoActionBar">
@@ -21,6 +21,10 @@
 
     <style name="MasonKiosk.Launcher">
         <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="Mason.Widget.Button" parent="Widget.MaterialComponents.Button">
+        <item name="textAllCaps">false</item>
     </style>
 
 </resources>

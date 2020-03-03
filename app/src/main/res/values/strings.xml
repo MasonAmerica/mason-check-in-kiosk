@@ -16,7 +16,7 @@
     <string name="kiosk_checkin_menu_option_restart_title">Restart</string>
 
     <!-- Identity -->
-    <string name="kiosk_checkin_identity_title">Welcome!</string>
+    <string name="kiosk_checkin_identity_title">&#160;</string>
 
     <string name="kiosk_checkin_identity_field_hint_title">%s (Optional)</string>
     <string name="kiosk_checkin_identity_field_invalid_error">Invalid %s</string>
@@ -34,7 +34,7 @@
     <string name="kiosk_checkin_nda_title">Sign the NDA</string>
 
     <!-- Report -->
-    <string name="kiosk_checkin_report_title">You\'re all set</string>
+    <string name="kiosk_checkin_report_title">&#160;</string>
     <string name="kiosk_checkin_report_info_title">Check-in complete</string>
     <string name="kiosk_checkin_report_info_body">We\'ll let your host know you\'re here.</string>
     <string name="kiosk_checkin_report_continue_button_title">Done</string>

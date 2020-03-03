@@ -57,6 +57,35 @@ class IdentityViewModelTest {
     }
 
     @Test
+    fun `Buttons are hidden on start`() = dispatcherRule.runBlocking {
+        val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
+
+        assertThat(vm.state.value?.areButtonsVisible).isFalse()
+    }
+
+    @Test
+    fun `Buttons are visible after user inputs text`() = dispatcherRule.runBlocking {
+        val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
+
+        vm.onFieldChanged(state, "Foo", true)
+
+        assertThat(vm.state.value?.areButtonsVisible).isTrue()
+    }
+
+    @Test
+    fun `Buttons stay visible after user clears text`() = dispatcherRule.runBlocking {
+        val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
+        `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))
+
+        vm.onFieldChanged(state, "Foo", true)
+        vm.onFieldChanged(state, "", true)
+
+        assertThat(vm.state.value?.areButtonsVisible).isTrue()
+    }
+
+    @Test
     fun `Guest fields with regex are processed`() = dispatcherRule.runBlocking {
         val state = FieldState(GuestField("id", GuestFieldType.NAME, "foo", true, ".+"))
         `when`(mockRepository.getGuestFields()).thenReturn(listOf(state))

@@ -40,6 +40,7 @@ class IdentityFragment(
         fields.viewTreeObserver.removeOnGlobalLayoutListener(installer)
     }
     private val progress: View? by lazy { requireActivity().findViewById<View>(R.id.progress) }
+    private var restartMenuItem: MenuItem? = null
     private val installer = KeyboardInstaller()
 
     init {
@@ -68,6 +69,7 @@ class IdentityFragment(
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.check_in_options, menu)
+        restartMenuItem = menu.findItem(R.id.action_restart)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,11 +91,15 @@ class IdentityFragment(
         progress?.isVisible = state.isLoading
         updateEnabledStatus(binding.root, state.areViewEnabled)
         binding.next.isEnabled = state.areViewEnabled && state.isContinueButtonEnabled
-        adapter.submitList(state.fieldStates)
+        binding.next.isVisible = state.areButtonsVisible
+        restartMenuItem?.isVisible = state.areButtonsVisible
+
         Glide.with(this)
                 .load(state.companyLogoUrl)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.logo)
+
+        adapter.submitList(state.fieldStates)
     }
 
     private fun updateEnabledStatus(group: ViewGroup, enabled: Boolean) {

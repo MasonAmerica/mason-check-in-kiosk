@@ -1,5 +1,6 @@
 package support.bymason.kiosk.checkin.feature.identity
 
+import androidx.core.view.isVisible
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
@@ -82,7 +83,7 @@ class IdentityFragmentTest {
     }
 
     @Test
-    fun `Continue button is disabled on launch`() {
+    fun `Continue button is hidden and disabled on launch`() {
         runBlocking {
             `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
                     "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
@@ -96,6 +97,7 @@ class IdentityFragmentTest {
         scenario.onFragment { fragment ->
             val binding = IdentityFragmentBinding.bind(fragment.requireView())
 
+            assertThat(binding.next.isVisible).isFalse()
             assertThat(binding.next.isEnabled).isFalse()
         }
     }
@@ -161,6 +163,28 @@ class IdentityFragmentTest {
     }
 
     @Test
+    fun `Continue button becomes visible when text is inputted`() {
+        runBlocking {
+            `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
+                    "Mason", "https://ssl.gstatic.com/s2/profiles/images/silhouette200.png"))
+            `when`(mockApi.getGuestFields()).thenReturn(listOf(
+                    GuestField("id1", GuestFieldType.NAME, "foo", true, ".+"),
+                    GuestField("id2", GuestFieldType.EMAIL, "foo", true, ".+")
+            ))
+        }
+
+        val scenario = launchFragment()
+        scenario.onFragment { fragment ->
+            val binding = IdentityFragmentBinding.bind(fragment.requireView())
+
+            Thread.sleep(500) // Wait for ListAdapter diffing
+            onView(withId(R.id.name)).perform(replaceText("A"))
+
+            assertThat(binding.next.isVisible).isTrue()
+        }
+    }
+
+    @Test
     fun `Continue button becomes enabled when all fields are valid`() {
         runBlocking {
             `when`(mockApi.getCompanyMetadata()).thenReturn(Company(
@@ -201,6 +225,9 @@ class IdentityFragmentTest {
         val scenario = launchFragment()
         scenario.onFragment { fragment ->
             Navigation.setViewNavController(fragment.requireView(), mockNavController)
+
+            Thread.sleep(500) // Wait for ListAdapter diffing
+            onView(withId(R.id.name)).perform(replaceText("A"))
         }
 
         onView(withId(R.id.next)).perform(click())

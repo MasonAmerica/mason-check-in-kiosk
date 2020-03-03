@@ -7,15 +7,30 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/start_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.13" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/end_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.87" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_large"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:layout_marginBottom="@dimen/spacing_normal"
         android:hint="@string/kiosk_checkin_host_finder_search_hint"
         app:layout_constraintBottom_toTopOf="@id/hosts_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/end_guide"
+        app:layout_constraintStart_toStartOf="@id/start_guide"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="500dp">
 
@@ -31,13 +46,10 @@
         android:id="@+id/hosts_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/spacing_large"
         android:layout_marginTop="@dimen/spacing_normal"
-        android:layout_marginEnd="@dimen/spacing_large"
-        android:layout_marginBottom="@dimen/spacing_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/end_guide"
+        app:layout_constraintStart_toStartOf="@id/start_guide"
         app:layout_constraintTop_toBottomOf="@id/search_layout"
         app:layout_constraintWidth_max="500dp">
 

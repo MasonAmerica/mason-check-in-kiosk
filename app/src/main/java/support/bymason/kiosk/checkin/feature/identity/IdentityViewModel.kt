@@ -110,7 +110,12 @@ class IdentityViewModel(
             }
 
             val isFormReady = newStates.none { it.hasError }
-            copy(isContinueButtonEnabled = isFormReady, fieldStates = newStates)
+            val hasUserFilledOutAnyFields = newStates.any { it.value.orEmpty().isNotEmpty() }
+            copy(
+                    isContinueButtonEnabled = isFormReady,
+                    areButtonsVisible = hasUserFilledOutAnyFields || areButtonsVisible,
+                    fieldStates = newStates
+            )
         }
 
         if (_state.value.isContinueButtonEnabled) {
@@ -132,6 +137,7 @@ class IdentityViewModel(
     data class State(
             val isLoading: Boolean = true,
             val areViewEnabled: Boolean = true,
+            val areButtonsVisible: Boolean = false,
             val isContinueButtonEnabled: Boolean = false,
             val fieldStates: List<FieldState> = emptyList(),
             val companyLogoUrl: String? = null
