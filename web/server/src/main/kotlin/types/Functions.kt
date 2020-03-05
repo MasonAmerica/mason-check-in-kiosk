@@ -10,6 +10,7 @@
 package firebase.functions
 
 import firebase.auth.Auth
+import firebase.auth.FunctionsAuth
 import firebase.firestore.Firestore
 import firebase.firestore.NamespaceBuilder
 import firebase.firestore.Timestamps
@@ -83,6 +84,7 @@ external interface ChangeJson {
 
 external class Functions {
     val firestore: NamespaceBuilder = definedExternally
+    val auth: FunctionsAuth = definedExternally
     val pubsub: Pubsub = definedExternally
     val https: Https = definedExternally
 

@@ -11,6 +11,14 @@ package firebase.auth
 import firebase.functions.App
 import kotlin.js.Promise
 
+external class FunctionsAuth {
+    fun user(): UserBuilder = definedExternally
+}
+
+external class UserBuilder {
+    fun onCreate(handler: (UserInfo) -> Promise<*>?): dynamic = definedExternally
+}
+
 external interface UserMetadata {
     val lastSignInTime: String
     val creationTime: String

@@ -10,10 +10,12 @@ kotlin {
     }
 
     sourceSets["main"].dependencies {
-        implementation(kotlin("stdlib-js"))
+        implementation(Config.Libs.Kotlin.js)
+        implementation(Config.Libs.Kotlin.coroutinesJs)
 
-        implementation(npm("firebase", "7.5.0"))
-        implementation(npm("firebaseui", "4.3.0"))
+        implementation(npm("kotlinx-coroutines-core", "1.3.2"))
+        implementation(npm("firebase", "7.9.3"))
+        implementation(npm("firebaseui", "4.4.0"))
     }
 }
 

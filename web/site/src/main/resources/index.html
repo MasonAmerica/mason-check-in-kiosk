@@ -8,11 +8,38 @@
 <script src="site.js"></script>
 <div id="signed-out-container"></div>
 <div id="signed-in-container" style="display: none">
+  <h3>Integrations</h3>
+
   <a id="add-to-google">Connect with G Suite</a>
   <br>
-  <a id="add-to-docusign">Connect with DocuSign</a>
-  <br>
   <a id="add-to-slack">Connect with Slack</a>
+
+  <h3>Configuration</h3>
+
+  <label>
+    Company name
+    <input type="text" id="company-name">
+  </label>
+  <br>
+  <label>
+    Company logo
+    <input type="url" id="company-logo">
+  </label>
+  <br><br>
+
+  <label>
+    eSignatures NDA template ID
+    <input type="text" id="esignatures-template-id">
+  </label>
+  <br>
+  <label>
+    eSignatures API token
+    <input type="tel" id="esignatures-api-token">
+  </label>
+  <br><br>
+
+  <div id="status"></div>
+  <button id="save">Save</button>
 </div>
 </body>
 </html>

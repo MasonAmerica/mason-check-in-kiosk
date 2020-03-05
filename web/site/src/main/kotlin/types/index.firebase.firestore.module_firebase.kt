@@ -1,25 +1,13 @@
 @file:JsQualifier("firebase.firestore")
+@file:JsModule("firebase/firestore")
 @file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
 
 package firebase.firestore
 
 import org.khronos.webgl.Uint8Array
 import kotlin.js.Date
+import kotlin.js.Json
 import kotlin.js.Promise
-
-external interface DocumentData {
-    @nativeGetter
-    operator fun get(field: String): Any?
-    @nativeSetter
-    operator fun set(field: String, value: Any)
-}
-
-external interface UpdateData {
-    @nativeGetter
-    operator fun get(fieldPath: String): Any?
-    @nativeSetter
-    operator fun set(fieldPath: String, value: Any)
-}
 
 external var CACHE_SIZE_UNLIMITED: Number
 
@@ -120,16 +108,16 @@ open external class Blob {
 
 open external class Transaction {
     open fun get(documentRef: DocumentReference): Promise<DocumentSnapshot>
-    open fun set(documentRef: DocumentReference, data: DocumentData, options: SetOptions? = definedExternally): Transaction
-    open fun update(documentRef: DocumentReference, data: UpdateData): Transaction
+    open fun set(documentRef: DocumentReference, data: Json, options: SetOptions? = definedExternally): Transaction
+    open fun update(documentRef: DocumentReference, data: Json): Transaction
     open fun update(documentRef: DocumentReference, field: String, value: Any, vararg moreFieldsAndValues: Any): Transaction
     open fun update(documentRef: DocumentReference, field: FieldPath, value: Any, vararg moreFieldsAndValues: Any): Transaction
     open fun delete(documentRef: DocumentReference): Transaction
 }
 
 open external class WriteBatch {
-    open fun set(documentRef: DocumentReference, data: DocumentData, options: SetOptions? = definedExternally): WriteBatch
-    open fun update(documentRef: DocumentReference, data: UpdateData): WriteBatch
+    open fun set(documentRef: DocumentReference, data: Json, options: SetOptions? = definedExternally): WriteBatch
+    open fun update(documentRef: DocumentReference, data: Json): WriteBatch
     open fun update(documentRef: DocumentReference, field: String, value: Any, vararg moreFieldsAndValues: Any): WriteBatch
     open fun update(documentRef: DocumentReference, field: FieldPath, value: Any, vararg moreFieldsAndValues: Any): WriteBatch
     open fun delete(documentRef: DocumentReference): WriteBatch
@@ -188,8 +176,8 @@ open external class DocumentReference {
     open var path: String
     open fun collection(collectionPath: String): CollectionReference
     open fun isEqual(other: DocumentReference): Boolean
-    open fun set(data: DocumentData, options: SetOptions? = definedExternally): Promise<Unit>
-    open fun update(data: UpdateData): Promise<Unit>
+    open fun set(data: Json, options: Json? = definedExternally): Promise<Unit>
+    open fun update(data: Json): Promise<Unit>
     open fun update(field: String, value: Any, vararg moreFieldsAndValues: Any): Promise<Unit>
     open fun update(field: FieldPath, value: Any, vararg moreFieldsAndValues: Any): Promise<Unit>
     open fun delete(): Promise<Unit>
@@ -217,14 +205,14 @@ open external class DocumentSnapshot {
     open var ref: DocumentReference
     open var id: String
     open var metadata: SnapshotMetadata
-    open fun data(options: SnapshotOptions? = definedExternally): DocumentData?
+    open fun data(options: SnapshotOptions? = definedExternally): Json?
     open fun get(fieldPath: String, options: SnapshotOptions? = definedExternally): Any
     open fun get(fieldPath: FieldPath, options: SnapshotOptions? = definedExternally): Any
     open fun isEqual(other: DocumentSnapshot): Boolean
 }
 
 open external class QueryDocumentSnapshot : DocumentSnapshot {
-    override fun data(options: SnapshotOptions?): DocumentData
+    override fun data(options: SnapshotOptions?): Json
 }
 
 external interface `T$31` {
@@ -292,7 +280,7 @@ open external class CollectionReference : Query {
     open var parent: DocumentReference?
     open var path: String
     open fun doc(documentPath: String? = definedExternally): DocumentReference
-    open fun add(data: DocumentData): Promise<DocumentReference>
+    open fun add(data: Json): Promise<DocumentReference>
     open fun isEqual(other: CollectionReference): Boolean
 }
 

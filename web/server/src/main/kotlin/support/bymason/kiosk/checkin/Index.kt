@@ -7,6 +7,7 @@ import support.bymason.kiosk.checkin.functions.cleanupIncompleteSessions
 import support.bymason.kiosk.checkin.functions.handleDocusignAuth
 import support.bymason.kiosk.checkin.functions.handleGSuiteAuth
 import support.bymason.kiosk.checkin.functions.handleSlackAuth
+import support.bymason.kiosk.checkin.functions.initUser
 import support.bymason.kiosk.checkin.functions.processClientRequest
 import support.bymason.kiosk.checkin.functions.sendNotifications
 import kotlin.js.Json
@@ -23,6 +24,8 @@ fun main() {
             .onRequest<Any?> { req, res -> handleDocusignAuth(req, res) }
     exports.slackAuthHandler = functions.https
             .onRequest<Any?> { req, res -> handleSlackAuth(req, res) }
+
+    exports.initUser = functions.auth.user().onCreate { user -> initUser(user) }
 
     exports.clientApi = functions.runWith(json("memory" to "2GB")).https
             .onCall<Json> { data, context -> processClientRequest(data, context) }
