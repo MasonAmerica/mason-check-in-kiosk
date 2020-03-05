@@ -129,7 +129,7 @@ fun initConfigurationFields(user: User) {
         launch {
             val documents = documentsRef.get().await()
 
-            val esignatures = documents.get("esignatures") as Json
+            val esignatures = documents.get("esignatures") as? Json ?: json()
             esignaturesTemplateId.value = esignatures["individual-nda"] as? String ?: ""
         }
 
