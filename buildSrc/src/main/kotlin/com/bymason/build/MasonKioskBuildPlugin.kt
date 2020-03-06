@@ -10,7 +10,7 @@ class MasonKioskBuildPlugin : Plugin<Project> {
         check(project === project.rootProject)
 
         project.tasks.register<DeployWeb>("deployWeb") {
-            dependsOn("web:site:processResources", ":web:site:browserWebpack")
+            dependsOn(":web:site:browserProductionWebpack")
             dependsOn(":web:server:assemble")
             dependsOn(":kotlinNpmInstall")
         }

@@ -47,10 +47,6 @@ internal abstract class DeployWeb : DefaultTask() {
                 into(parameters.projectDir.dir("web/server/functions"))
                 rename { "index.js" }
             }
-            fileOps.copy {
-                from(parameters.projectDir.dir("web/site/build/processedResources/Js/main"))
-                into(parameters.projectDir.dir("web/site/build/distributions"))
-            }
 
             if (!parameters.devArg.get()) {
                 execOps.exec {
