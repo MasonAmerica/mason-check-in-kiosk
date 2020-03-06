@@ -22,9 +22,9 @@ fun RepositoryHandler.deps() {
 }
 
 object Config {
-    private const val kotlinVersion = "1.3.61"
-    private const val navVersion = "2.3.0-alpha02"
-    private const val coroutinesVersion = "1.3.3"
+    private const val kotlinVersion = "1.3.70"
+    private const val navVersion = "2.3.0-alpha03"
+    private const val coroutinesVersion = "1.3.4"
 
     object SdkVersions {
         const val compile = 29
@@ -57,15 +57,15 @@ object Config {
             const val coroutinesJs =
                     "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion"
 
-            const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
+            const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
         }
 
         object Jetpack {
-            private const val lifecycleVersion = "2.2.0"
+            private const val lifecycleVersion = "2.3.0-alpha01"
 
-            const val core = "androidx.core:core-ktx:1.3.0-alpha01"
-            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha02"
-            const val fragment = "androidx.fragment:fragment-ktx:1.2.2"
+            const val core = "androidx.core:core-ktx:1.3.0-alpha02"
+            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha03"
+            const val fragment = "androidx.fragment:fragment-ktx:1.3.0-alpha01"
             const val rv = "androidx.recyclerview:recyclerview:1.2.0-alpha01"
             const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
 
@@ -79,17 +79,17 @@ object Config {
             const val navFragments = "androidx.navigation:navigation-fragment-ktx:$navVersion"
             const val navUi = "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-            const val webkit = "androidx.webkit:webkit:1.2.0-rc01"
+            const val webkit = "androidx.webkit:webkit:1.2.0"
         }
 
         object Firebase {
-            const val analytics = "com.google.firebase:firebase-analytics:17.2.2"
+            const val analytics = "com.google.firebase:firebase-analytics:17.2.3"
             const val functions = "com.google.firebase:firebase-functions-ktx:19.0.2"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
 
             const val identityToolkit =
                     "com.google.apis:google-api-services-identitytoolkit:v3-rev20180723-1.30.1"
-            const val jwt = "com.auth0.android:jwtdecode:1.4.0"
+            const val jwt = "com.auth0.android:jwtdecode:2.0.0"
             const val authInterop = "com.google.firebase:firebase-auth-interop:19.0.0"
         }
 
@@ -110,10 +110,10 @@ object Config {
             const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.2.0"
             const val core = "androidx.test:core-ktx:1.2.0"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
-            const val fragment = "androidx.fragment:fragment-testing:1.2.2"
+            const val fragment = "androidx.fragment:fragment-testing:1.3.0-alpha01"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
-            const val mockito = "org.mockito:mockito-core:3.2.4"
-            const val mockitoAndroid = "org.mockito:mockito-android:3.2.4"
+            const val mockito = "org.mockito:mockito-core:3.3.1"
+            const val mockitoAndroid = "org.mockito:mockito-android:3.3.1"
             const val coroutines =
                     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 

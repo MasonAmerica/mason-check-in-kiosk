@@ -1,9 +1,9 @@
 package support.bymason.kiosk.checkin.feature.identity
 
 import kotlinx.coroutines.invoke
+import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.list
 import support.bymason.kiosk.checkin.core.data.Cache
 import support.bymason.kiosk.checkin.core.data.CheckInApi
 import support.bymason.kiosk.checkin.core.data.DispatcherProvider
