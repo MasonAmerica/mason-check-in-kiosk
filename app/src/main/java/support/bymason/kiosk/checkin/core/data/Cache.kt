@@ -1,6 +1,7 @@
 package support.bymason.kiosk.checkin.core.data
 
 import android.content.Context
+import androidx.collection.lruCache
 import com.google.common.hash.Hashing
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -8,6 +9,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import support.bymason.kiosk.checkin.core.CrashLogger
 import support.bymason.kiosk.checkin.core.MasonKiosk
 import support.bymason.kiosk.checkin.core.logBreadcrumb
@@ -51,23 +54,24 @@ private class CacheImpl(
         private val cacheName: String,
         private val alwaysDoRequest: Boolean
 ) : Cache {
+    private val mutex = Mutex()
+    private val hotExecutions = lruCache<String, Pair<Long, Deferred<*>>>(10)
     private val cacheDir by lazy { File(context.cacheDir, cacheName) }
 
     override suspend fun <T> memoize(
             input: Cache.Input<T>,
             block: suspend () -> T
     ): T = dispatchers.default {
-        val resultOp = GlobalScope.async(dispatchers.default, CoroutineStart.LAZY) { block() }
+        val cacheKey = computeCacheKey(input)
+
+        val resultOp = mutex.withLock { getExecution(cacheKey, block) }
         if (alwaysDoRequest) resultOp.start()
 
-        val cacheKey = Hashing.sha256().newHasher()
-                .apply { for (key in input.keys) putString(key, Charsets.UTF_8) }
-                .hash()
-        val cacheFile = File(cacheDir, cacheKey.toString())
-
-        val lastCached = System.currentTimeMillis() - cacheFile.lastModified()
-        if (lastCached > ttlUnit.toMillis(ttl) || cacheFile.length() == 0L) {
+        val cacheFile = File(cacheDir, cacheKey)
+        if (isExpired(cacheFile.lastModified()) || cacheFile.length() == 0L) {
             save(cacheFile, input, resultOp)
+            resultOp.await()
+        } else if (resultOp.isCompleted) {
             resultOp.await()
         } else {
             try {
@@ -81,6 +85,33 @@ private class CacheImpl(
                 resultOp.await()
             }
         }
+    }
+
+    private fun <T> computeCacheKey(input: Cache.Input<T>): String {
+        return Hashing.sha256().newHasher()
+                .apply { for (key in input.keys) putString(key, Charsets.UTF_8) }
+                .hash().toString()
+    }
+
+    private fun <T> getExecution(cacheKey: String, block: suspend () -> T): Deferred<T> {
+        val (cacheTime, execution) = hotExecutions[cacheKey] ?: 0L to null
+
+        return if (execution == null || isExpired(cacheTime)) {
+            val newExecution = GlobalScope.async(dispatchers.default, CoroutineStart.LAZY) {
+                block()
+            }
+            hotExecutions.put(cacheKey, System.currentTimeMillis() to newExecution)
+            newExecution
+        } else {
+            // Returning different types with the same cache key is a developer error
+            @Suppress("UNCHECKED_CAST")
+            execution as Deferred<T>
+        }
+    }
+
+    private fun isExpired(cacheTime: Long): Boolean {
+        val lastCached = System.currentTimeMillis() - cacheTime
+        return lastCached > ttlUnit.toMillis(ttl)
     }
 
     private suspend fun <T> save(
