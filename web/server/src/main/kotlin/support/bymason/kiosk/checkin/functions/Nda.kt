@@ -175,14 +175,18 @@ private suspend fun generateEsignaturesLink(
                     "test" to if (signingData.isTestRequest) "yes" else "no"
             ))
             .await().body
-    val contractData = contract.asDynamic().data.contract
-    val url = contractData.signers[0].embedded_url
-
     console.log(
             "Generated eSignatures NDA for ${signingData.guestName} " +
                     "(${signingData.guestEmail}) to sign: ",
-            JSON.stringify(contractData)
+            JSON.stringify(contract)
     )
+
+    if (contract["status"] == "error") {
+        throw HttpsError("unknown", contract["data"].unsafeCast<String>())
+    }
+
+    val contractData = contract.asDynamic().data.contract
+    val url = contractData.signers[0].embedded_url
 
     sessionDoc.ref.set(json(
             "state" to 2,

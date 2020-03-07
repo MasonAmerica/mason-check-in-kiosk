@@ -68,16 +68,16 @@ suspend fun refreshDocusignCreds(uid: String, creds: Json): Json {
             .query(json(
                     "grant_type" to "refresh_token",
                     "refresh_token" to creds["refresh_token"]
-            )).await()
+            )).await().body
 
     admin.firestore()
             .collection(uid)
             .doc("config")
             .collection("credentials")
             .doc("docusign")
-            .set(credsResult.body, SetOptions.merge)
+            .set(credsResult, SetOptions.merge)
 
-    return credsResult.body
+    return credsResult
 }
 
 data class GoogleAuthState(val prevToken: String?, val client: OAuth2Client)

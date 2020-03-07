@@ -81,14 +81,16 @@ private suspend fun notifyHostViaSlack(
         requirePresence: Boolean
 ) {
     val creds = getAndInitCreds(uid, "slack")
+    val token = creds.getValue("slack")["access_token"]
     val hostEmail = host.primaryEmail
+
     val slackUser = superagent.get("https://slack.com/api/users.lookupByEmail")
             .query(json(
-                    "token" to creds.getValue("slack")["access_token"],
+                    "token" to token,
                     "email" to hostEmail
             ))
             .await().body
-    console.log("Slack user: ", slackUser)
+    console.log("Slack user: ", JSON.stringify(slackUser))
 
     if (!slackUser["ok"].unsafeCast<Boolean>()) {
         throw HttpsError("failed-precondition", slackUser["error"].unsafeCast<String>())
@@ -98,7 +100,7 @@ private suspend fun notifyHostViaSlack(
     if (requirePresence) {
         val userPresence = superagent.get("https://slack.com/api/users.getPresence")
                 .query(json(
-                        "token" to creds.getValue("slack")["access_token"],
+                        "token" to token,
                         "user" to slackUserId
                 ))
                 .await().body
@@ -113,12 +115,12 @@ private suspend fun notifyHostViaSlack(
 
     val slackMessage = superagent.post("https://slack.com/api/chat.postMessage")
             .query(json(
-                    "token" to creds.getValue("slack")["access_token"],
+                    "token" to token,
                     "channel" to slackUserId,
                     "text" to "Your guest ($guestName) just arrived! :wave:"
             ))
             .await().body
-    console.log("Slack message: ", slackMessage)
+    console.log("Slack message: ", JSON.stringify(slackMessage))
 
     if (!slackMessage["ok"].unsafeCast<Boolean>()) {
         throw HttpsError("unknown", slackMessage["error"].unsafeCast<String>())
@@ -145,7 +147,7 @@ private suspend fun notifyHostViaSms(host: `Schema$User`, guestName: String) {
                     "Body" to "Your guest ($guestName) just arrived!"
             ))
             .await().body
-    console.log("Twilio message: ", sms)
+    console.log("Twilio message: ", JSON.stringify(sms))
 
     if (sms["error_code"] != null) {
         throw HttpsError("unknown", sms["error_message"].unsafeCast<String>())

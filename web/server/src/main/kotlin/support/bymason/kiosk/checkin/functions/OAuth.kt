@@ -68,7 +68,7 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
                 .query(json(
                         "grant_type" to "authorization_code",
                         "code" to req.query["code"]
-                )).await()
+                )).await().body
     } catch (e: Throwable) {
         val error = e.asDynamic().response?.text ?: e.toString()
         console.warn(error)
@@ -78,8 +78,8 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
 
     val accountResult = try {
         superagent.get("https://account-d.docusign.com/oauth/userinfo")
-                .set(json("Authorization" to "Bearer ${credsResult.body["access_token"]}"))
-                .await()
+                .set(json("Authorization" to "Bearer ${credsResult["access_token"]}"))
+                .await().body
     } catch (e: Throwable) {
         val error = e.asDynamic().response?.text ?: e.toString()
         console.warn(error)
@@ -92,8 +92,8 @@ private suspend fun fetchDocusignAccessToken(req: Request<Any?>, res: Response<A
             .doc("config")
             .collection("credentials")
             .doc("docusign")
-    ref.set(accountResult.body, SetOptions.merge).await()
-    ref.set(credsResult.body, SetOptions.merge).await()
+    ref.set(accountResult, SetOptions.merge).await()
+    ref.set(credsResult, SetOptions.merge).await()
     res.redirect("/")
 }
 
@@ -103,19 +103,19 @@ private suspend fun fetchSlackAccessToken(req: Request<Any?>, res: Response<Any?
                     "code" to req.query["code"],
                     "client_id" to functions.config().slack.client_id,
                     "client_secret" to functions.config().slack.client_secret
-            )).await()
+            )).await().body
 
-    if (result.body["ok"].unsafeCast<Boolean>()) {
+    if (result["ok"].unsafeCast<Boolean>()) {
         admin.firestore()
                 .collection(req.query["state"].unsafeCast<String>())
                 .doc("config")
                 .collection("credentials")
                 .doc("slack")
-                .set(result.body, SetOptions.merge)
+                .set(result, SetOptions.merge)
                 .await()
         res.redirect("/")
     } else {
-        console.warn(result.body)
-        res.status(401).send(result.body)
+        console.warn(result)
+        res.status(401).send(result)
     }
 }
