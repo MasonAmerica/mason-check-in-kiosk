@@ -4,7 +4,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("com.supercilex.gradle.versions") version "0.4.0"
+    id("com.supercilex.gradle.versions") version "0.5.0"
     id("org.gradle.test-retry") version "1.1.3"
     id("io.fabric")
     id("shot")
