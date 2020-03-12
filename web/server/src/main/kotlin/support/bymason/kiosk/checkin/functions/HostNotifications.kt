@@ -137,9 +137,10 @@ private suspend fun notifyHostViaSms(host: `Schema$User`, guestName: String) {
     }
 
     val accountSid = functions.config().twilio.sid
-    val userHash = functions.config().twilio.user_hash
-    val sms = superagent.post("https://api.twilio.com/2010-04-01/Accounts/$accountSid/Messages.json")
-            .set(json("Authorization" to "Basic $userHash"))
+    val accountToken = functions.config().twilio.token
+    val auth = accountSid + ":" + accountToken
+    val sms = superagent
+            .post("https://$auth@api.twilio.com/2010-04-01/Accounts/$accountSid/Messages.json")
             .type("form")
             .send(json(
                     "To" to if ("+" in hostPhone) hostPhone else "+1$hostPhone",
