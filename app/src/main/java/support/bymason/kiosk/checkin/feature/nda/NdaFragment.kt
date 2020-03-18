@@ -1,5 +1,6 @@
 package support.bymason.kiosk.checkin.feature.nda
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -39,6 +40,7 @@ class NdaFragment(
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.root.webViewClient = vm.createWebViewClient()
         binding.root.webChromeClient = vm.createWebChromeClient()

@@ -2,6 +2,4 @@
 <resources>
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#000000</color>
-
-    <color name="launch_background">@color/material_grey_800</color>
 </resources>
