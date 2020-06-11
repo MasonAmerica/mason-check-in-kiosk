@@ -4,8 +4,8 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("com.supercilex.gradle.versions") version "0.5.0"
-    id("org.gradle.test-retry") version "1.1.3"
+    id("com.supercilex.gradle.versions") version "0.6.0"
+    id("org.gradle.test-retry") version "1.1.6"
     id("io.fabric")
     id("shot")
 
@@ -30,6 +30,7 @@ android {
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "support.bymason.kiosk.checkin.helpers.ScreenshotTestRunner"
+        testApplicationId = "support.bymason.kiosk.checkin.debug.test"
     }
 
     signingConfigs {
@@ -81,6 +82,10 @@ android {
 
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/licenses/*")
+        exclude("META-INF/AL2.0")
+        exclude("META-INF/LGPL2.1")
+        exclude("win32-*/attach_hotspot_windows.dll")
     }
 
     compileOptions {
@@ -99,10 +104,6 @@ androidExtensions {
 
 versionMaster {
     configureVersionCode.set(forcedVersionCode == null)
-}
-
-shot {
-    appId = "support.bymason.kiosk.checkin.debug"
 }
 
 dependencies {

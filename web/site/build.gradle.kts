@@ -13,6 +13,6 @@ dependencies {
     implementation(Config.Libs.Kotlin.js)
     implementation(Config.Libs.Kotlin.coroutinesJs)
 
-    implementation(npm("firebase", "7.9.3"))
-    implementation(npm("firebaseui", "4.4.0"))
+    implementation(npm("firebase", "7.15.1"))
+    implementation(npm("firebaseui", "4.5.1"))
 }

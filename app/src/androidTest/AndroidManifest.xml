@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="support.bymason.kiosk.checkin.test"
+    package="support.bymason.kiosk.checkin.debug.test"
     android:sharedUserId="support.bymason.kiosk.checkin.uid">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

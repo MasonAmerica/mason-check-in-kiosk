@@ -22,9 +22,9 @@ fun RepositoryHandler.deps() {
 }
 
 object Config {
-    private const val kotlinVersion = "1.3.70"
-    private const val navVersion = "2.3.0-alpha03"
-    private const val coroutinesVersion = "1.3.4"
+    private const val kotlinVersion = "1.3.72"
+    private const val navVersion = "2.3.0-rc01"
+    private const val coroutinesVersion = "1.3.7"
 
     object SdkVersions {
         const val compile = 29
@@ -33,13 +33,13 @@ object Config {
     }
 
     object Plugins {
-        const val android = "com.android.tools.build:gradle:4.0.0-beta02"
+        const val android = "com.android.tools.build:gradle:4.0.0"
         const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         const val kotlinSerialization = "org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion"
         const val navArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
         const val google = "com.google.gms:google-services:4.3.3"
         const val fabric = "io.fabric.tools:gradle:1.31.2"
-        const val shot = "com.karumi:shot:3.1.0"
+        const val shot = "com.karumi:shot:4.3.0"
 
         val PluginDependenciesSpec.versionChecker
             get() = id("com.github.ben-manes.versions") version "0.28.0"
@@ -61,15 +61,15 @@ object Config {
         }
 
         object Jetpack {
-            private const val lifecycleVersion = "2.3.0-alpha01"
+            private const val lifecycleVersion = "2.3.0-alpha04"
 
-            const val core = "androidx.core:core-ktx:1.3.0-alpha02"
-            const val appCompat = "androidx.appcompat:appcompat:1.2.0-alpha03"
-            const val fragment = "androidx.fragment:fragment-ktx:1.3.0-alpha01"
-            const val rv = "androidx.recyclerview:recyclerview:1.2.0-alpha01"
-            const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta4"
+            const val core = "androidx.core:core-ktx:1.3.0"
+            const val appCompat = "androidx.appcompat:appcompat:1.2.0-rc01"
+            const val fragment = "androidx.fragment:fragment-ktx:1.3.0-alpha06"
+            const val rv = "androidx.recyclerview:recyclerview:1.2.0-alpha03"
+            const val constraint = "androidx.constraintlayout:constraintlayout:2.0.0-beta6"
 
-            const val material = "com.google.android.material:material:1.2.0-alpha05"
+            const val material = "com.google.android.material:material:1.2.0-beta01"
 
             const val common = "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
             const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
@@ -83,7 +83,7 @@ object Config {
         }
 
         object Firebase {
-            const val analytics = "com.google.firebase:firebase-analytics:17.2.3"
+            const val analytics = "com.google.firebase:firebase-analytics:17.4.3"
             const val functions = "com.google.firebase:firebase-functions-ktx:19.0.2"
             const val crashlytics = "com.crashlytics.sdk.android:crashlytics:2.10.1"
 
@@ -94,26 +94,26 @@ object Config {
         }
 
         object Misc {
-            private const val retrofitVersion = "2.7.1"
+            private const val retrofitVersion = "2.9.0"
 
-            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.2"
+            const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.3"
             const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
             const val glide = "com.github.bumptech.glide:glide:4.11.0"
-            const val guava = "com.google.guava:guava:28.2-android"
+            const val guava = "com.google.guava:guava:29.0-android"
         }
 
         object Testing {
-            const val junit = "androidx.test.ext:junit-ktx:1.1.2-alpha04"
+            const val junit = "androidx.test.ext:junit-ktx:1.1.2-rc01"
             const val truth = "androidx.test.ext:truth:1.2.0"
             const val espresso = "androidx.test.espresso:espresso-core:3.2.0"
             const val espressoWeb = "androidx.test.espresso:espresso-web:3.2.0"
             const val espressoContrib = "androidx.test.espresso:espresso-contrib:3.2.0"
             const val core = "androidx.test:core-ktx:1.2.0"
             const val arch = "androidx.arch.core:core-testing:2.1.0"
-            const val fragment = "androidx.fragment:fragment-testing:1.3.0-alpha01"
+            const val fragment = "androidx.fragment:fragment-testing:1.3.0-alpha06"
             const val robolectric = "org.robolectric:robolectric:4.3.1"
-            const val mockito = "org.mockito:mockito-core:3.3.1"
-            const val mockitoAndroid = "org.mockito:mockito-android:3.3.1"
+            const val mockito = "org.mockito:mockito-core:3.3.3"
+            const val mockitoAndroid = "org.mockito:mockito-android:3.3.3"
             const val coroutines =
                     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 
